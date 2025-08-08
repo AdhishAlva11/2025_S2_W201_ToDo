@@ -1,24 +1,24 @@
-*.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+# IDE + Gradle
+.idea/
+.gradle/
+
+# Local config
 local.properties
-# Ignore all build folders in all modules
+
+# Build output (all modules)
 **/build/
 
-# Kotlin compiler cache
+# Kotlin caches
 .kotlinc/
 .kotlin/
 
-# OS junk files
+# OS junk
+.DS_Store
 Thumbs.db
+
+# Native build junk
+.externalNativeBuild
+.cxx
+
+# IntelliJ module files
+*.iml
