@@ -13,3 +13,12 @@
 .externalNativeBuild
 .cxx
 local.properties
+# Ignore all build folders in all modules
+**/build/
+
+# Kotlin compiler cache
+.kotlinc/
+.kotlin/
+
+# OS junk files
+Thumbs.db
