@@ -22,3 +22,24 @@ Thumbs.db
 
 # IntelliJ module files
 *.iml
+
+# Android Studio / IntelliJ
+.idea/caches/
+.idea/libraries/
+.idea/modules.xml
+.idea/workspace.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+
+# Keystore (don’t commit private signing keys)
+*.jks
+*.keystore
+signing.properties
+
+# Captures
+captures/
+
+# Logs / temp
+*.log
+*.tmp
+*.swp
