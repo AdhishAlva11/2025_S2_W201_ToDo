@@ -1,25 +1,25 @@
-package com.autgroup.s2025.w201.todo
+package com.autgroup.s2025.w201.todo.Activities
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-
+import androidx.appcompat.app.AppCompatActivity
+import com.autgroup.s2025.w201.todo.R
+import com.autgroup.s2025.w201.todo.databinding.ActivityDisplayMapBinding
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.autgroup.s2025.w201.todo.databinding.ActivityHomePageBinding
 
-class HomePageActivity : AppCompatActivity(), OnMapReadyCallback {
+class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
-    private lateinit var binding: ActivityHomePageBinding
+    private lateinit var binding: ActivityDisplayMapBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityHomePageBinding.inflate(layoutInflater)
+        binding = ActivityDisplayMapBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.

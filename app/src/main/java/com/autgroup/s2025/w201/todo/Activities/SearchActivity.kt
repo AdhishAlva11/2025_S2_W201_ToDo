@@ -1,10 +1,11 @@
-package com.autgroup.s2025.w201.todo
+package com.autgroup.s2025.w201.todo.Activities
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.autgroup.s2025.w201.todo.R
 
 class SearchActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
