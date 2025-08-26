@@ -12,16 +12,16 @@
         android:supportsRtl="true"
         android:theme="@style/Theme._2025_S2_W201_ToDo">
         <activity
-            android:name=".Activities.SearchActivity"
+            android:name=".activities.SearchActivity"
             android:exported="false" />
         <activity
-            android:name=".Activities.SignupActivity"
+            android:name=".activities.SignupActivity"
             android:exported="false" />
         <activity
-            android:name=".Activities.LoginActivity"
+            android:name=".activities.LoginActivity"
             android:exported="false" />
         <activity
-            android:name=".Activities.FavouritesActivity"
+            android:name=".activities.FavouritesActivity"
             android:exported="false" />
         <!--
              TODO: Before you run your application, you need a Google Maps API key.
@@ -39,11 +39,11 @@
             android:value="YOUR_API_KEY" />
 
         <activity
-            android:name=".Activities.HomePageActivity"
+            android:name=".activities.HomePageActivity"
             android:exported="false"
             android:label="@string/title_activity_home_page" />
         <activity
-            android:name=".Activities.DisplayMapActivity"
+            android:name=".activities.DisplayMapActivity"
             android:exported="false"
             android:label="@string/title_activity_display_map" />
         <activity
