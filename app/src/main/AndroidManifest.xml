@@ -12,6 +12,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme._2025_S2_W201_ToDo">
         <activity
+            android:name=".activities.User"
+            android:exported="false"
+            android:label="@string/title_activity_user"
+            android:theme="@style/Theme._2025_S2_W201_ToDo.NoActionBar" />
+        <activity
             android:name=".activities.SearchActivity"
             android:exported="false" />
         <activity
