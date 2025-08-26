@@ -1,4 +1,4 @@
-package com.autgroup.s2025.w201.todo.Activities
+package com.autgroup.s2025.w201.todo.activities
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
