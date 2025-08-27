@@ -2,4 +2,6 @@
     <string name="app_name">2025_S2_(W201)_ToDo</string>
     <string name="title_activity_display_map">DisplayMapActivity</string>
     <string name="title_activity_home_page">HomePageActivity</string>
+    <string name="travel_itineray">Travel Itineray</string>
+    <string name="japan_adventure">Japan Adventure</string>
 </resources>
