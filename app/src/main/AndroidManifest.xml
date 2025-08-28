@@ -22,7 +22,10 @@
             android:exported="false" />
         <activity
             android:name=".activities.HomePageActivity"
-            android:exported="false" />
+            android:exported="true"
+            android:label="@string/title_activity_home_page"
+            android:theme="@style/Theme._2025_S2_W201_ToDo">
+        </activity>
         <activity
             android:name=".activities.DisplayMapActivity"
             android:exported="false" />
@@ -38,7 +41,7 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="YOUR_API_KEY" />
+            android:value="${MAPS_API_KEY}" />
     </application>
 
 </manifest>

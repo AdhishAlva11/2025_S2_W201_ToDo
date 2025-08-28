@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <style name="Theme._2025_S2_W201_ToDo" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Theme._2025_S2_W201_ToDo" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Material3 colors will still be applied via M3 components -->
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorOnPrimary">@color/white</item>
     </style>
 </resources>
