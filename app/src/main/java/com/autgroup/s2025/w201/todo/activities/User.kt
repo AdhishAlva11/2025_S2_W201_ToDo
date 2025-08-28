@@ -12,6 +12,7 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.app.AppCompatActivity
 import com.autgroup.s2025.w201.todo.databinding.ActivityUserBinding
+import com.autgroup.s2025.w201.todo.R
 
 class User : AppCompatActivity() {
 
