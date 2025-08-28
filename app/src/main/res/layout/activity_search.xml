@@ -31,57 +31,70 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <LinearLayout
+        <GridLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:columnCount="3"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:alignmentMode="alignMargins"
+            android:rowOrderPreserved="false"
+            android:useDefaultMargins="true">
 
+            <!-- Title spans all columns -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Choose your interests"
                 android:textSize="18sp"
                 android:textStyle="bold"
+                android:layout_columnSpan="3"
                 android:layout_marginBottom="12dp" />
 
+            <!-- Checkboxes in grid layout -->
             <CheckBox
                 android:id="@+id/checkboxFood"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="🍽️ Food" />
+                android:layout_columnWeight="1"
+                android:text="Food" />
 
             <CheckBox
                 android:id="@+id/checkboxWalking"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="🚶 Walking" />
+                android:layout_columnWeight="1"
+                android:text="Walking" />
 
             <CheckBox
                 android:id="@+id/checkboxSports"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="🏀 Sports" />
+                android:layout_columnWeight="1"
+                android:text="Sports" />
 
             <CheckBox
                 android:id="@+id/checkboxViews"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="🌄 Views" />
+                android:layout_columnWeight="1"
+                android:text="Views" />
 
             <CheckBox
                 android:id="@+id/checkboxFamily"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="👨‍👩‍👧‍👦 Family" />
+                android:layout_columnWeight="1"
+                android:text="Family" />
 
             <CheckBox
                 android:id="@+id/checkboxCulture"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="🎭 Culture" />
+                android:layout_columnWeight="1"
+                android:text="Culture" />
 
-        </LinearLayout>
+        </GridLayout>
     </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
