@@ -18,83 +18,131 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Card-style checklist container -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/checklistCard"
+    <!-- Scrollable grid of cards -->
+    <ScrollView
+        android:id="@+id/scrollContainer"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="6dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
         app:layout_constraintTop_toBottomOf="@id/autocompleteFragment"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
         <GridLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:columnCount="3"
+            android:columnCount="2"
             android:orientation="horizontal"
-            android:padding="16dp"
             android:alignmentMode="alignMargins"
             android:rowOrderPreserved="false"
-            android:useDefaultMargins="true">
+            android:useDefaultMargins="true"
+            android:padding="8dp">
 
-            <!-- Title spans all columns -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Choose your interests"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:layout_columnSpan="3"
-                android:layout_marginBottom="12dp" />
-
-            <!-- Checkboxes in grid layout -->
-            <CheckBox
-                android:id="@+id/checkboxFood"
+            <!-- One card per interest -->
+            <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="150dp"
                 android:layout_columnWeight="1"
-                android:text="Food" />
+                app:cardCornerRadius="12dp"
+                app:cardElevation="6dp">
 
-            <CheckBox
-                android:id="@+id/checkboxWalking"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_columnWeight="1"
-                android:text="Walking" />
+                <CheckBox
+                    android:id="@+id/checkboxFood"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Food"
+                    android:gravity="center"
+                    android:textSize="18sp"
+                    android:buttonTint="@color/black" />
+            </androidx.cardview.widget.CardView>
 
-            <CheckBox
-                android:id="@+id/checkboxSports"
+            <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="150dp"
                 android:layout_columnWeight="1"
-                android:text="Sports" />
+                app:cardCornerRadius="12dp"
+                app:cardElevation="6dp">
 
-            <CheckBox
-                android:id="@+id/checkboxViews"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_columnWeight="1"
-                android:text="Views" />
+                <CheckBox
+                    android:id="@+id/checkboxWalking"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Walking"
+                    android:gravity="center"
+                    android:textSize="18sp"
+                    android:buttonTint="@color/black" />
+            </androidx.cardview.widget.CardView>
 
-            <CheckBox
-                android:id="@+id/checkboxFamily"
+            <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="150dp"
                 android:layout_columnWeight="1"
-                android:text="Family" />
+                app:cardCornerRadius="12dp"
+                app:cardElevation="6dp">
 
-            <CheckBox
-                android:id="@+id/checkboxCulture"
+                <CheckBox
+                    android:id="@+id/checkboxSports"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Sports"
+                    android:gravity="center"
+                    android:textSize="18sp"
+                    android:buttonTint="@color/black" />
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="150dp"
                 android:layout_columnWeight="1"
-                android:text="Culture" />
+                app:cardCornerRadius="12dp"
+                app:cardElevation="6dp">
+
+                <CheckBox
+                    android:id="@+id/checkboxViews"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Views"
+                    android:gravity="center"
+                    android:textSize="18sp"
+                    android:buttonTint="@color/black" />
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:layout_columnWeight="1"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="6dp">
+
+                <CheckBox
+                    android:id="@+id/checkboxFamily"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Family"
+                    android:gravity="center"
+                    android:textSize="18sp"
+                    android:buttonTint="@color/black" />
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:layout_columnWeight="1"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="6dp">
+
+                <CheckBox
+                    android:id="@+id/checkboxCulture"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Culture"
+                    android:gravity="center"
+                    android:textSize="18sp"
+                    android:buttonTint="@color/black" />
+            </androidx.cardview.widget.CardView>
 
         </GridLayout>
-    </androidx.cardview.widget.CardView>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
