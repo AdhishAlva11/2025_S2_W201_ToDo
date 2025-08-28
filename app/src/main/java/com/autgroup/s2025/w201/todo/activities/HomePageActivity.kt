@@ -16,6 +16,13 @@ import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
+// adding these imports so map opens on persons location no matter where they are
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.maps.CameraUpdate
+import com.google.android.gms.tasks.OnSuccessListener
+
+
 // Our Activity class, representing the "Home Page" (the landing page with the map).
 // It extends AppCompatActivity (so it can act as an Android screen)
 // and implements OnMapReadyCallback (so we can respond when the map finishes loading).
@@ -31,9 +38,16 @@ class HomePageActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private val LOCATION_PERMISSION_REQUEST_CODE = 1
 
+    // location provider so it opens on persons location
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+
     // The first lifecycle method that runs when this Activity is created
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+
 
         // Inflate the layout using ViewBinding and set it as the content view
         binding = ActivityHomePageBinding.inflate(layoutInflater)
@@ -73,24 +87,55 @@ class HomePageActivity : AppCompatActivity(), OnMapReadyCallback {
      */
     // This callback is triggered once the Google Map is fully loaded and ready for interaction
     override fun onMapReady(googleMap: GoogleMap) {
-        // Save the map object into our mMap variable
+        //google map object is now ready so we assign it to our mMap variable
         mMap = googleMap
 
-        // If permission is granted, enable the "blue dot" showing the user's current location
-        if(ContextCompat.checkSelfPermission(
-            this,
-            android.Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
-            )
-        {
+        // Enable zoom buttons (+ / - on the map)
+        mMap.uiSettings.isZoomControlsEnabled = true
+
+        //check if the user has already granted "Access_FINE_Location" permission
+        //This is needed to show the blue "My Location" dot and move the camera to user
+
+        if (ContextCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            //Permission granted - tun on the blue dot that tracks the user's location
             mMap.isMyLocationEnabled = true
+
+            //Use the fusedLocationClient to get the devices last known location
+            //This saves battery (instead of forcing a fresh GPS request) and is usually accurate
+
+            fusedLocationClient.lastLocation.addOnSuccessListener(
+                this, // The activity that listens for results
+
+                object : com.google.android.gms.tasks.OnSuccessListener<android.location.Location?> {
+                    // This callback runs when the location request succeeds
+                    override fun onSuccess(location: android.location.Location?) {
+                        if (location != null) {
+                            //if valid location is returned, create a LatLng from Latitude/Longititude
+                            val userLatLng = LatLng(location.latitude, location.longitude)
+                            //move camera slowly to users position and zoom into level 12
+                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 12f))
+                        } else {
+                            //if location is null (eg GPS is off or first time)
+                            //fall back to defualt location
+                            val auckland = LatLng(-36.8485, 174.7633)
+                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(auckland, 12f))
+                        }
+                    }
+                }
+            )
+        } else {
+            //if user hasnt granted permission
+            //fall back to Auckland so the map still shows "something" instead of being blank
+            val auckland = LatLng(-36.8485, 174.7633)
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(auckland, 12f))
         }
-        // Define coordinates for Auckland (latitude, longitude)
-        val auckland = LatLng(-36.8485, 174.7633)
-        // Move the camera to Auckland with a zoom level of 12
-        // (this acts as a default view until GPS updates the user's real location)
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(auckland, 12f))
     }
+
+
 
     // This method is called after the user responds to our permission request popup
     override fun onRequestPermissionsResult(
