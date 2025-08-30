@@ -4,4 +4,14 @@
     <string name="title_activity_home_page">HomePageActivity</string>
     <string name="travel_itineray">Travel Itineray</string>
     <string name="japan_adventure">Japan Adventure</string>
+    <string name="hint_event_name">Event Name</string>
+    <string name="hint_start_date">Start Date (yyyy-mm-dd)</string>
+    <string name="hint_duration">Duration (days)</string>
+    <string name="event_name">Event Name</string>
+    <string name="duration">Duration:</string>
+    <string name="start_date">Start Date:</string>
+    <string name="trip_name">Trip Name</string>
+    <string name="trip_start_date">Start Date: %1$s</string>
+    <string name="trip_duration">Duration: %1$d days</string>
+    <string name="trip_menu">Trip Menu</string>
 </resources>
