@@ -67,6 +67,12 @@ class HomePageActivity : AppCompatActivity(), OnMapReadyCallback {
         // Enable zoom controls (+/- buttons on the map)
         mMap.uiSettings.isZoomControlsEnabled = true
 
+        // Enable gestures (pinch + scroll + rotate + tilt)
+        mMap.uiSettings.isZoomGesturesEnabled = true
+        mMap.uiSettings.isScrollGesturesEnabled = true
+        mMap.uiSettings.isRotateGesturesEnabled = true
+        mMap.uiSettings.isTiltGesturesEnabled = true
+
         if (ContextCompat.checkSelfPermission(
                 this,
                 android.Manifest.permission.ACCESS_FINE_LOCATION
