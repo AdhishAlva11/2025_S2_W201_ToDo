@@ -5,6 +5,7 @@ import android.widget.CheckBox
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.autgroup.s2025.w201.todo.R
+import com.autgroup.s2025.w201.todo.classes.Search
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
@@ -12,12 +13,14 @@ import com.google.android.libraries.places.widget.listener.PlaceSelectionListene
 
 class SearchActivity : AppCompatActivity() {
 
+    private var currentSearch: Search? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_search)
 
-        // Initialize Places SDK using the key from strings.xml
+        // Initialize Places SDK
         val apiKey = getString(R.string.google_places_key)
         if (!Places.isInitialized()) {
             Places.initialize(applicationContext, apiKey)
@@ -33,12 +36,16 @@ class SearchActivity : AppCompatActivity() {
 
         autocompleteFragment.setOnPlaceSelectedListener(object : PlaceSelectionListener {
             override fun onPlaceSelected(place: Place) {
+                val search = buildSearchFromUI(place)
+                currentSearch = search
+
                 Toast.makeText(
                     this@SearchActivity,
-                    "Selected: ${place.name}",
+                    "Search created: $search",
                     Toast.LENGTH_SHORT
                 ).show()
-                // Future: Use place.latLng to show on map or filter results
+
+                // Future: Use `search` to query/filter your results
             }
 
             override fun onError(status: com.google.android.gms.common.api.Status) {
@@ -49,8 +56,9 @@ class SearchActivity : AppCompatActivity() {
                 ).show()
             }
         })
+    }
 
-        // Access interest checkboxes
+    private fun buildSearchFromUI(place: Place?): Search {
         val foodCheck = findViewById<CheckBox>(R.id.checkboxFood)
         val walkingCheck = findViewById<CheckBox>(R.id.checkboxWalking)
         val sportsCheck = findViewById<CheckBox>(R.id.checkboxSports)
@@ -58,16 +66,14 @@ class SearchActivity : AppCompatActivity() {
         val familyCheck = findViewById<CheckBox>(R.id.checkboxFamily)
         val cultureCheck = findViewById<CheckBox>(R.id.checkboxCulture)
 
-        // Example: Collect selected interests (for future filtering)
-        val selectedInterests = listOf(
-            "Food" to foodCheck.isChecked,
-            "Walking" to walkingCheck.isChecked,
-            "Sports" to sportsCheck.isChecked,
-            "Views" to viewsCheck.isChecked,
-            "Family" to familyCheck.isChecked,
-            "Culture" to cultureCheck.isChecked
-        )
+        val selectedInterests = mutableListOf<String>()
+        if (foodCheck.isChecked) selectedInterests.add("Food")
+        if (walkingCheck.isChecked) selectedInterests.add("Walking")
+        if (sportsCheck.isChecked) selectedInterests.add("Sports")
+        if (viewsCheck.isChecked) selectedInterests.add("Views")
+        if (familyCheck.isChecked) selectedInterests.add("Family")
+        if (cultureCheck.isChecked) selectedInterests.add("Culture")
 
-
+        return Search.fromPlaceAndInterests(place, selectedInterests)
     }
 }
