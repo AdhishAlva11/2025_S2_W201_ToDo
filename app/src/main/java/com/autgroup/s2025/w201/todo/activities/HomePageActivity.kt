@@ -34,6 +34,7 @@ import com.google.android.gms.tasks.OnSuccessListener
 // UI components for Material Navigation Drawer
 import com.google.android.material.navigation.NavigationView
 import androidx.drawerlayout.widget.DrawerLayout
+import com.google.android.gms.maps.model.MarkerOptions
 
 class HomePageActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -159,6 +160,7 @@ class HomePageActivity : AppCompatActivity(), OnMapReadyCallback {
                             // If location available → move camera to user’s location
                             val userLatLng = LatLng(location.latitude, location.longitude)
                             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 12f))
+                            mMap.addMarker(MarkerOptions().position(userLatLng).title("You Are Here!"))
                         } else {
                             // If null → fallback to Auckland
                             val auckland = LatLng(-36.8485, 174.7633)
