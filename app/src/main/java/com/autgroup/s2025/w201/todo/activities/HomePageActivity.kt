@@ -155,7 +155,7 @@ class HomePageActivity : AppCompatActivity(), OnMapReadyCallback {
                 this,
                 object : OnSuccessListener<android.location.Location?> {
                     override fun onSuccess(location: android.location.Location?) {
-                        if (location != null) {
+                        if ( location != null) {
                             // If location available → move camera to user’s location
                             val userLatLng = LatLng(location.latitude, location.longitude)
                             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 12f))
