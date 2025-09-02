@@ -54,7 +54,7 @@ dependencies {
 
     // Google Maps + Location
     implementation(libs.play.services.maps)       // Google Maps
-    implementation(libs.play.services.location)   // Location API (needed for FusedLocationProviderClient)
+    implementation(libs.play.services.location)   // Location API (needed for FusedLocationProviderClient
 
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintlayout)
