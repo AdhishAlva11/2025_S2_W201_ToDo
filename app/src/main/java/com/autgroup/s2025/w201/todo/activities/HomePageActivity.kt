@@ -71,6 +71,8 @@ class HomePageActivity : AppCompatActivity(), OnMapReadyCallback {
         //Tell the activity to use the toolbar from the layout
         setSupportActionBar(binding.toolbar)
 
+        supportActionBar?.title = ""
+
         //Create the hamburger toggle and attach it to the drawer + toolbar
         toggle = ActionBarDrawerToggle(
             this,
