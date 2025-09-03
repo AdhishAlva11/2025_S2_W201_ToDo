@@ -15,4 +15,7 @@
     <string name="trip_start_date">Start Date: %1$s</string>
     <string name="trip_duration">Duration: %1$d days</string>
     <string name="trip_menu">Trip Menu</string>
+    <string name="add_event">Add Event +</string>
+    <string name="travel_itinerary">Travel Itinerary</string>
+    <string name="back">Back</string>
 </resources>

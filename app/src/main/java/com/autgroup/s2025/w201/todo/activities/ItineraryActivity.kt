@@ -9,6 +9,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import com.autgroup.s2025.w201.todo.R
+import com.autgroup.s2025.w201.todo.classes.Itinerary
 
 class ItineraryActivity : AppCompatActivity() {
 
@@ -130,10 +131,3 @@ class ItineraryActivity : AppCompatActivity() {
             .show()
     }
 }
-
-// Data class for itinerary
-data class Itinerary(
-    var name: String,
-    var startDate: String,
-    var duration: Int
-)
