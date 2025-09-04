@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import com.autgroup.s2025.w201.todo.R
 import com.autgroup.s2025.w201.todo.classes.Itinerary
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class ItineraryActivity : AppCompatActivity() {
 
@@ -34,7 +35,37 @@ class ItineraryActivity : AppCompatActivity() {
         addEvent.setOnClickListener {
             showAddEventDialog()
         }
+
+        // ─── Bottom Navigation Setup ───
+        val bottomNav: BottomNavigationView = findViewById(R.id.bottomNav)
+        bottomNav.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_home -> {
+                    startActivity(Intent(this, HomePageActivity::class.java))
+                    true
+                }
+
+                R.id.nav_itinerary -> {
+                    // Only start if we’re NOT already in ItineraryActivity
+                    if (false) {
+                        startActivity(Intent(this, ItineraryActivity::class.java))
+                    }
+                    true
+                }
+
+                R.id.nav_favourites -> {
+                    startActivity(Intent(this, FavouritesActivity::class.java))
+                    true
+                }
+
+                else -> false
+            }
+        }
+
+        // Optionally: mark current menu as selected
+        bottomNav.selectedItemId = R.id.nav_itinerary
     }
+
 
     private fun showAddEventDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_event, null)
@@ -130,4 +161,5 @@ class ItineraryActivity : AppCompatActivity() {
             .setNegativeButton("Cancel", null)
             .show()
     }
+
 }

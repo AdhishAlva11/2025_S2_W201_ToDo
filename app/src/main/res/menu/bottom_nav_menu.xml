@@ -16,4 +16,8 @@
         android:title="Profile"
         android:icon="@android:drawable/ic_menu_manage" />
 
+    <item
+        android:id="@+id/nav_itinerary"
+        android:title="Itinerary"
+        android:icon="@android:drawable/ic_menu_agenda" />
 </menu>
