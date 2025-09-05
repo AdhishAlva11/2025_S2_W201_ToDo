@@ -1,9 +1,11 @@
 package com.autgroup.s2025.w201.todo.activities
 
 import android.os.Bundle
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.autgroup.s2025.w201.todo.R
-import com.autgroup.s2025.w201.todo.databinding.ActivityDisplayMapBinding
+import com.autgroup.s2025.w201.todo.classes.Search
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -13,36 +15,41 @@ import com.google.android.gms.maps.model.MarkerOptions
 
 class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
-    private lateinit var mMap: GoogleMap
-    private lateinit var binding: ActivityDisplayMapBinding
+    private var searchData: Search? = null
+    private lateinit var googleMap: GoogleMap
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_display_map)
 
-        binding = ActivityDisplayMapBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        searchData = intent.getSerializableExtra("searchData") as? Search
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        if (searchData == null) {
+            Toast.makeText(this, "No location data received", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
+
         val mapFragment = supportFragmentManager
-            .findFragmentById(R.id.map) as SupportMapFragment
+            .findFragmentById(R.id.mapFragment) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        val overlay = findViewById<TextView>(R.id.interestOverlay)
+        overlay.text = searchData?.interests?.joinToString(", ")
     }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
-    override fun onMapReady(googleMap: GoogleMap) {
-        mMap = googleMap
+    override fun onMapReady(map: GoogleMap) {
+        googleMap = map
+        val lat = searchData?.lat
+        val lng = searchData?.lng
+        val placeName = searchData?.placeName ?: "Selected Location"
 
-        // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+        if (lat != null && lng != null) {
+            val location = LatLng(lat, lng)
+            googleMap.addMarker(MarkerOptions().position(location).title(placeName))
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15f))
+        } else {
+            Toast.makeText(this, "Invalid coordinates", Toast.LENGTH_SHORT).show()
+        }
     }
 }

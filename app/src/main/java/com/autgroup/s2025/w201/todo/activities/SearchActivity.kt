@@ -1,6 +1,8 @@
 package com.autgroup.s2025.w201.todo.activities
 
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Button
 import android.widget.CheckBox
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -10,23 +12,21 @@ import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
+import java.io.Serializable
 
 class SearchActivity : AppCompatActivity() {
 
-    private var currentSearch: Search? = null
+    private var currentPlace: Place? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_search)
 
-        // Initialize Places SDK
         val apiKey = getString(R.string.google_places_key)
         if (!Places.isInitialized()) {
             Places.initialize(applicationContext, apiKey)
         }
 
-        // Setup Autocomplete Fragment
         val autocompleteFragment = supportFragmentManager
             .findFragmentById(R.id.autocompleteFragment) as AutocompleteSupportFragment
 
@@ -36,43 +36,38 @@ class SearchActivity : AppCompatActivity() {
 
         autocompleteFragment.setOnPlaceSelectedListener(object : PlaceSelectionListener {
             override fun onPlaceSelected(place: Place) {
-                val search = buildSearchFromUI(place)
-                currentSearch = search
-
-                Toast.makeText(
-                    this@SearchActivity,
-                    "Search created: $search",
-                    Toast.LENGTH_SHORT
-                ).show()
-
-                // Future: Use `search` to query/filter your results
+                currentPlace = place
+                Toast.makeText(this@SearchActivity, "Selected: ${place.name}", Toast.LENGTH_SHORT).show()
             }
 
             override fun onError(status: com.google.android.gms.common.api.Status) {
-                Toast.makeText(
-                    this@SearchActivity,
-                    "Error: $status",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(this@SearchActivity, "Error: $status", Toast.LENGTH_SHORT).show()
             }
         })
+
+        findViewById<Button>(R.id.searchButton).setOnClickListener {
+            if (currentPlace == null) {
+                Toast.makeText(this, "Please select a location", Toast.LENGTH_SHORT).show()
+            } else {
+                val searchData = buildSearchFromUI(currentPlace)
+                val intent = Intent(this, DisplayMapActivity::class.java)
+                intent.putExtra("searchData", searchData as Serializable)
+                startActivity(intent)
+            }
+        }
     }
 
     private fun buildSearchFromUI(place: Place?): Search {
-        val foodCheck = findViewById<CheckBox>(R.id.checkboxFood)
-        val walkingCheck = findViewById<CheckBox>(R.id.checkboxWalking)
-        val sportsCheck = findViewById<CheckBox>(R.id.checkboxSports)
-        val viewsCheck = findViewById<CheckBox>(R.id.checkboxViews)
-        val familyCheck = findViewById<CheckBox>(R.id.checkboxFamily)
-        val cultureCheck = findViewById<CheckBox>(R.id.checkboxCulture)
-
-        val selectedInterests = mutableListOf<String>()
-        if (foodCheck.isChecked) selectedInterests.add("Food")
-        if (walkingCheck.isChecked) selectedInterests.add("Walking")
-        if (sportsCheck.isChecked) selectedInterests.add("Sports")
-        if (viewsCheck.isChecked) selectedInterests.add("Views")
-        if (familyCheck.isChecked) selectedInterests.add("Family")
-        if (cultureCheck.isChecked) selectedInterests.add("Culture")
+        val selectedInterests = listOf(
+            R.id.checkboxFood to "Food",
+            R.id.checkboxWalking to "Walking",
+            R.id.checkboxSports to "Sports",
+            R.id.checkboxViews to "Views",
+            R.id.checkboxFamily to "Family",
+            R.id.checkboxCulture to "Culture"
+        ).mapNotNull { (id, label) ->
+            if (findViewById<CheckBox>(id).isChecked) label else null
+        }
 
         return Search.fromPlaceAndInterests(place, selectedInterests)
     }
