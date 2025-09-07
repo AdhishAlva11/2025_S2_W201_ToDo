@@ -61,12 +61,17 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
 
-    // Firebase + Google Sign In
-    implementation(libs.firebase.auth)
+    // Firebase (auth + realtime database)
+    implementation(platform("com.google.firebase:firebase-bom:34.2.0"))
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-database")
+    implementation("com.google.firebase:firebase-analytics")
+
+    // Google Sign-In
+    implementation("com.google.android.gms:play-services-auth:21.4.0")
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
-    implementation("com.google.android.gms:play-services-auth:21.4.0")
 
     // Testing
     testImplementation(libs.junit)
