@@ -2,7 +2,6 @@ package com.autgroup.s2025.w201.todo.activities
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import android.widget.ImageButton
 import android.widget.TextView
@@ -26,12 +25,14 @@ class FavouritesActivity : AppCompatActivity() {
         }
 
         // Back button
-        val btnBack: ImageButton = findViewById(R.id.btnBack)
-        btnBack.setOnClickListener {
+        val backButton: ImageButton = findViewById(R.id.btnBack)
+        backButton.setOnClickListener {
+            val intent = Intent(this, HomePageActivity::class.java)
+            startActivity(intent)
             finish()
         }
 
-        // ➕ Add Favourite (not functional yet, just logs)
+        // Add Favourite (not functional yet, just logs)
         val addFavourite: TextView = findViewById(R.id.tvAddFavourite)
         addFavourite.setOnClickListener {
             println("Add Favourite clicked (not functional yet)")

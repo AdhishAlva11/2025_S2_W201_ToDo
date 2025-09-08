@@ -47,9 +47,6 @@ class ItineraryActivity : AppCompatActivity() {
 
                 R.id.nav_itinerary -> {
                     // Only start if we’re NOT already in ItineraryActivity
-                    if (false) {
-                        startActivity(Intent(this, ItineraryActivity::class.java))
-                    }
                     true
                 }
 
