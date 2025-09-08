@@ -3,6 +3,7 @@ package com.autgroup.s2025.w201.todo.activities
 // Used for starting new screens (Intents will open FavouritesActivity or later ItineraryActivity)
 import android.content.Intent
 import android.os.Bundle
+import androidx.core.view.GravityCompat // tells Android which side of screen to open on
 
 // Provides the “hamburger” icon toggle for opening/closing the drawer
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -23,6 +24,7 @@ import com.google.android.gms.maps.model.LatLng
 
 // Permissions handling (needed for location access)
 import android.content.pm.PackageManager
+import android.widget.ImageView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
@@ -70,20 +72,17 @@ class HomePageActivity : AppCompatActivity(), OnMapReadyCallback {
 
         //Tell the activity to use the toolbar from the layout
         setSupportActionBar(binding.toolbar)
+        supportActionBar?.title = ""
 
         //Create the hamburger toggle and attach it to the drawer + toolbar
-        toggle = ActionBarDrawerToggle(
-            this,
-            drawerLayout,
-            binding.toolbar,
-            R.string.navigation_drawer_open,   // String resource shown when drawer is opened
-            R.string.navigation_drawer_close   // String resource shown when drawer is closed
-        )
-        //Add listener so toggle knows when drawer is open/closer
-        drawerLayout.addDrawerListener(toggle)
-
-        //Sync toggle state (ensure hamburger icon updated correctley)
-        toggle.syncState()
+        val customDrawerIcon: ImageView = findViewById(R.id.custom_drawer_icon)
+        customDrawerIcon.setOnClickListener {
+            if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                drawerLayout.closeDrawer(GravityCompat.START)
+            } else {
+                drawerLayout.openDrawer(GravityCompat.START)
+            }
+        }
 
         // Handle drawer item clicks
         val navigationView: NavigationView = findViewById(R.id.navigation_view)
