@@ -2,6 +2,7 @@ package com.autgroup.s2025.w201.todo.activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.autgroup.s2025.w201.todo.databinding.ActivitySignupBinding
@@ -12,8 +13,6 @@ import com.google.firebase.database.FirebaseDatabase
 class SignupActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySignupBinding
     private lateinit var firebaseAuth : FirebaseAuth
-
-    private lateinit var dbRef : DatabaseReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,30 +27,43 @@ class SignupActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        dbRef = FirebaseDatabase.getInstance().getReference("Users")
-
         binding.button.setOnClickListener {
             val email = binding.emailEt.text.toString()
             val pass = binding.passET.text.toString()
             val confirmPass = binding.confirmPassEt.text.toString()
 
-            if(email.isNotEmpty() || pass.isNotEmpty() || confirmPass.isNotEmpty()){
+            if(email.isNotEmpty() && pass.isNotEmpty() && confirmPass.isNotEmpty()){
                 if(pass == confirmPass){
                     firebaseAuth.createUserWithEmailAndPassword(email, pass).addOnCompleteListener {
                         if(it.isSuccessful){
 
                             val user = firebaseAuth.currentUser
-                            val uid = user?.uid
+                            val userId = user?.uid ?: return@addOnCompleteListener
 
-                            val userData = mapOf(
-                                "favourites" to mapOf <String, Any>(),
-                                "itineraries" to mapOf <String, Any>()
+                            var dbRef = FirebaseDatabase.getInstance(
+                                "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
+                            ).getReference("users")
+
+                            dbRef.child(userId).setValue(userId)
+                                .addOnSuccessListener {
+                                    Log.d("FirebaseTest", "Test write success")
+                                    Toast.makeText(this, "Test write success", Toast.LENGTH_SHORT).show()
+                                }
+                                .addOnFailureListener { e ->
+                                    Log.e("FirebaseTest", "Test write failed", e)
+                                    Toast.makeText(this, "Test write failed: ${e.message}", Toast.LENGTH_LONG).show()
+                                }
+
+                            /*val userData = mapOf(
+                                "favourites" to mapOf<String, Any>(),
+                                "itineraries" to mapOf<String, Any>()
                             )
 
-                            val test = "hello"
+                            dbRef = FirebaseDatabase.getInstance(
+                                "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
+                            ).getReference("users/$userId")
 
-
-                            dbRef.child(uid!!).setValue(userData)
+                            dbRef.child("userData").setValue(userData)*/
 
                             val intent = Intent(this, HomePageActivity::class.java)
                             startActivity(intent)
