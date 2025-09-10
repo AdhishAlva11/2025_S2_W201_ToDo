@@ -5,9 +5,11 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.autgroup.s2025.w201.todo.classes.Activity
+import com.autgroup.s2025.w201.todo.classes.Favourities
+import com.autgroup.s2025.w201.todo.classes.User
 import com.autgroup.s2025.w201.todo.databinding.ActivitySignupBinding
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 
 class SignupActivity : AppCompatActivity() {
@@ -28,6 +30,8 @@ class SignupActivity : AppCompatActivity() {
         }
 
         binding.button.setOnClickListener {
+            val firstName = binding.firstNameEt.text.toString()
+            val lastName = binding.lastNameEt.text.toString()
             val email = binding.emailEt.text.toString()
             val pass = binding.passET.text.toString()
             val confirmPass = binding.confirmPassEt.text.toString()
@@ -42,9 +46,11 @@ class SignupActivity : AppCompatActivity() {
 
                             var dbRef = FirebaseDatabase.getInstance(
                                 "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
-                            ).getReference("users")
+                            ).getReference(userId)
 
-                            dbRef.child(userId).setValue(userId)
+                            val userData = User(firstName, lastName, null, null)
+
+                            dbRef.child("UserData").setValue(userData)
                                 .addOnSuccessListener {
                                     Log.d("FirebaseTest", "Test write success")
                                     Toast.makeText(this, "Test write success", Toast.LENGTH_SHORT).show()
