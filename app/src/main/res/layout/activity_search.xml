@@ -46,7 +46,7 @@
                     android:id="@+id/checkboxFood"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="Food"
+                    android:text="Restaurants"
                     android:gravity="center"
                     android:textSize="18sp"/>
             </androidx.cardview.widget.CardView>
@@ -91,7 +91,7 @@
                     android:id="@+id/checkboxViews"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="Views"
+                    android:text="Landmarks"
                     android:gravity="center"
                     android:textSize="18sp"/>
             </androidx.cardview.widget.CardView>
@@ -106,7 +106,7 @@
                     android:id="@+id/checkboxFamily"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="Family"
+                    android:text="Family Attractions"
                     android:gravity="center"
                     android:textSize="18sp"/>
             </androidx.cardview.widget.CardView>

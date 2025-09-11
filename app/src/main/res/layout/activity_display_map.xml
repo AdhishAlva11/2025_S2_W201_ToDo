@@ -1,21 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/displayMapRoot"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".activities.DisplayMapActivity">
 
+    <!-- Google Map -->
     <fragment
         android:id="@+id/mapFragment"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <!-- Overlay for selected interests -->
     <TextView
         android:id="@+id/interestOverlay"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="top|center_horizontal"
-        android:layout_marginTop="16dp"
-        android:background="@android:color/black"
+        android:background="#80000000"
         android:textColor="@android:color/white"
-        android:padding="8dp"
-        android:text="Interests" />
+        android:padding="12dp"
+        android:textSize="16sp"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:layout_margin="8dp"
+        android:layout_gravity="top" />
+
 </FrameLayout>
