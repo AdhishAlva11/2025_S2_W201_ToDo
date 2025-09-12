@@ -2,20 +2,27 @@
     <string name="app_name">2025_S2_(W201)_ToDo</string>
     <string name="title_activity_display_map">DisplayMapActivity</string>
     <string name="title_activity_home_page">HomePageActivity</string>
-    <string name="travel_itineray">Travel Itineray</string>
+
+    <!-- Itinerary-related strings -->
+    <string name="travel_itinerary">Travel Itinerary</string>
     <string name="japan_adventure">Japan Adventure</string>
     <string name="hint_event_name">Event Name</string>
     <string name="hint_start_date">Start Date (yyyy-mm-dd)</string>
     <string name="hint_duration">Duration (days)</string>
     <string name="event_name">Event Name</string>
-    <string name="project_google_api_key">AIzaSyBJvIhFs-ZgMJIuhrPCUH2M33zdvyj-Od4</string>
     <string name="duration">Duration:</string>
     <string name="start_date">Start Date:</string>
     <string name="trip_name">Trip Name</string>
-    <string name="trip_start_date">Start Date: %1$s</string>
-    <string name="trip_duration">Duration: %1$d days</string>
-    <string name="trip_menu">Trip Menu</string>
     <string name="add_event">Add Event +</string>
-    <string name="travel_itinerary">Travel Itinerary</string>
     <string name="back">Back</string>
+
+    <!-- Auth / Firebase related -->
+    <string name="default_web_client_id">598254263424-te0dvjnufdifkgbj9fj0gjgjjvgnkq79.apps.googleusercontent.com</string>
+
+    <!-- Google Maps API Key -->
+    <string name="project_google_api_key">AIzaSyBJvIhFs-ZgMJIuhrPCUH2M33zdvyj-Od4</string>
+
+    <!-- Navigation drawer -->
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 </resources>

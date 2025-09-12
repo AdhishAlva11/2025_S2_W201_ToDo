@@ -4,4 +4,6 @@ class Activity {
     val test = 0
 
     val name  = "Adhish"
+
+    val name1 = " "
 }
