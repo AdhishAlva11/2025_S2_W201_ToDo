@@ -60,17 +60,6 @@ class SignupActivity : AppCompatActivity() {
                                     Toast.makeText(this, "Test write failed: ${e.message}", Toast.LENGTH_LONG).show()
                                 }
 
-                            /*val userData = mapOf(
-                                "favourites" to mapOf<String, Any>(),
-                                "itineraries" to mapOf<String, Any>()
-                            )
-
-                            dbRef = FirebaseDatabase.getInstance(
-                                "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
-                            ).getReference("users/$userId")
-
-                            dbRef.child("userData").setValue(userData)*/
-
                             val intent = Intent(this, HomePageActivity::class.java)
                             startActivity(intent)
                         } else {

@@ -3,11 +3,13 @@ package com.autgroup.s2025.w201.todo.activities
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.autgroup.s2025.w201.todo.R
+import com.autgroup.s2025.w201.todo.classes.User
 import com.autgroup.s2025.w201.todo.databinding.ActivityLoginBinding
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -15,6 +17,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.database.FirebaseDatabase
 
 class LoginActivity : AppCompatActivity() {
 
@@ -100,6 +103,33 @@ class LoginActivity : AppCompatActivity() {
         val credential = GoogleAuthProvider.getCredential(account.idToken, null)
         firebaseAuth.signInWithCredential(credential).addOnCompleteListener {
             if (it.isSuccessful) {
+
+                val user = firebaseAuth.currentUser
+                val userId = user?.uid ?: return@addOnCompleteListener
+
+                val fullName = account.displayName ?: ""
+
+                val firstLastName = fullName.split(" ")
+                val firstNameFromGoogle = firstLastName.firstOrNull() ?: ""
+                val lastNameFromGoogle = if (firstLastName.size > 1) firstLastName.subList(1, firstLastName.size)
+                    .joinToString(" ") else ""
+
+                var dbRef = FirebaseDatabase.getInstance(
+                    "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
+                ).getReference(userId)
+
+                val userData = User(firstNameFromGoogle, lastNameFromGoogle, null, null)
+
+                dbRef.child("UserData").setValue(userData)
+                    .addOnSuccessListener {
+                        Log.d("FirebaseTest", "Test write success")
+                        Toast.makeText(this, "Test write success", Toast.LENGTH_SHORT).show()
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("FirebaseTest", "Test write failed", e)
+                        Toast.makeText(this, "Test write failed: ${e.message}", Toast.LENGTH_LONG).show()
+                    }
+
                 val intent = Intent(this, HomePageActivity::class.java)
                 startActivity(intent)
                 finish()  // closes login screen
