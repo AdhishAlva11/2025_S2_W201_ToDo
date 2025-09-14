@@ -80,6 +80,13 @@ class HomePageActivity : AppCompatActivity(), OnMapReadyCallback {
         // Remove default "Home Page" title
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
+        // Search bar click - open SearchActivity
+        val searchBar = findViewById<android.widget.EditText>(R.id.search_bar)
+        searchBar.setOnClickListener {
+            val intent = Intent(this, SearchActivity::class.java)
+            startActivity(intent)
+        }
+
         //Create the hamburger toggle and attach it to the drawer + toolbar
         toggle = ActionBarDrawerToggle(
             this,
@@ -220,4 +227,9 @@ class HomePageActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
     }
+
+
+
+
+
 }
