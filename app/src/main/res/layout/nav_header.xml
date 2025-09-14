@@ -14,12 +14,12 @@
         android:src="@drawable/ic_person"
         android:contentDescription="Profile Icon" />
 
-    <!-- Username -->
+    <!-- Username  - leave blank we add later-->
     <TextView
         android:id="@+id/user_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="User Name"
+        android:text=""
         android:textColor="@android:color/white"
         android:textSize="18sp"
         android:layout_marginTop="8dp" />

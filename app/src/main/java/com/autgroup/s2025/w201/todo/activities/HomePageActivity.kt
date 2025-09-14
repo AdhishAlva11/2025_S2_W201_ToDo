@@ -36,6 +36,13 @@ import com.google.android.material.navigation.NavigationView
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.gms.maps.model.MarkerOptions
 
+import android.util.Log
+import android.widget.TextView
+import android.widget.ImageView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
+import com.bumptech.glide.Glide
+
 class HomePageActivity : AppCompatActivity(), OnMapReadyCallback {
 
     // Map reference
@@ -70,6 +77,8 @@ class HomePageActivity : AppCompatActivity(), OnMapReadyCallback {
 
         //Tell the activity to use the toolbar from the layout
         setSupportActionBar(binding.toolbar)
+        // Remove default "Home Page" title
+        supportActionBar?.setDisplayShowTitleEnabled(false)
 
         //Create the hamburger toggle and attach it to the drawer + toolbar
         toggle = ActionBarDrawerToggle(
@@ -88,27 +97,41 @@ class HomePageActivity : AppCompatActivity(), OnMapReadyCallback {
         // Handle drawer item clicks
         val navigationView: NavigationView = findViewById(R.id.navigation_view)
 
-        navigationView.setNavigationItemSelectedListener(
-            object : NavigationView.OnNavigationItemSelectedListener {
-                override fun onNavigationItemSelected(menuItem: android.view.MenuItem): Boolean {
-                    when (menuItem.itemId) {
-                        // Open FavouritesActivity
-                        R.id.nav_favourites -> {
-                            startActivity(Intent(this@HomePageActivity, FavouritesActivity::class.java))
-                            return true
-                        }
+        // --- Access header layout from NavigationView ---
+        val headerView = navigationView.getHeaderView(0)
+        val userNameTextView = headerView.findViewById<TextView>(R.id.user_name)
+        val profileImageView = headerView.findViewById<ImageView>(R.id.profile_icon)
 
-                        // Placeholder for ItineraryActivity (not created yet)
-                        R.id.nav_itinerary -> {
-                            // TODO: Add startActivity(Intent(this@HomePageActivity, ItineraryActivity::class.java))
-                            return true
-                        }
+// --- Fetch user data from Firebase ---
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        if (userId != null) {
+            val dbRef = FirebaseDatabase.getInstance(
+                "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
+            ).getReference(userId).child("UserData")
 
-                        else -> return false
+            dbRef.get().addOnSuccessListener { snapshot ->
+                if (snapshot.exists()) {
+                    val firstName = snapshot.child("userFirstName").getValue(String::class.java) ?: ""
+                    val lastName = snapshot.child("userLastName").getValue(String::class.java) ?: ""
+                    val photoUrl = snapshot.child("photoUrl").getValue(String::class.java)
+
+                    // Update drawer header name
+                    userNameTextView.text = "$firstName $lastName"
+
+                    // If Google profile photo exists, load it
+                    if (!photoUrl.isNullOrEmpty()) {
+                        Glide.with(this)
+                            .load(photoUrl)
+                            .circleCrop()
+                            .into(profileImageView)
                     }
+                } else {
+                    Log.d("Firebase", "No user data found for $userId")
                 }
+            }.addOnFailureListener { e ->
+                Log.e("Firebase", "Failed to fetch user data", e)
             }
-        )
+        }
 
 
         // Check if location permission is granted; if not, request it
@@ -160,7 +183,7 @@ class HomePageActivity : AppCompatActivity(), OnMapReadyCallback {
                             // If location available → move camera to user’s location
                             val userLatLng = LatLng(location.latitude, location.longitude)
                             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 12f))
-                            mMap.addMarker(MarkerOptions().position(userLatLng).title("You Are Here!"))
+                            //mMap.addMarker(MarkerOptions().position(userLatLng).title("You Are Here!"))
                         } else {
                             // If null → fallback to Auckland
                             val auckland = LatLng(-36.8485, 174.7633)

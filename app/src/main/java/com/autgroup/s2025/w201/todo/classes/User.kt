@@ -1,8 +1,10 @@
 package com.autgroup.s2025.w201.todo.classes
 
-class User (
+class User(
     var userFirstName: String? = null,
     var userLastName: String? = null,
-    var userFavourities: Favourities?,
-    var userItineraries: List<Activity>?
+    var email: String? = null,               // new: store email
+    var photoUrl: String? = null,            // new: store Google photo (optional)
+    var userFavourities: Favourities? = null,
+    var userItineraries: List<Activity>? = null
 )
