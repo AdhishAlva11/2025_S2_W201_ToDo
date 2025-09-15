@@ -4,6 +4,7 @@
 
 # Local config
 local.properties
+secrets.properties
 
 # Build output (all modules)
 **/build/

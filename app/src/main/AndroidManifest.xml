@@ -22,6 +22,9 @@
             android:name=".activities.SearchActivity"
             android:exported="false" />
         <activity
+            android:name=".activities.ItineraryActivity"
+            android:exported="false" />
+        <activity
             android:name=".activities.FavouritesActivity"
             android:exported="false" />
         <activity
