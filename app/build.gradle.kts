@@ -81,6 +81,8 @@ dependencies {
     implementation(libs.places)
     kapt("com.github.bumptech.glide:compiler:4.16.0")
 
+
+
     // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
