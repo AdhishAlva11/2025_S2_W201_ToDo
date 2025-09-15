@@ -106,6 +106,28 @@ class HomePageActivity : AppCompatActivity(), OnMapReadyCallback {
         // Handle drawer item clicks
         val navigationView: NavigationView = findViewById(R.id.navigation_view)
 
+        navigationView.setNavigationItemSelectedListener(
+            object : NavigationView.OnNavigationItemSelectedListener {
+                override fun onNavigationItemSelected(menuItem: android.view.MenuItem): Boolean {
+                    when (menuItem.itemId) {
+                        // Open FavouritesActivity
+                        R.id.nav_favourites -> {
+                            startActivity(Intent(this@HomePageActivity, FavouritesActivity::class.java))
+                            return true
+                        }
+
+                        // Placeholder for ItineraryActivity (not created yet)
+                        R.id.nav_itinerary -> {
+                            // TODO: Add startActivity(Intent(this@HomePageActivity, ItineraryActivity::class.java))
+                            return true
+                        }
+
+                        else -> return false
+                    }
+                }
+            }
+        )
+
         // --- Access header layout from NavigationView ---
         val headerView = navigationView.getHeaderView(0)
         val userNameTextView = headerView.findViewById<TextView>(R.id.user_name)
