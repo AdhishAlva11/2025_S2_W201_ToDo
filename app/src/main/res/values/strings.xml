@@ -16,6 +16,10 @@
     <string name="add_event">Add Event +</string>
     <string name="back">Back</string>
 
+    <!-- Strings used in ItineraryActivity -->
+    <string name="trip_start_date">Start Date: %s</string>
+    <string name="trip_duration">Duration: %d days</string>
+
     <!-- Auth / Firebase related -->
     <string name="default_web_client_id">598254263424-te0dvjnufdifkgbj9fj0gjgjjvgnkq79.apps.googleusercontent.com</string>
 
@@ -25,4 +29,7 @@
     <!-- Navigation drawer -->
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <!-- Trip card menu -->
+    <string name="trip_menu">Trip Menu</string>
 </resources>
