@@ -228,8 +228,4 @@ class HomePageActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-
-
-
-
 }
