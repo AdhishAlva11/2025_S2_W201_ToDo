@@ -59,11 +59,11 @@ class SearchActivity : AppCompatActivity() {
 
     private fun buildSearchFromUI(place: Place?): Search {
         val selectedInterests = listOf(
-            R.id.checkboxFood to "Food",
+            R.id.checkboxFood to "Restaurants",
             R.id.checkboxWalking to "Walking",
             R.id.checkboxSports to "Sports",
-            R.id.checkboxViews to "Views",
-            R.id.checkboxFamily to "Family",
+            R.id.checkboxViews to "Landmarks",
+            R.id.checkboxFamily to "Family Attractions",
             R.id.checkboxCulture to "Culture"
         ).mapNotNull { (id, label) ->
             if (findViewById<CheckBox>(id).isChecked) label else null
