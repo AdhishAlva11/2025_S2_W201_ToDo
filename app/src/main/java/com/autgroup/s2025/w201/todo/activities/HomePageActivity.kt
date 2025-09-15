@@ -118,7 +118,7 @@ class HomePageActivity : AppCompatActivity(), OnMapReadyCallback {
 
                         // Placeholder for ItineraryActivity (not created yet)
                         R.id.nav_itinerary -> {
-                            // TODO: Add startActivity(Intent(this@HomePageActivity, ItineraryActivity::class.java))
+                            startActivity(Intent(this@HomePageActivity, ItineraryActivity::class.java))
                             return true
                         }
 
