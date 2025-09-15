@@ -1,74 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.drawerlayout.widget.DrawerLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     tools:context=".activities.HomePageActivity">
 
-<!--Main Content (map + toolbar) -->
-<LinearLayout
-    android:orientation="vertical"
-    android:layout_width = "match_parent"
-    android:layout_height="match_parent">
-
-    <!--Toolbar at the top -->
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
+    <!-- Main Content (Toolbar + Map) -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:background="?attr/colorPrimary"
+        android:layout_height="match_parent"
         android:fitsSystemWindows="true"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        android:orientation="vertical">
 
-        <!-- Row inside toolbar for search bar -->
-        <LinearLayout
+        <!-- Toolbar at the top -->
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:layout_height="56dp"
+            android:background="?attr/colorPrimary"
+            android:fitsSystemWindows="true"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-            <!-- Fake Search Bar -->
-            <EditText
-                android:id="@+id/search_bar"
-                android:layout_width="0dp"
-                android:layout_height="32dp"
-                android:layout_marginStart="6dp"
-                android:layout_marginEnd="24dp"
-                android:layout_weight="1"
-                android:background="@drawable/search_edittext_bg"
-                android:backgroundTint="@android:color/white"
-                android:cursorVisible="false"
-                android:drawableEnd="@android:drawable/ic_menu_search"
-                android:focusable="false"
+            <!-- Row inside toolbar for search bar -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:gravity="center_vertical"
-                android:hint="Search..."
-                android:imeOptions="actionSearch"
-                android:paddingStart="6dp"
-                android:paddingEnd="6dp"
-                android:singleLine="true"
-                android:textColor="@android:color/black" />
-        </LinearLayout>
-    </androidx.appcompat.widget.Toolbar>
+                android:orientation="horizontal">
 
-    <!--Google Map-->
-    <fragment
-        android:id="@+id/map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-</LinearLayout>
+                <!-- Fake Search Bar -->
+                <EditText
+                    android:id="@+id/search_bar"
+                    android:layout_width="0dp"
+                    android:layout_height="32dp"
+                    android:layout_marginStart="6dp"
+                    android:layout_marginEnd="24dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/search_edittext_bg"
+                    android:backgroundTint="@android:color/white"
+                    android:cursorVisible="false"
+                    android:drawableEnd="@android:drawable/ic_menu_search"
+                    android:focusable="false"
+                    android:gravity="center_vertical"
+                    android:hint="Search..."
+                    android:imeOptions="actionSearch"
+                    android:paddingStart="6dp"
+                    android:paddingEnd="6dp"
+                    android:singleLine="true"
+                    android:textColor="@android:color/black" />
+            </LinearLayout>
+        </androidx.appcompat.widget.Toolbar>
 
-    <!--Navigation Drawer Panel -->
+        <!-- Google Map Fragment -->
+        <fragment
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigation_view"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        app:menu="@menu/drawer_menu"
-        app:headerLayout="@layout/nav_header" />
+        android:fitsSystemWindows="true"
+        app:headerLayout="@layout/nav_header"
+        app:menu="@menu/drawer_menu" /> <!-- Also respects system insets -->
 
 </androidx.drawerlayout.widget.DrawerLayout>
