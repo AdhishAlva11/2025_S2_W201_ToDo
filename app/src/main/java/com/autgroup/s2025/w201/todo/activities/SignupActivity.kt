@@ -48,7 +48,15 @@ class SignupActivity : AppCompatActivity() {
                                 "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
                             ).getReference(userId)
 
-                            val userData = User(firstName, lastName, null, null)
+                            // update:   to store email in data base as well works with google sign up and normal
+                            val userData = User(
+                                userFirstName = firstName,
+                                userLastName = lastName,
+                                email = email,
+                                photoUrl = null,
+                                userFavourities = null,
+                                userItineraries = null
+                            )
 
                             dbRef.child("UserData").setValue(userData)
                                 .addOnSuccessListener {

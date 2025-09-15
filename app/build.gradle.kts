@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.android.libraries.mapsplatform.secrets.gradle.plugin)
     alias(libs.plugins.google.gms.google.services)
+
+    id("org.jetbrains.kotlin.kapt")
 }
 
 android {
@@ -53,26 +55,29 @@ dependencies {
     implementation(libs.androidx.material3)
 
     // Google Maps + Location
-    implementation(libs.play.services.maps)       // Google Maps
-    implementation(libs.play.services.location)   // Location API (needed for FusedLocationProviderClient
+    implementation(libs.play.services.maps)
+    implementation(libs.play.services.location)
 
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.material)
     implementation(libs.androidx.activity)
 
-    // Firebase (auth + realtime database)
-    implementation(platform("com.google.firebase:firebase-bom:34.2.0"))
-    implementation("com.google.firebase:firebase-auth")
-    implementation("com.google.firebase:firebase-database")
-    implementation("com.google.firebase:firebase-analytics")
+    //Firebase (auth + realtime database + analytics with KTX)
+    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
+    implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-database-ktx")
+    implementation("com.google.firebase:firebase-analytics-ktx")
 
     // Google Sign-In
     implementation("com.google.android.gms:play-services-auth:21.4.0")
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
-    implementation(libs.firebase.auth.ktx)
+
+    // Glide (for loading profile images from Google account)
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    kapt("com.github.bumptech.glide:compiler:4.16.0")
 
     // Testing
     testImplementation(libs.junit)

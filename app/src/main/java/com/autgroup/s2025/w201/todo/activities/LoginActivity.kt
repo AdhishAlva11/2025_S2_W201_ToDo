@@ -108,31 +108,49 @@ class LoginActivity : AppCompatActivity() {
                 val userId = user?.uid ?: return@addOnCompleteListener
 
                 val fullName = account.displayName ?: ""
-
                 val firstLastName = fullName.split(" ")
                 val firstNameFromGoogle = firstLastName.firstOrNull() ?: ""
-                val lastNameFromGoogle = if (firstLastName.size > 1) firstLastName.subList(1, firstLastName.size)
-                    .joinToString(" ") else ""
+                val lastNameFromGoogle = if (firstLastName.size > 1) {
+                    firstLastName.subList(1, firstLastName.size).joinToString(" ")
+                } else ""
 
-                var dbRef = FirebaseDatabase.getInstance(
+                val dbRef = FirebaseDatabase.getInstance(
                     "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
                 ).getReference(userId)
 
-                val userData = User(firstNameFromGoogle, lastNameFromGoogle, null, null)
+                // Extract email and photo from Google account
+                val emailFromGoogle = account.email ?: ""
+                val photoUrlFromGoogle = account.photoUrl?.toString()
 
-                dbRef.child("UserData").setValue(userData)
-                    .addOnSuccessListener {
-                        Log.d("FirebaseTest", "Test write success")
-                        Toast.makeText(this, "Test write success", Toast.LENGTH_SHORT).show()
-                    }
-                    .addOnFailureListener { e ->
-                        Log.e("FirebaseTest", "Test write failed", e)
-                        Toast.makeText(this, "Test write failed: ${e.message}", Toast.LENGTH_LONG).show()
+                //added this  - saves photo
+                val userData = User(
+                    userFirstName = firstNameFromGoogle,
+                    userLastName = lastNameFromGoogle,
+                    email = emailFromGoogle,
+                    photoUrl = photoUrlFromGoogle,
+                    userFavourities = null,
+                    userItineraries = null
+                )
+
+                // Prevent overwriting existing user data
+                dbRef.child("UserData").get().addOnSuccessListener { snapshot ->
+                    if (!snapshot.exists()) {
+                        dbRef.child("UserData").setValue(userData)
+                            .addOnSuccessListener {
+                                Log.d("FirebaseTest", "UserData created successfully")
+                            }
+                            .addOnFailureListener { e ->
+                                Log.e("FirebaseTest", "UserData write failed", e)
+                            }
+                    } else {
+                        Log.d("FirebaseTest", "UserData already exists, not overwriting")
                     }
 
-                val intent = Intent(this, HomePageActivity::class.java)
-                startActivity(intent)
-                finish()  // closes login screen
+                    val intent = Intent(this, HomePageActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                }
+
             } else {
                 Toast.makeText(this, it.exception.toString(), Toast.LENGTH_LONG).show()
             }
