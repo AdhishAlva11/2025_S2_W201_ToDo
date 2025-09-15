@@ -77,11 +77,6 @@ dependencies {
 
     // Glide (for loading profile images from Google account)
     implementation("com.github.bumptech.glide:glide:4.16.0")
-<<<<<<< Updated upstream
-    implementation(libs.play.services.places)
-=======
-    implementation(libs.firebase.auth.ktx)
->>>>>>> Stashed changes
     kapt("com.github.bumptech.glide:compiler:4.16.0")
 
     // Testing
