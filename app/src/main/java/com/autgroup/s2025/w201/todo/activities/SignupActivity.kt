@@ -2,10 +2,15 @@ package com.autgroup.s2025.w201.todo.activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.autgroup.s2025.w201.todo.classes.Activity
+import com.autgroup.s2025.w201.todo.classes.Favourities
+import com.autgroup.s2025.w201.todo.classes.User
 import com.autgroup.s2025.w201.todo.databinding.ActivitySignupBinding
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 
 class SignupActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySignupBinding
@@ -25,15 +30,45 @@ class SignupActivity : AppCompatActivity() {
         }
 
         binding.button.setOnClickListener {
+            val firstName = binding.firstNameEt.text.toString()
+            val lastName = binding.lastNameEt.text.toString()
             val email = binding.emailEt.text.toString()
             val pass = binding.passET.text.toString()
             val confirmPass = binding.confirmPassEt.text.toString()
 
-            if(email.isNotEmpty() || pass.isNotEmpty() || confirmPass.isNotEmpty()){
+            if(email.isNotEmpty() && pass.isNotEmpty() && confirmPass.isNotEmpty()){
                 if(pass == confirmPass){
                     firebaseAuth.createUserWithEmailAndPassword(email, pass).addOnCompleteListener {
                         if(it.isSuccessful){
-                            val intent = Intent(this, LoginActivity::class.java)
+
+                            val user = firebaseAuth.currentUser
+                            val userId = user?.uid ?: return@addOnCompleteListener
+
+                            var dbRef = FirebaseDatabase.getInstance(
+                                "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
+                            ).getReference(userId)
+
+                            // update:   to store email in data base as well works with google sign up and normal
+                            val userData = User(
+                                userFirstName = firstName,
+                                userLastName = lastName,
+                                email = email,
+                                photoUrl = null,
+                                userFavourities = null,
+                                userItineraries = null
+                            )
+
+                            dbRef.child("UserData").setValue(userData)
+                                .addOnSuccessListener {
+                                    Log.d("FirebaseTest", "Test write success")
+                                    Toast.makeText(this, "Test write success", Toast.LENGTH_SHORT).show()
+                                }
+                                .addOnFailureListener { e ->
+                                    Log.e("FirebaseTest", "Test write failed", e)
+                                    Toast.makeText(this, "Test write failed: ${e.message}", Toast.LENGTH_LONG).show()
+                                }
+
+                            val intent = Intent(this, HomePageActivity::class.java)
                             startActivity(intent)
                         } else {
                             Toast.makeText(this, it.exception.toString(), Toast.LENGTH_LONG).show()

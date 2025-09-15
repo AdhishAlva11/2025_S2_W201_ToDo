@@ -3,11 +3,13 @@ package com.autgroup.s2025.w201.todo.activities
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.autgroup.s2025.w201.todo.R
+import com.autgroup.s2025.w201.todo.classes.User
 import com.autgroup.s2025.w201.todo.databinding.ActivityLoginBinding
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -15,6 +17,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.database.FirebaseDatabase
 
 class LoginActivity : AppCompatActivity() {
 
@@ -100,9 +103,54 @@ class LoginActivity : AppCompatActivity() {
         val credential = GoogleAuthProvider.getCredential(account.idToken, null)
         firebaseAuth.signInWithCredential(credential).addOnCompleteListener {
             if (it.isSuccessful) {
-                val intent = Intent(this, HomePageActivity::class.java)
-                startActivity(intent)
-                finish()  // closes login screen
+
+                val user = firebaseAuth.currentUser
+                val userId = user?.uid ?: return@addOnCompleteListener
+
+                val fullName = account.displayName ?: ""
+                val firstLastName = fullName.split(" ")
+                val firstNameFromGoogle = firstLastName.firstOrNull() ?: ""
+                val lastNameFromGoogle = if (firstLastName.size > 1) {
+                    firstLastName.subList(1, firstLastName.size).joinToString(" ")
+                } else ""
+
+                val dbRef = FirebaseDatabase.getInstance(
+                    "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
+                ).getReference(userId)
+
+                // Extract email and photo from Google account
+                val emailFromGoogle = account.email ?: ""
+                val photoUrlFromGoogle = account.photoUrl?.toString()
+
+                //added this  - saves photo
+                val userData = User(
+                    userFirstName = firstNameFromGoogle,
+                    userLastName = lastNameFromGoogle,
+                    email = emailFromGoogle,
+                    photoUrl = photoUrlFromGoogle,
+                    userFavourities = null,
+                    userItineraries = null
+                )
+
+                // Prevent overwriting existing user data
+                dbRef.child("UserData").get().addOnSuccessListener { snapshot ->
+                    if (!snapshot.exists()) {
+                        dbRef.child("UserData").setValue(userData)
+                            .addOnSuccessListener {
+                                Log.d("FirebaseTest", "UserData created successfully")
+                            }
+                            .addOnFailureListener { e ->
+                                Log.e("FirebaseTest", "UserData write failed", e)
+                            }
+                    } else {
+                        Log.d("FirebaseTest", "UserData already exists, not overwriting")
+                    }
+
+                    val intent = Intent(this, HomePageActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                }
+
             } else {
                 Toast.makeText(this, it.exception.toString(), Toast.LENGTH_LONG).show()
             }
