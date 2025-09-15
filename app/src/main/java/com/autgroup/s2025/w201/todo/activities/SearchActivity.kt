@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.autgroup.s2025.w201.todo.R
 import com.autgroup.s2025.w201.todo.classes.Search
+import com.google.android.gms.location.places.Place
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
@@ -22,7 +23,7 @@ class SearchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
-        val apiKey = getString(R.string.google_places_key)
+        val apiKey = getString(R.string.project_google_api_key)
         if (!Places.isInitialized()) {
             Places.initialize(applicationContext, apiKey)
         }

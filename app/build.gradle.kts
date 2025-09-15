@@ -77,6 +77,7 @@ dependencies {
 
     // Glide (for loading profile images from Google account)
     implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation(libs.play.services.places)
     kapt("com.github.bumptech.glide:compiler:4.16.0")
 
     // Testing
