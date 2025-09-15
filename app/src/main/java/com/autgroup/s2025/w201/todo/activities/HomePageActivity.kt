@@ -139,8 +139,7 @@ class HomePageActivity : AppCompatActivity(), OnMapReadyCallback {
                 Log.e("Firebase", "Failed to fetch user data", e)
             }
         }
-
-
+        
         // Check if location permission is granted; if not, request it
         if (ContextCompat.checkSelfPermission(
                 this,
