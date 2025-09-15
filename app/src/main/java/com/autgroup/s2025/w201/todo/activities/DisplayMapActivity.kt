@@ -74,7 +74,7 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun fetchNearbyPlaces(location: LatLng, type: String) {
-        val apiKey = getString(R.string.google_places_key)
+        val apiKey = getString(R.string.project_google_api_key)
         val url =
             "https://maps.googleapis.com/maps/api/place/nearbysearch/json" +
                     "?location=${location.latitude},${location.longitude}" +
