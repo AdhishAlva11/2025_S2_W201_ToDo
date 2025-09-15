@@ -74,9 +74,11 @@ dependencies {
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
     // Glide (for loading profile images from Google account)
     implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation(libs.places)
     kapt("com.github.bumptech.glide:compiler:4.16.0")
 
     // Testing
