@@ -17,6 +17,14 @@ import okhttp3.*
 import org.json.JSONObject
 import java.io.IOException
 
+// Data class for storing place info
+data class PlaceInfo(
+    val name: String,
+    val address: String,
+    val rating: Double,
+    val openStatus: String
+)
+
 class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var searchData: Search? = null
@@ -53,6 +61,7 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(map: GoogleMap) {
         googleMap = map
+
         val lat = searchData?.lat
         val lng = searchData?.lng
         val placeName = searchData?.placeName ?: "Selected Location"
@@ -62,7 +71,7 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
             googleMap.addMarker(MarkerOptions().position(location).title(placeName))
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 14f))
 
-            // Search nearby places for each interest
+            // Fetch nearby places dynamically
             searchData?.interests?.forEach { interest ->
                 interestToType[interest]?.let { type ->
                     fetchNearbyPlaces(location, type)
@@ -70,6 +79,14 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         } else {
             Toast.makeText(this, "Invalid coordinates", Toast.LENGTH_SHORT).show()
+        }
+
+        // Show bottom sheet when marker is clicked
+        googleMap.setOnMarkerClickListener { marker ->
+            val info = marker.tag as? PlaceInfo
+            val bottomSheet = BottomSheetInfo.newInstance(info)
+            bottomSheet.show(supportFragmentManager, "BottomSheetInfo")
+            true
         }
     }
 
@@ -101,10 +118,19 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
                         val lat = geometry.getDouble("lat")
                         val lng = geometry.getDouble("lng")
 
+                        val address = place.optString("vicinity", "No address available")
+                        val rating = place.optDouble("rating", 0.0)
+                        val openNow = if (place.has("opening_hours")) {
+                            if (place.getJSONObject("opening_hours").optBoolean("open_now")) "Open now" else "Closed"
+                        } else {
+                            "Hours not available"
+                        }
+
                         val markerPos = LatLng(lat, lng)
-                        googleMap.addMarker(
+                        val marker = googleMap.addMarker(
                             MarkerOptions().position(markerPos).title(name)
                         )
+                        marker?.tag = PlaceInfo(name, address, rating, openNow)
                     }
                 }
             }
