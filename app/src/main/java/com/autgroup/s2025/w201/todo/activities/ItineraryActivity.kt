@@ -30,7 +30,7 @@ class ItineraryActivity : AppCompatActivity() {
             finish()
         }
 
-        // Add Event → show pop-up
+        // Add Event show pop-up
         val addEvent: TextView = findViewById(R.id.tvAddEvent)
         addEvent.setOnClickListener {
             showAddEventDialog()
