@@ -6,6 +6,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.autgroup.s2025.w201.todo.R
+import com.autgroup.s2025.w201.todo.classes.PlaceInfo
 import com.autgroup.s2025.w201.todo.classes.Search
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -13,21 +14,16 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import okhttp3.*
 import org.json.JSONObject
 import java.io.IOException
 
-// Data class for storing place info
-data class PlaceInfo(
-    val name: String,
-    val address: String,
-    val rating: Double,
-    val openStatus: String
-)
-
 class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var searchData: Search? = null
+    private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var googleMap: GoogleMap
     private val client = OkHttpClient()
 
@@ -130,7 +126,7 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
                         val marker = googleMap.addMarker(
                             MarkerOptions().position(markerPos).title(name)
                         )
-                        marker?.tag = PlaceInfo(name, address, rating, openNow)
+                        marker?.tag = PlaceInfo(name, address, rating, openNow, lat, lng)
                     }
                 }
             }
