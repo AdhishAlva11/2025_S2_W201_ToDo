@@ -16,7 +16,7 @@
         android:layout_height="wrap_content"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:src="@android:drawable/ic_media_previous"
-        android:contentDescription="@string/back"
+        android:text="@string/back_button"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>
 
