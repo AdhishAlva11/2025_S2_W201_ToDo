@@ -89,7 +89,9 @@ class FavouritesActivity : AppCompatActivity() {
     // Retrieve favourites from Firebase Realtime Database
     private fun loadFavourites() {
         val userId = firebaseAuth.currentUser?.uid ?: return
-        val favouritesRef = database.child("users").child(userId).child("favourites")
+        val favouritesRef = FirebaseDatabase.getInstance(
+            "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
+        ).getReference("$userId/Favourites")
 
         favouritesRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
