@@ -1,73 +1,112 @@
 package com.autgroup.s2025.w201.todo.activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.ImageButton
-import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.autgroup.s2025.w201.todo.R
-import com.autgroup.s2025.w201.todo.classes.Favourite
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
-
+import com.google.firebase.database.*
+import com.autgroup.s2025.w201.todo.classes.Favourite
+import com.autgroup.s2025.w201.todo.activities.FavouritesAdapter
 
 class FavouritesActivity : AppCompatActivity() {
 
+    // Firebase references
+    private lateinit var firebaseAuth: FirebaseAuth
+    private lateinit var database: DatabaseReference
+
+    // RecyclerView and adapter
     private lateinit var recyclerView: RecyclerView
-    private lateinit var favouritesAdapter: FavouritesAdapter
     private val favouritesList = mutableListOf<Favourite>()
+    private lateinit var adapter: FavouritesAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContentView(R.layout.activity_favourites)
 
+        // Setup Firebase authentication and database
+        firebaseAuth = FirebaseAuth.getInstance()
+        database = FirebaseDatabase.getInstance().reference
+
+        // Setup RecyclerView with adapter
         recyclerView = findViewById(R.id.recyclerFavourites)
         recyclerView.layoutManager = LinearLayoutManager(this)
+        adapter = FavouritesAdapter(favouritesList) { favourite ->
+            // Handle user tapping a favourite → go to detail/location screen
+            val intent = Intent(this@FavouritesActivity, DisplayMapActivity::class.java).apply {
+                putExtra("placeName", favourite.title)
+                putExtra("lat", favourite.lat)
+                putExtra("lng", favourite.lng)
+            }
+            startActivity(intent)
+        }
+        recyclerView.adapter = adapter
 
-        favouritesAdapter = FavouritesAdapter(favouritesList)
-        recyclerView.adapter = favouritesAdapter
+        // Apply system bar padding
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main_layout)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
 
-        loadFavouritesFromFirebase()
-
-        // Optional: Back button
-        findViewById<ImageButton>(R.id.btnBack).setOnClickListener {
+        // Back button logic
+        val backButton: ImageButton = findViewById(R.id.btnBack)
+        backButton.setOnClickListener {
+            startActivity(Intent(this, HomePageActivity::class.java))
             finish()
         }
 
-        // Optional: Bottom navigation handling
-        val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNav)
+        // Footer navigation
+        val bottomNav: BottomNavigationView = findViewById(R.id.bottomNav)
         bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_home -> {
-                    // Navigate to Home
+                    startActivity(Intent(this, HomePageActivity::class.java))
                     true
                 }
+                R.id.nav_itinerary -> {
+                    startActivity(Intent(this, ItineraryActivity::class.java))
+                    true
+                }
+                R.id.nav_favourites -> true
                 else -> false
             }
         }
+        bottomNav.selectedItemId = R.id.nav_favourites
+
+        // Load favourites for the logged-in user
+        loadFavourites()
     }
 
-    private fun loadFavouritesFromFirebase() {
-        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        val database = FirebaseDatabase.getInstance().getReference("favourites").child(userId)
+    // Retrieve favourites from Firebase Realtime Database
+    private fun loadFavourites() {
+        val userId = firebaseAuth.currentUser?.uid ?: return
+        val favouritesRef = FirebaseDatabase.getInstance(
+            "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
+        ).getReference("$userId/Favourites")
 
-        database.addValueEventListener(object : ValueEventListener {
+        favouritesRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 favouritesList.clear()
-                for (childSnapshot in snapshot.children) {
-                    val favourite = childSnapshot.getValue(Favourite::class.java)
-                    favourite?.let { favouritesList.add(it) }
+                for (favSnapshot in snapshot.children) {
+                    val favourite = favSnapshot.getValue(Favourite::class.java)
+                    if (favourite != null) {
+                        favouritesList.add(favourite)
+                    }
                 }
-                favouritesAdapter.notifyDataSetChanged()
+                adapter.notifyDataSetChanged()
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(this@FavouritesActivity, "Failed to load favourites.", Toast.LENGTH_SHORT).show()
+                println("Error loading favourites: ${error.message}")
             }
         })
     }
