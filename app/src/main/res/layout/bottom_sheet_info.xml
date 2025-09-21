@@ -5,18 +5,25 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
+    <Button
+        android:id="@+id/addFavouriteButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Add to Favourites"/>
+
+    <Button
+        android:id="@+id/btnAddToItinerary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Add to Itinerary" />
+
     <TextView
         android:id="@+id/titleText"
         android:textStyle="bold"
         android:textSize="18sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
-
-    <Button
-        android:id="@+id/addFavouriteButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Add to Favourites"/>
 
     <TextView
         android:id="@+id/addressText"

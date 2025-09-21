@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import android.widget.Button
+import androidx.appcompat.app.AlertDialog
 import com.autgroup.s2025.w201.todo.R
 import com.autgroup.s2025.w201.todo.classes.PlaceInfo
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -56,6 +57,7 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
         val ratingText = view.findViewById<TextView>(R.id.ratingText)
         val openStatusText = view.findViewById<TextView>(R.id.openStatusText)
         val addFavButton = view.findViewById<Button>(R.id.addFavouriteButton)
+        val addToItineraryBtn = view.findViewById<Button>(R.id.btnAddToItinerary)
 
         val name = arguments?.getString(ARG_NAME) ?: "No Name"
         val address = arguments?.getString(ARG_ADDRESS) ?: "No Address"
@@ -89,6 +91,55 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
                     Toast.makeText(context, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
                 }
         }
+
+        addToItineraryBtn.setOnClickListener {
+            // Create a PlaceInfo object from the arguments
+            val place = PlaceInfo(
+                name = arguments?.getString(ARG_NAME) ?: "",
+                address = arguments?.getString(ARG_ADDRESS) ?: "",
+                rating = arguments?.getDouble(ARG_RATING) ?: 0.0,
+                openStatus = arguments?.getString(ARG_STATUS) ?: "",
+                lat = arguments?.getDouble("lat") ?: 0.0,
+                lng = arguments?.getDouble("lng") ?: 0.0
+            )
+            showChooseItineraryDialog(place)
+        }
     }
+
+    private fun showChooseItineraryDialog(place: PlaceInfo) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val dbRef = FirebaseDatabase.getInstance(
+            "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
+        ).getReference("$userId/Itineraries")
+
+        dbRef.get().addOnSuccessListener { snapshot ->
+            val itineraryNames = snapshot.children.map { it.key ?: "" }
+            /*if (itineraryNames.isEmpty()) {
+                Toast.makeText(context, "No itineraries yet. Create one first.", Toast.LENGTH_LONG).show()
+                return@addOnSuccessListener
+            }*/
+
+            val builder = AlertDialog.Builder(requireContext())
+            builder.setTitle("Add to itinerary")
+            builder.setItems(itineraryNames.toTypedArray()) { _, which ->
+                val selected = itineraryNames[which]
+                addActivityToItinerary(place, selected)
+            }
+            builder.show()
+        }
+    }
+
+    private fun addActivityToItinerary(place: PlaceInfo, itineraryName: String) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val dbRef = FirebaseDatabase.getInstance(
+            "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
+        ).getReference("$userId/Itineraries/$itineraryName")
+
+        dbRef.push().setValue(place)
+            .addOnSuccessListener {
+                Toast.makeText(context, "Added to $itineraryName!", Toast.LENGTH_SHORT).show()
+            }
+    }
+
 
 }

@@ -11,6 +11,8 @@ import androidx.appcompat.widget.PopupMenu
 import com.autgroup.s2025.w201.todo.R
 import com.autgroup.s2025.w201.todo.classes.Itinerary
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 
 class ItineraryActivity : AppCompatActivity() {
 
@@ -67,75 +69,50 @@ class ItineraryActivity : AppCompatActivity() {
     private fun showAddEventDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_event, null)
         val etEventName = dialogView.findViewById<EditText>(R.id.etEventName)
-        val etStartDate = dialogView.findViewById<EditText>(R.id.etStartDate)
-        val etDuration = dialogView.findViewById<EditText>(R.id.etDuration)
 
         AlertDialog.Builder(this)
-            .setTitle("Add Event")
+            .setTitle("Add Itinerary")
             .setView(dialogView)
             .setPositiveButton("Add") { _, _ ->
                 val name = etEventName.text.toString()
-                val startDate = etStartDate.text.toString()
-                val duration = etDuration.text.toString().toIntOrNull() ?: 1
-
-                addItinerary(name, startDate, duration)
+                addItinerary(name)
             }
             .setNegativeButton("Cancel", null)
             .show()
     }
 
-    private fun addItinerary(name: String, startDate: String, duration: Int) {
-        val itinerary = Itinerary(name, startDate, duration)
-        itineraries.add(itinerary)
 
+    private fun addItinerary(name: String) {
+        // Save to Firebase as an empty itinerary
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val dbRef = FirebaseDatabase.getInstance(
+            "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
+        ).getReference("$userId/Itineraries")
+
+        dbRef.child(name).setValue(name)
+            .addOnSuccessListener {
+                Toast.makeText(this, "Itinerary '$name' created!", Toast.LENGTH_SHORT).show()
+            }
+
+        // Also add to your local list so you can show it instantly
+        itineraries.add(Itinerary(name)) // your Itinerary model can just be name now
+
+        // Add a card to the UI
         val itineraryList = findViewById<LinearLayout>(R.id.itineraryList)
         val cardView = layoutInflater.inflate(R.layout.trip_card_template, itineraryList, false)
-
         val tripTitle = cardView.findViewById<TextView>(R.id.tripTitle)
-        val tripDate = cardView.findViewById<TextView>(R.id.tripDate)
-        val tripDays = cardView.findViewById<TextView>(R.id.tripDays)
-        val tripMenu: ImageButton = cardView.findViewById(R.id.tripMenu2)
-
-        // Set UI values
-        tripTitle.text = itinerary.name
-        tripDate.text = getString(R.string.trip_start_date, itinerary.startDate)
-        tripDays.text = getString(R.string.trip_duration, itinerary.duration)
-
-        // Popup menu for edit/delete
-        tripMenu.setOnClickListener { view ->
-            val popup = PopupMenu(this, view)
-            popup.menuInflater.inflate(R.menu.trip_card_menu, popup.menu)
-            popup.setOnMenuItemClickListener { item ->
-                when (item.itemId) {
-                    R.id.action_edit -> {
-                        showEditItineraryDialog(itinerary, cardView)
-                        true
-                    }
-                    R.id.action_delete -> {
-                        itineraryList.removeView(cardView)
-                        itineraries.remove(itinerary)
-                        true
-                    }
-                    else -> false
-                }
-            }
-            popup.show()
-        }
-
+        tripTitle.text = name
         itineraryList.addView(cardView)
-        Toast.makeText(this, "Event added!", Toast.LENGTH_SHORT).show()
     }
+
 
     private fun showEditItineraryDialog(itinerary: Itinerary, cardView: View) {
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_event, null)
         val etEventName = dialogView.findViewById<EditText>(R.id.etEventName)
-        val etStartDate = dialogView.findViewById<EditText>(R.id.etStartDate)
-        val etDuration = dialogView.findViewById<EditText>(R.id.etDuration)
+
 
         // Pre-fill existing itinerary data
         etEventName.setText(itinerary.name)
-        etStartDate.setText(itinerary.startDate)
-        etDuration.setText(itinerary.duration.toString())
 
         AlertDialog.Builder(this)
             .setTitle("Edit Event")
@@ -143,8 +120,6 @@ class ItineraryActivity : AppCompatActivity() {
             .setPositiveButton("Save") { _, _ ->
                 // Update itinerary object
                 itinerary.name = etEventName.text.toString()
-                itinerary.startDate = etStartDate.text.toString()
-                itinerary.duration = etDuration.text.toString().toIntOrNull() ?: 1
 
                 // Update the UI
                 val tripTitle = cardView.findViewById<TextView>(R.id.tripTitle)
@@ -152,8 +127,6 @@ class ItineraryActivity : AppCompatActivity() {
                 val tripDays = cardView.findViewById<TextView>(R.id.tripDays)
 
                 tripTitle.text = itinerary.name
-                tripDate.text = getString(R.string.trip_start_date, itinerary.startDate)
-                tripDays.text = getString(R.string.trip_duration, itinerary.duration)
             }
             .setNegativeButton("Cancel", null)
             .show()
