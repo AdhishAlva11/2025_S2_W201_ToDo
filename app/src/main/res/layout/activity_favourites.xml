@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+    android:id="@+id/main_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="16dp"
     tools:context=".activities.FavouritesActivity">
@@ -22,8 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_media_previous"
-            android:contentDescription="Back" />
+            android:src="@android:drawable/ic_media_previous" />
 
         <!-- Title -->
         <TextView
@@ -31,45 +31,24 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
-            android:text="Favourites"
+            android:text="@string/favourites"
             android:textColor="@color/ColourTheme"
             android:textSize="20sp"
-            android:textStyle="bold" />
-
+            android:textStyle="bold"/>
     </LinearLayout>
 
-    <!-- Add Favourite Button -->
-    <TextView
-        android:id="@+id/tvAddFavourite"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Add Favourite +"
-        android:textSize="16sp" />
-
-    <!-- Scrollable List for Favourites -->
-    <ScrollView
+    <!-- RecyclerView for favourites -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerFavourites"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginTop="16dp">
-
-        <LinearLayout
-            android:id="@+id/favouritesList"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <!-- No static favourites for now; they will be added dynamically later -->
-
-        </LinearLayout>
-    </ScrollView>
+        android:paddingTop="12dp"/>
 
     <!-- Bottom Navigation/Footer -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        app:menu="@menu/bottom_nav_menu" />
+        app:menu="@menu/bottom_nav_menu"/>
 </LinearLayout>

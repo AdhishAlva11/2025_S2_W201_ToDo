@@ -5,6 +5,6 @@ class User(
     var userLastName: String? = null,
     var email: String? = null,               // new: store email
     var photoUrl: String? = null,            // new: store Google photo (optional)
-    var userFavourities: Favourities? = null,
+    var userFavourities: Favourite? = null,
     var userItineraries: List<PlaceInfo>? = null
 )

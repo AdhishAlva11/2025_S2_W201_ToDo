@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">2025_S2_(W201)_ToDo</string>
+    <string name="app_name">2025_S2_W201_ToDo</string>
     <string name="title_activity_display_map">DisplayMapActivity</string>
     <string name="title_activity_home_page">HomePageActivity</string>
 
@@ -14,7 +14,7 @@
     <string name="start_date">Start Date:</string>
     <string name="trip_name">Trip Name</string>
     <string name="add_event">Add Event +</string>
-    <string name="back">Back</string>
+    <string name="back_button">Back</string>
 
     <!-- Strings used in ItineraryActivity -->
     <string name="trip_start_date">Start Date: %s</string>
@@ -32,4 +32,5 @@
 
     <!-- Trip card menu -->
     <string name="trip_menu">Trip Menu</string>
+    <string name="favourites">Favourites</string>
 </resources>
