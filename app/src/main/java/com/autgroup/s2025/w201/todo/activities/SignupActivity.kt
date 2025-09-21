@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.autgroup.s2025.w201.todo.classes.Activity
 import com.autgroup.s2025.w201.todo.classes.Favourities
 import com.autgroup.s2025.w201.todo.classes.User
 import com.autgroup.s2025.w201.todo.databinding.ActivitySignupBinding

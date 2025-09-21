@@ -1,8 +1,10 @@
 package com.autgroup.s2025.w201.todo.classes
 
-data class Activity(
+data class PlaceInfo(
     val name: String,
     val address: String,
     val rating: Double,
-    val openStatus: String
+    val openStatus: String,
+    val lat: Double,
+    val lng: Double
 )

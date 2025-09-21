@@ -12,6 +12,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
+    <Button
+        android:id="@+id/addFavouriteButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Add to Favourites"/>
+
     <TextView
         android:id="@+id/addressText"
         android:textSize="16sp"
