@@ -4,45 +4,39 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
     tools:context=".activities.HomePageActivity">
 
-    <!-- Toolbar at the top -->
+    <!-- Toolbar with Search Bar -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="wrap_content"
+        android:minHeight="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:fitsSystemWindows="true"
+        android:padding="8dp"
         android:layout_alignParentTop="true">
 
         <!-- Search Bar -->
-        <LinearLayout
+        <EditText
+            android:id="@+id/search_bar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="6dp"
+            android:background="@drawable/search_edittext_bg"
+            android:backgroundTint="@android:color/white"
+            android:cursorVisible="false"
+            android:drawableEnd="@android:drawable/ic_menu_search"
+            android:focusable="false"
             android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <EditText
-                android:id="@+id/search_bar"
-                android:layout_width="0dp"
-                android:layout_height="32dp"
-                android:layout_marginStart="6dp"
-                android:layout_marginEnd="24dp"
-                android:layout_weight="1"
-                android:background="@drawable/search_edittext_bg"
-                android:backgroundTint="@android:color/white"
-                android:cursorVisible="false"
-                android:drawableEnd="@android:drawable/ic_menu_search"
-                android:focusable="false"
-                android:gravity="center_vertical"
-                android:hint="Search..."
-                android:imeOptions="actionSearch"
-                android:paddingStart="6dp"
-                android:paddingEnd="6dp"
-                android:singleLine="true"
-                android:textColor="@android:color/black" />
-        </LinearLayout>
+            android:hint="Search..."
+            android:imeOptions="actionSearch"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:singleLine="true"
+            android:textColor="@android:color/black" />
     </androidx.appcompat.widget.Toolbar>
 
     <!-- Map Fragment (fills space between toolbar and bottom nav) -->
