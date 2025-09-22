@@ -1,5 +1,6 @@
 package com.autgroup.s2025.w201.todo.activities
 
+import android.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -7,14 +8,16 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.autgroup.s2025.w201.todo.R
 import com.autgroup.s2025.w201.todo.classes.Itinerary
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 
 class ItineraryAdapter(
-    private val itineraries: List<Itinerary>,
-    private val onItemClick: (Itinerary) -> Unit
+    private val itineraries: MutableList<Itinerary>,
+    private val onClick: (Itinerary) -> Unit
 ) : RecyclerView.Adapter<ItineraryAdapter.ItineraryViewHolder>() {
 
     inner class ItineraryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val itineraryName: TextView = itemView.findViewById(R.id.itineraryName)
+        val txtItineraryName: TextView = itemView.findViewById(R.id.itineraryName)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItineraryViewHolder {
@@ -25,10 +28,31 @@ class ItineraryAdapter(
 
     override fun onBindViewHolder(holder: ItineraryViewHolder, position: Int) {
         val itinerary = itineraries[position]
-        holder.itineraryName.text = itinerary.name
+        holder.txtItineraryName.text = itinerary.name ?: "Unnamed"
 
+        // Click → open details
         holder.itemView.setOnClickListener {
-            onItemClick(itinerary)
+            onClick(itinerary)
+        }
+
+        // Long-click → delete
+        holder.itemView.setOnLongClickListener {
+            AlertDialog.Builder(holder.itemView.context)
+                .setTitle("Delete Itinerary")
+                .setMessage("Are you sure you want to delete '${itinerary.name}'?")
+                .setPositiveButton("Yes") { _, _ ->
+                    val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@setPositiveButton
+                    val dbRef = FirebaseDatabase.getInstance(
+                        "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
+                    ).getReference("$userId/Itineraries")
+
+                    dbRef.child(itinerary.name ?: "").removeValue()
+                    itineraries.removeAt(position)
+                    notifyItemRemoved(position)
+                }
+                .setNegativeButton("No", null)
+                .show()
+            true
         }
     }
 

@@ -30,7 +30,7 @@ class ItineraryActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.recyclerItineraries)
         recyclerView.layoutManager = LinearLayoutManager(this)
         adapter = ItineraryAdapter(itineraries) { itinerary ->
-            // On itinerary click → open details
+            // On click: open itinerary details
             val intent = Intent(this, ItineraryDetailActivity::class.java)
             intent.putExtra("itineraryName", itinerary.name)
             startActivity(intent)
@@ -42,7 +42,7 @@ class ItineraryActivity : AppCompatActivity() {
             finish()
         }
 
-        // Add itinerary
+        // Add itinerary button
         findViewById<TextView>(R.id.tvAddEvent).setOnClickListener {
             showAddItineraryDialog()
         }
@@ -50,7 +50,7 @@ class ItineraryActivity : AppCompatActivity() {
         // Load itineraries from Firebase
         loadItineraries()
 
-        // Bottom nav
+        // Bottom navigation
         val bottomNav: BottomNavigationView = findViewById(R.id.bottomNav)
         bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
@@ -90,16 +90,19 @@ class ItineraryActivity : AppCompatActivity() {
             "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
         ).getReference("$userId/Itineraries")
 
-        // Save empty itinerary in Firebase
-        dbRef.child(name).setValue(name)
+        // Create an empty itinerary object in Firebase
+        dbRef.child(name).setValue(mapOf<String, Any>())
             .addOnSuccessListener {
                 Toast.makeText(this, "Itinerary '$name' created!", Toast.LENGTH_SHORT).show()
-            }
 
-        // Add locally
-        val itinerary = Itinerary(name)
-        itineraries.add(itinerary)
-        adapter.notifyItemInserted(itineraries.size - 1)
+                // Add locally to update RecyclerView
+                val itinerary = Itinerary(name)
+                itineraries.add(itinerary)
+                adapter.notifyItemInserted(itineraries.size - 1)
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Failed to create itinerary: ${e.message}", Toast.LENGTH_LONG).show()
+            }
     }
 
     private fun loadItineraries() {

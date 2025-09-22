@@ -8,7 +8,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.autgroup.s2025.w201.todo.R
 import com.autgroup.s2025.w201.todo.classes.PlaceInfo
 
-class PlaceAdapter(private val places: List<PlaceInfo>) : RecyclerView.Adapter<PlaceAdapter.PlaceViewHolder>() {
+class PlaceAdapter(
+    private val places: MutableList<PlaceInfo>,
+    private val onLongClick: (PlaceInfo, Int) -> Unit
+) : RecyclerView.Adapter<PlaceAdapter.PlaceViewHolder>() {
 
     inner class PlaceViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val txtName: TextView = itemView.findViewById(R.id.txtPlaceName)
@@ -25,11 +28,17 @@ class PlaceAdapter(private val places: List<PlaceInfo>) : RecyclerView.Adapter<P
 
     override fun onBindViewHolder(holder: PlaceViewHolder, position: Int) {
         val place = places[position]
-        holder.txtName.text = place.name
-        holder.txtAddress.text = place.address
-        holder.txtStatus.text = place.openStatus
-        holder.txtRating.text = "⭐ ${place.rating}"
+        holder.txtName.text = place.name ?: ""
+        holder.txtAddress.text = place.address ?: ""
+        holder.txtStatus.text = place.openStatus ?: ""
+        holder.txtRating.text = place.rating?.toString() ?: "N/A"
+
+        holder.itemView.setOnLongClickListener {
+            onLongClick(place, position)
+            true
+        }
     }
 
     override fun getItemCount(): Int = places.size
 }
+
