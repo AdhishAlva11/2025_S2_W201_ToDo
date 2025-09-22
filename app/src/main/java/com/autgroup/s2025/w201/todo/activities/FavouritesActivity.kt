@@ -2,64 +2,32 @@ package com.autgroup.s2025.w201.todo.activities
 
 import android.content.Intent
 import android.os.Bundle
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import android.widget.ImageButton
 import android.widget.TextView
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.autgroup.s2025.w201.todo.R
 
-class FavouritesActivity : AppCompatActivity() {
+class FavouritesActivity : BaseActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContentView(R.layout.activity_favourites)
 
-        // Apply window insets
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
+        // Inject Favourites layout into BaseActivity skeleton
+        layoutInflater.inflate(R.layout.activity_favourites, findViewById(R.id.content_frame))
 
-        // Back button
+        // Highlight Favourites tab in bottom navigation
+        setupBottomNavigation(R.id.nav_favourites)
+
+        // Back button → optional (since bottom nav already handles Home)
         val backButton: ImageButton = findViewById(R.id.btnBack)
         backButton.setOnClickListener {
-            val intent = Intent(this, HomePageActivity::class.java)
-            startActivity(intent)
-            finish()
+            startActivity(Intent(this, HomePageActivity::class.java))
+            // finish() not strictly needed, but can be kept if you don’t want this screen in back stack
         }
 
-        // Add Favourite (not functional yet, just logs)
+        // Add Favourite action (stub)
         val addFavourite: TextView = findViewById(R.id.tvAddFavourite)
         addFavourite.setOnClickListener {
             println("Add Favourite clicked (not functional yet)")
         }
-
-        // Footer Navigation
-        val bottomNav: BottomNavigationView = findViewById(R.id.bottomNav)
-        bottomNav.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.nav_home -> {
-                    startActivity(Intent(this, HomePageActivity::class.java))
-                    true
-                }
-
-                R.id.nav_itinerary -> {
-                    startActivity(Intent(this, ItineraryActivity::class.java))
-                    true
-                }
-
-                R.id.nav_favourites -> {
-                    // already here
-                    true
-                }
-
-                else -> false
-            }
-        }
-        bottomNav.selectedItemId = R.id.nav_favourites
     }
 }

@@ -1,20 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="16dp"
     tools:context=".activities.FavouritesActivity">
 
-    <!-- Top Bar -->
+    <!-- Page Title Row (sits right under the search bar from BaseActivity) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:layout_marginTop="8dp"> <!-- adds spacing under search bar -->
 
         <!-- Back Button -->
         <ImageButton
@@ -35,7 +35,6 @@
             android:textColor="@color/ColourTheme"
             android:textSize="20sp"
             android:textStyle="bold" />
-
     </LinearLayout>
 
     <!-- Add Favourite Button -->
@@ -45,9 +44,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="Add Favourite +"
-        android:textSize="16sp" />
+        android:textSize="16sp"/>
 
-    <!-- Scrollable List for Favourites -->
+    <!-- Scrollable List -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -58,18 +57,6 @@
             android:id="@+id/favouritesList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <!-- No static favourites for now; they will be added dynamically later -->
-
-        </LinearLayout>
+            android:orientation="vertical"/>
     </ScrollView>
-
-    <!-- Bottom Navigation/Footer -->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNav"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        app:menu="@menu/bottom_nav_menu" />
 </LinearLayout>
