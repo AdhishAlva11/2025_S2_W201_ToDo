@@ -1,5 +1,6 @@
 package com.autgroup.s2025.w201.todo.classes
 
+import com.google.android.libraries.places.api.model.Review
 import java.io.Serializable
 
 data class PlaceInfo(
