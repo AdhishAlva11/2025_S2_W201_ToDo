@@ -1,7 +1,9 @@
 package com.autgroup.s2025.w201.todo.activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -15,6 +17,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.autgroup.s2025.w201.todo.classes.Review
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import okhttp3.*
 import org.json.JSONObject
 import java.io.IOException
@@ -38,6 +41,44 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_display_map)
 
+        // --- Toolbar setup ---
+        setSupportActionBar(findViewById(R.id.toolbar))
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+
+        // Search bar click → open SearchActivity
+        val searchBar = findViewById<EditText>(R.id.search_bar)
+        searchBar.setOnClickListener {
+            val intent = Intent(this, SearchActivity::class.java)
+            startActivity(intent)
+        }
+
+        // --- Bottom Navigation setup ---
+        val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_navigation)
+        bottomNav.selectedItemId = R.id.nav_home // highlight "Home" or whichever makes sense
+
+        bottomNav.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_home -> {
+                    startActivity(Intent(this, HomePageActivity::class.java))
+                    true
+                }
+                R.id.nav_favourites -> {
+                    startActivity(Intent(this, FavouritesActivity::class.java))
+                    true
+                }
+                R.id.nav_itinerary -> {
+                    startActivity(Intent(this, ItineraryActivity::class.java))
+                    true
+                }
+                R.id.nav_profile -> {
+                    startActivity(Intent(this, ProfileActivity::class.java))
+                    true
+                }
+                else -> false
+            }
+        }
+
+        // --- Data from intent ---
         searchData = intent.getSerializableExtra("searchData") as? Search
         if (searchData == null) {
             Toast.makeText(this, "No location data received", Toast.LENGTH_SHORT).show()
