@@ -19,33 +19,33 @@ class ItineraryDetailActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: PlaceAdapter
     private val activities = mutableListOf<PlaceInfo>()
+    private lateinit var itineraryName: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_itinerary_detail)
 
-        val itineraryName = intent.getStringExtra("itineraryName") ?: "Itinerary"
-
-        // Set title as itinerary name
-        val tvTitle = findViewById<TextView>(R.id.tvItineraryTitle) // add a TextView in XML for title
-        tvTitle.text = itineraryName
+        itineraryName = intent.getStringExtra("itineraryName") ?: return
 
         // Back button
-        val backButton = findViewById<ImageButton>(R.id.btnBack)
-        backButton.setOnClickListener {
-            finish() // Simply finish this activity to go back
-        }
+        findViewById<ImageButton>(R.id.btnBack).setOnClickListener { finish() }
 
+        // Dynamic title
+        findViewById<TextView>(R.id.tvItineraryTitle).text = itineraryName
+
+        // RecyclerView setup
         recyclerView = findViewById(R.id.recyclerViewItinerary)
         recyclerView.layoutManager = LinearLayoutManager(this)
-        adapter = PlaceAdapter(activities)
+        adapter = PlaceAdapter(activities) { place, position ->
+            deletePlace(place, position)
+        }
         recyclerView.adapter = adapter
 
-        loadActivities(itineraryName)
+        loadActivities()
     }
 
-    private fun loadActivities(itineraryName: String) {
+    private fun loadActivities() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val dbRef = FirebaseDatabase.getInstance(
             "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
@@ -55,6 +55,7 @@ class ItineraryDetailActivity : AppCompatActivity() {
             override fun onDataChange(snapshot: DataSnapshot) {
                 activities.clear()
                 for (child in snapshot.children) {
+                    // Only parse if it's a PlaceInfo object
                     val place = child.getValue(PlaceInfo::class.java)
                     if (place != null) activities.add(place)
                 }
@@ -62,10 +63,26 @@ class ItineraryDetailActivity : AppCompatActivity() {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(this@ItineraryDetailActivity, "Failed: ${error.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this@ItineraryDetailActivity,
+                    "Failed to load itinerary: ${error.message}",
+                    Toast.LENGTH_LONG
+                ).show()
             }
         })
     }
 
+    private fun deletePlace(place: PlaceInfo, position: Int) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val dbRef = FirebaseDatabase.getInstance(
+            "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
+        ).getReference("$userId/Itineraries/$itineraryName")
 
+        dbRef.orderByChild("name").equalTo(place.name).get().addOnSuccessListener { snapshot ->
+            snapshot.children.forEach { it.ref.removeValue() }
+            activities.removeAt(position)
+            adapter.notifyItemRemoved(position)
+            Toast.makeText(this, "${place.name} removed", Toast.LENGTH_SHORT).show()
+        }
+    }
 }

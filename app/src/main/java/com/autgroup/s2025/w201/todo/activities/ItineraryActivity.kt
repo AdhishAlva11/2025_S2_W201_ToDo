@@ -30,7 +30,7 @@ class ItineraryActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.recyclerItineraries)
         recyclerView.layoutManager = LinearLayoutManager(this)
         adapter = ItineraryAdapter(itineraries) { itinerary ->
-            // On itinerary click → open details
+            // On click: open itinerary details
             val intent = Intent(this, ItineraryDetailActivity::class.java)
             intent.putExtra("itineraryName", itinerary.name)
             startActivity(intent)
@@ -42,7 +42,7 @@ class ItineraryActivity : AppCompatActivity() {
             finish()
         }
 
-        // Add itinerary
+        // Add itinerary button
         findViewById<TextView>(R.id.tvAddEvent).setOnClickListener {
             showAddItineraryDialog()
         }
@@ -50,31 +50,23 @@ class ItineraryActivity : AppCompatActivity() {
         // Load itineraries from Firebase
         loadItineraries()
 
-        // --- Bottom Navigation ---
+        // Bottom navigation
         val bottomNav: BottomNavigationView = findViewById(R.id.bottomNav)
-        bottomNav.selectedItemId = R.id.nav_itinerary  // highlight Itinerary tab
-
         bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_home -> {
                     startActivity(Intent(this, HomePageActivity::class.java))
-                    overridePendingTransition(0, 0)
                     true
                 }
+                R.id.nav_itinerary -> true
                 R.id.nav_favourites -> {
                     startActivity(Intent(this, FavouritesActivity::class.java))
-                    overridePendingTransition(0, 0)
-                    true
-                }
-                R.id.nav_itinerary -> true // already here
-                R.id.nav_profile -> {
-                    startActivity(Intent(this, ProfileActivity::class.java))
-                    overridePendingTransition(0, 0)
                     true
                 }
                 else -> false
             }
         }
+        bottomNav.selectedItemId = R.id.nav_itinerary
     }
 
     private fun showAddItineraryDialog() {
@@ -98,14 +90,15 @@ class ItineraryActivity : AppCompatActivity() {
             "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
         ).getReference("$userId/Itineraries")
 
+        // Save the itinerary as a string (name)
         dbRef.child(name).setValue(name)
             .addOnSuccessListener {
                 Toast.makeText(this, "Itinerary '$name' created!", Toast.LENGTH_SHORT).show()
-            }
 
-        val itinerary = Itinerary(name)
-        itineraries.add(itinerary)
-        adapter.notifyItemInserted(itineraries.size - 1)
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Failed to create itinerary: ${it.message}", Toast.LENGTH_LONG).show()
+            }
     }
 
     private fun loadItineraries() {
