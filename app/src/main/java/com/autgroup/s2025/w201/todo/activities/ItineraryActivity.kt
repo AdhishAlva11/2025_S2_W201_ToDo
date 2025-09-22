@@ -90,18 +90,14 @@ class ItineraryActivity : AppCompatActivity() {
             "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
         ).getReference("$userId/Itineraries")
 
-        // Create an empty itinerary object in Firebase
-        dbRef.child(name).setValue(mapOf<String, Any>())
+        // Save the itinerary as a string (name)
+        dbRef.child(name).setValue(name)
             .addOnSuccessListener {
                 Toast.makeText(this, "Itinerary '$name' created!", Toast.LENGTH_SHORT).show()
 
-                // Add locally to update RecyclerView
-                val itinerary = Itinerary(name)
-                itineraries.add(itinerary)
-                adapter.notifyItemInserted(itineraries.size - 1)
             }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Failed to create itinerary: ${e.message}", Toast.LENGTH_LONG).show()
+            .addOnFailureListener {
+                Toast.makeText(this, "Failed to create itinerary: ${it.message}", Toast.LENGTH_LONG).show()
             }
     }
 
