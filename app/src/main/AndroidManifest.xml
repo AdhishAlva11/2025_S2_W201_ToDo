@@ -15,6 +15,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme._2025_S2_W201_ToDo" >
+
+        <activity
+            android:name=".activities.ProfileActivity"
+            android:exported="false" />
+
         <activity
             android:name=".activities.SignupActivity"
             android:exported="false" />
@@ -38,7 +43,6 @@
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
