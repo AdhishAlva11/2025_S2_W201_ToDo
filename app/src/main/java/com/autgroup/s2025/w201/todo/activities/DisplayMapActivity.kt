@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.autgroup.s2025.w201.todo.R
 import com.autgroup.s2025.w201.todo.classes.PlaceInfo
+import com.autgroup.s2025.w201.todo.classes.Review
 import com.autgroup.s2025.w201.todo.classes.Search
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -14,8 +15,6 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.FirebaseDatabase
 import okhttp3.*
 import org.json.JSONObject
 import java.io.IOException
@@ -23,7 +22,6 @@ import java.io.IOException
 class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var searchData: Search? = null
-    private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var googleMap: GoogleMap
     private val client = OkHttpClient()
 
@@ -67,7 +65,6 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
             googleMap.addMarker(MarkerOptions().position(location).title(placeName))
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 14f))
 
-            // Fetch nearby places dynamically
             searchData?.interests?.forEach { interest ->
                 interestToType[interest]?.let { type ->
                     fetchNearbyPlaces(location, type)
@@ -77,11 +74,12 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
             Toast.makeText(this, "Invalid coordinates", Toast.LENGTH_SHORT).show()
         }
 
-        // Show bottom sheet when marker is clicked
         googleMap.setOnMarkerClickListener { marker ->
             val info = marker.tag as? PlaceInfo
-            val bottomSheet = BottomSheetInfo.newInstance(info)
-            bottomSheet.show(supportFragmentManager, "BottomSheetInfo")
+            if (info != null) {
+                val bottomSheet = BottomSheetInfo.newInstance(info)
+                bottomSheet.show(supportFragmentManager, "BottomSheetInfo")
+            }
             true
         }
     }
@@ -109,26 +107,77 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
                 runOnUiThread {
                     for (i in 0 until results.length()) {
                         val place = results.getJSONObject(i)
-                        val name = place.getString("name")
-                        val geometry = place.getJSONObject("geometry").getJSONObject("location")
-                        val lat = geometry.getDouble("lat")
-                        val lng = geometry.getDouble("lng")
-
-                        val address = place.optString("vicinity", "No address available")
-                        val rating = place.optDouble("rating", 0.0)
-                        val openNow = if (place.has("opening_hours")) {
-                            if (place.getJSONObject("opening_hours").optBoolean("open_now")) "Open now" else "Closed"
-                        } else {
-                            "Hours not available"
+                        val placeId = place.getString("place_id")
+                        fetchPlaceDetails(placeId) { placeInfo ->
+                            runOnUiThread {
+                                val markerPos = LatLng(placeInfo.lat!!, placeInfo.lng!!)
+                                val marker = googleMap.addMarker(
+                                    MarkerOptions().position(markerPos).title(placeInfo.name)
+                                )
+                                marker?.tag = placeInfo
+                            }
                         }
-
-                        val markerPos = LatLng(lat, lng)
-                        val marker = googleMap.addMarker(
-                            MarkerOptions().position(markerPos).title(name)
-                        )
-                        marker?.tag = PlaceInfo(name, address, rating, openNow, lat, lng)
                     }
                 }
+            }
+        })
+    }
+
+    private fun fetchPlaceDetails(placeId: String, onResult: (PlaceInfo) -> Unit) {
+        val apiKey = getString(R.string.project_google_api_key)
+        val url = "https://maps.googleapis.com/maps/api/place/details/json" +
+                "?place_id=$placeId" +
+                "&fields=name,rating,formatted_address,opening_hours,reviews,geometry" +
+                "&key=$apiKey"
+
+        val request = Request.Builder().url(url).build()
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e("PlaceDetailsAPI", "Request failed", e)
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                val body = response.body?.string() ?: return
+                val json = JSONObject(body).getJSONObject("result")
+
+                val name = json.optString("name", "No name")
+                val address = json.optString("formatted_address", "No address")
+                val rating = json.optDouble("rating", 0.0)
+                val openNow = if (json.has("opening_hours")) {
+                    if (json.getJSONObject("opening_hours").optBoolean("open_now")) "Open now" else "Closed"
+                } else "Hours not available"
+
+                val geometry = json.getJSONObject("geometry").getJSONObject("location")
+                val lat = geometry.getDouble("lat")
+                val lng = geometry.getDouble("lng")
+
+                val reviewsList = mutableListOf<Review>()
+                if (json.has("reviews")) {
+                    val reviews = json.getJSONArray("reviews")
+                    for (i in 0 until reviews.length()) {
+                        val r = reviews.getJSONObject(i)
+                        reviewsList.add(
+                            Review(
+                                authorName = r.optString("author_name"),
+                                rating = r.optDouble("rating"),
+                                time = r.optString("relative_time_description"),
+                                text = r.optString("text")
+                            )
+                        )
+                    }
+                }
+
+                val placeInfo = PlaceInfo(
+                    name = name,
+                    address = address,
+                    rating = rating,
+                    openStatus = openNow,
+                    lat = lat,
+                    lng = lng,
+                    reviews = reviewsList
+                )
+
+                onResult(placeInfo)
             }
         })
     }
