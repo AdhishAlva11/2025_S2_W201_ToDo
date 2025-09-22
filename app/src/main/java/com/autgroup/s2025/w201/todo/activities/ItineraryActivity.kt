@@ -50,23 +50,31 @@ class ItineraryActivity : AppCompatActivity() {
         // Load itineraries from Firebase
         loadItineraries()
 
-        // Bottom nav
+        // --- Bottom Navigation ---
         val bottomNav: BottomNavigationView = findViewById(R.id.bottomNav)
+        bottomNav.selectedItemId = R.id.nav_itinerary  // highlight Itinerary tab
+
         bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_home -> {
                     startActivity(Intent(this, HomePageActivity::class.java))
+                    overridePendingTransition(0, 0)
                     true
                 }
-                R.id.nav_itinerary -> true
                 R.id.nav_favourites -> {
                     startActivity(Intent(this, FavouritesActivity::class.java))
+                    overridePendingTransition(0, 0)
+                    true
+                }
+                R.id.nav_itinerary -> true // already here
+                R.id.nav_profile -> {
+                    startActivity(Intent(this, ProfileActivity::class.java))
+                    overridePendingTransition(0, 0)
                     true
                 }
                 else -> false
             }
         }
-        bottomNav.selectedItemId = R.id.nav_itinerary
     }
 
     private fun showAddItineraryDialog() {
@@ -90,13 +98,11 @@ class ItineraryActivity : AppCompatActivity() {
             "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
         ).getReference("$userId/Itineraries")
 
-        // Save empty itinerary in Firebase
         dbRef.child(name).setValue(name)
             .addOnSuccessListener {
                 Toast.makeText(this, "Itinerary '$name' created!", Toast.LENGTH_SHORT).show()
             }
 
-        // Add locally
         val itinerary = Itinerary(name)
         itineraries.add(itinerary)
         adapter.notifyItemInserted(itineraries.size - 1)
