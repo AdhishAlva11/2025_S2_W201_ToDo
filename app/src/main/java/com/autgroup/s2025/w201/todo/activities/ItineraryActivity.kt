@@ -63,6 +63,11 @@ class ItineraryActivity : AppCompatActivity() {
                     startActivity(Intent(this, FavouritesActivity::class.java))
                     true
                 }
+                R.id.nav_profile -> {
+                    startActivity(Intent(this, ProfileActivity::class.java))
+                    overridePendingTransition(0, 0)
+                    true
+                }
                 else -> false
             }
         }
