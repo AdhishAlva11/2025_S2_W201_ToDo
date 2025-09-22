@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:background="?attr/selectableItemBackground"
+    android:layout_marginBottom="8dp">
+
+    <TextView
+        android:id="@+id/txtPlaceName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Place Name"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@color/black" />
+
+    <TextView
+        android:id="@+id/txtPlaceAddress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Address"
+        android:textSize="14sp"
+        android:textColor="@color/black"
+        android:layout_marginTop="2dp"/>
+
+    <TextView
+        android:id="@+id/txtPlaceStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Open Status"
+        android:textSize="14sp"
+        android:textColor="@color/black"
+        android:layout_marginTop="2dp"/>
+
+    <TextView
+        android:id="@+id/txtPlaceRating"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Rating"
+        android:textSize="14sp"
+        android:textColor="@color/black"
+        android:layout_marginTop="2dp"/>
+
+</LinearLayout>
