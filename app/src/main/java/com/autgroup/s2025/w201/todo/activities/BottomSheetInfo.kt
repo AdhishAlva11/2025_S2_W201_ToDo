@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.autgroup.s2025.w201.todo.R
 import com.autgroup.s2025.w201.todo.classes.PlaceInfo
+import com.autgroup.s2025.w201.todo.classes.Review
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase

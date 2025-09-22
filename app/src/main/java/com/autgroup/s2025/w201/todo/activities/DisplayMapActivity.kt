@@ -14,7 +14,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.libraries.places.api.model.Review
+import com.autgroup.s2025.w201.todo.classes.Review
 import okhttp3.*
 import org.json.JSONObject
 import java.io.IOException
