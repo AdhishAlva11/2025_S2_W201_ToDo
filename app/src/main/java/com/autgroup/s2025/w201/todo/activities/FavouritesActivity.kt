@@ -1,5 +1,6 @@
 package com.autgroup.s2025.w201.todo.activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.ImageButton
@@ -26,15 +27,41 @@ class FavouritesActivity : AppCompatActivity() {
 
         firebaseAuth = FirebaseAuth.getInstance()
 
-        // Initialize RecyclerView and Adapter
+        // RecyclerView setup
         recyclerView = findViewById(R.id.recyclerFavourites)
         favouritesAdapter = FavouritesAdapter(favouritesList)
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = favouritesAdapter
 
-        // Optional: Back button
+        // Back button
         findViewById<ImageButton>(R.id.btnBack).setOnClickListener {
             finish()
+        }
+
+        // --- Bottom Navigation setup ---
+        val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNav)
+        bottomNav.selectedItemId = R.id.nav_favourites  // highlight this tab
+
+        bottomNav.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_home -> {
+                    startActivity(Intent(this, HomePageActivity::class.java))
+                    overridePendingTransition(0, 0)
+                    true
+                }
+                R.id.nav_favourites -> true // already here
+                R.id.nav_itinerary -> {
+                    startActivity(Intent(this, ItineraryActivity::class.java))
+                    overridePendingTransition(0, 0)
+                    true
+                }
+                R.id.nav_profile -> {
+                    startActivity(Intent(this, ProfileActivity::class.java))
+                    overridePendingTransition(0, 0)
+                    true
+                }
+                else -> false
+            }
         }
 
         // Load favourites from Firebase
@@ -44,7 +71,6 @@ class FavouritesActivity : AppCompatActivity() {
     private fun loadFavourites() {
         val userId = firebaseAuth.currentUser?.uid ?: return
 
-        // Correct Firebase Realtime Database reference
         val favouritesRef = FirebaseDatabase.getInstance(
             "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
         ).getReference("$userId/Favourites")
