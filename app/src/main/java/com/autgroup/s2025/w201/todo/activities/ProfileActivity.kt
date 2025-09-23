@@ -256,20 +256,22 @@ class ProfileActivity : AppCompatActivity() {
 
         imageUri?.let { uri ->
             fileRef.putFile(uri)
-                .addOnSuccessListener {
+                .addOnSuccessListener { taskSnapshot ->
+                    // Now the file is uploaded, get the download URL
                     fileRef.downloadUrl.addOnSuccessListener { downloadUri ->
                         val dbRef = FirebaseDatabase.getInstance(
                             "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
                         ).getReference(userId).child("UserData")
 
                         dbRef.child("photoUrl").setValue(downloadUri.toString())
-                        Toast.makeText(this, "Profile photo updated!", Toast.LENGTH_SHORT).show()
                     }
                 }
-                .addOnFailureListener {
-                    Toast.makeText(this, "Upload failed: ${it.message}", Toast.LENGTH_LONG).show()
+                .addOnFailureListener { e ->
+                    // Show error message
+                    Toast.makeText(this, "Upload failed: ${e.message}", Toast.LENGTH_LONG).show()
                 }
         }
     }
+
 
 }
