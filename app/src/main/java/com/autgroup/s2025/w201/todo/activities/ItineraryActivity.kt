@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.autgroup.s2025.w201.todo.R
+import com.autgroup.s2025.w201.todo.adapters.ItineraryAdapter
 import com.autgroup.s2025.w201.todo.classes.Itinerary
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth

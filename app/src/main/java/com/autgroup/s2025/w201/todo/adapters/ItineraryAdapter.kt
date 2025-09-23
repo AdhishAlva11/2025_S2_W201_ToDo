@@ -1,4 +1,4 @@
-package com.autgroup.s2025.w201.todo.activities
+package com.autgroup.s2025.w201.todo.adapters
 
 import android.app.AlertDialog
 import android.view.LayoutInflater

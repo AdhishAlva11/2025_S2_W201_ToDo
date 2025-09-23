@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.autgroup.s2025.w201.todo.R
+import com.autgroup.s2025.w201.todo.adapters.FavouritesAdapter
 import com.autgroup.s2025.w201.todo.classes.Favourite
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
