@@ -2,7 +2,6 @@ package com.autgroup.s2025.w201.todo.activities
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -16,6 +15,9 @@ import com.autgroup.s2025.w201.todo.classes.Itinerary
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import android.view.View
+import android.widget.AdapterView
+import android.widget.Spinner
 
 class ItineraryActivity : AppCompatActivity() {
 
@@ -38,7 +40,20 @@ class ItineraryActivity : AppCompatActivity() {
         }
         recyclerView.adapter = adapter
 
+        // Filter spinner setup
+        val spinnerFilter: Spinner = findViewById(R.id.spinnerFilter)
+        spinnerFilter.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                when (position) {
+                    0 -> itineraries.sortBy { it.name?.lowercase() ?: "" }          // A → Z
+                    1 -> itineraries.sortByDescending { it.name?.lowercase() ?: "" } // Z → A
+                    2 -> itineraries.sortBy { it.name?.length ?: 0 }               // Short → Long
+                }
+                adapter.notifyDataSetChanged()
+            }
 
+            override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
 
         // Add itinerary button
         findViewById<TextView>(R.id.tvAddEvent).setOnClickListener {

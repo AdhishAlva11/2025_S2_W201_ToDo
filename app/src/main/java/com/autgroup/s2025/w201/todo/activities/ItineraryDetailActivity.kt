@@ -8,6 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.appcompat.app.AlertDialog
 import com.autgroup.s2025.w201.todo.R
 import com.autgroup.s2025.w201.todo.classes.PlaceInfo
 import com.autgroup.s2025.w201.todo.adapters.PlaceAdapter
@@ -26,19 +27,30 @@ class ItineraryDetailActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_itinerary_detail)
 
+
         itineraryName = intent.getStringExtra("itineraryName") ?: return
 
         // Back button
-        findViewById<ImageButton>(R.id.btnBack).setOnClickListener { finish() }
+        val btnBack = findViewById<ImageButton>(R.id.btnBack)
+        btnBack.setOnClickListener { finish() }
 
-        // Dynamic title
-        findViewById<TextView>(R.id.tvItineraryTitle).text = itineraryName
+        // Set dynamic title
+        val tvTitle = findViewById<TextView>(R.id.tvItineraryTitle)
+        tvTitle.text = itineraryName
 
         // RecyclerView setup
         recyclerView = findViewById(R.id.recyclerViewItinerary)
         recyclerView.layoutManager = LinearLayoutManager(this)
         adapter = PlaceAdapter(activities) { place, position ->
-            deletePlace(place, position)
+
+            AlertDialog.Builder(this)
+                .setTitle("Delete Activity")
+                .setMessage("Are you sure you want to delete '${place.name}' from this itinerary?")
+                .setPositiveButton("Delete") { _, _ ->
+                    deletePlace(place, position)
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
         }
         recyclerView.adapter = adapter
 
@@ -55,7 +67,6 @@ class ItineraryDetailActivity : AppCompatActivity() {
             override fun onDataChange(snapshot: DataSnapshot) {
                 activities.clear()
                 for (child in snapshot.children) {
-                    // Only parse if it's a PlaceInfo object
                     val place = child.getValue(PlaceInfo::class.java)
                     if (place != null) activities.add(place)
                 }

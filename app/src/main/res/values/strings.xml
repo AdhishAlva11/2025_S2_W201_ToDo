@@ -33,4 +33,10 @@
     <!-- Trip card menu -->
     <string name="trip_menu">Trip Menu</string>
     <string name="favourites">Favourites</string>
+
+    <string-array name="itinerary_filters">
+        <item>A → Z</item>
+        <item>Z → A</item>
+        <item>Short → Long</item>
+    </string-array>
 </resources>

@@ -36,9 +36,9 @@
 
     <!-- Main content area -->
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <!-- Add itinerary button -->
@@ -48,9 +48,30 @@
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:text="+ Add Itinerary"
+            android:textColor="@color/purple_500"
             android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="@color/purple_500" />
+            android:textStyle="bold" />
+
+        <!-- Filter spinner -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:paddingEnd="8dp"
+                android:text="Filter:" />
+
+            <Spinner
+                android:id="@+id/spinnerFilter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:entries="@array/itinerary_filters" />
+        </LinearLayout>
 
         <!-- RecyclerView for itineraries -->
         <androidx.recyclerview.widget.RecyclerView
