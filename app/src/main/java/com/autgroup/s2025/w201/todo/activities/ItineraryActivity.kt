@@ -90,26 +90,36 @@ class ItineraryActivity : AppCompatActivity() {
     private fun showAddItineraryDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_event, null)
         val etEventName = dialogView.findViewById<TextView>(R.id.etEventName)
+        val etDays = dialogView.findViewById<TextView>(R.id.etDays)
 
         AlertDialog.Builder(this)
             .setTitle("Add Itinerary")
             .setView(dialogView)
             .setPositiveButton("Add") { _, _ ->
                 val name = etEventName.text.toString().trim()
-                if (name.isNotEmpty()) addItinerary(name)
+                val daysStr = etDays.text.toString().trim()
+                val days = daysStr.toIntOrNull() ?: 1
+                if (name.isNotEmpty()) addItinerary(name, days)
             }
             .setNegativeButton("Cancel", null)
             .show()
     }
 
-    private fun addItinerary(name: String) {
+
+    private fun addItinerary(name: String, days: Int) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val dbRef = FirebaseDatabase.getInstance(
             "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
         ).getReference("$userId/Itineraries")
 
-        // Save as an empty itinerary (object)
-        dbRef.child(name).setValue(name)
+        // Build the itinerary map: { "days": <n>, "Day 1": {}, "Day 2": {}, ... }
+        val itineraryMap = mutableMapOf<String, Any>()
+        itineraryMap["days"] = days
+        for (i in 1..days) {
+            itineraryMap["Day $i"] = mapOf<String, Any>() // empty map for activities
+        }
+
+        dbRef.child(name).setValue(itineraryMap)
             .addOnSuccessListener {
                 Toast.makeText(this, "Itinerary '$name' created!", Toast.LENGTH_SHORT).show()
             }
@@ -117,6 +127,7 @@ class ItineraryActivity : AppCompatActivity() {
                 Toast.makeText(this, "Failed: ${it.message}", Toast.LENGTH_LONG).show()
             }
     }
+
 
     private fun loadItineraries() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return

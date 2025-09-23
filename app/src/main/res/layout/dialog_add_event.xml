@@ -10,4 +10,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Itinerary Name" />
+
+    <EditText
+        android:id="@+id/etDays"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Number of days"
+        android:inputType="number"
+        android:layout_marginTop="12dp" />
 </LinearLayout>

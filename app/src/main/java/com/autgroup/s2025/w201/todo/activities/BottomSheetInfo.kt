@@ -96,25 +96,62 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
         dbRef.get().addOnSuccessListener { snapshot ->
             val itineraryNames = snapshot.children.map { it.key ?: "" }
 
-            val builder = AlertDialog.Builder(requireContext())
-            builder.setTitle("Add to itinerary")
-            builder.setItems(itineraryNames.toTypedArray()) { _, which ->
-                val selected = itineraryNames[which]
-                addActivityToItinerary(place, selected)
-            }
-            builder.show()
+            AlertDialog.Builder(requireContext())
+                .setTitle("Choose Itinerary")
+                .setItems(itineraryNames.toTypedArray()) { _, which ->
+                    val selectedItinerary = itineraryNames[which]
+                    // after itinerary selected, ask for day
+                    showChooseDayDialog(place, selectedItinerary)
+                }
+                .show()
         }
     }
 
-    private fun addActivityToItinerary(place: PlaceInfo, itineraryName: String) {
+    private fun showChooseDayDialog(place: PlaceInfo, itineraryName: String) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val dbRef = FirebaseDatabase.getInstance(
             "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
         ).getReference("$userId/Itineraries/$itineraryName")
 
+        dbRef.get().addOnSuccessListener { snapshot ->
+            // Build the list of days. Prefer "days" count if present:
+            val daysCount = snapshot.child("days").getValue(Int::class.java)
+            val daysList = mutableListOf<String>()
+            if (daysCount != null && daysCount > 0) {
+                for (i in 1..daysCount) daysList.add("Day $i")
+            } else {
+                // fallback: any keys starting with Day
+                for (child in snapshot.children) {
+                    val key = child.key ?: continue
+                    if (key.startsWith("Day ", true)) daysList.add(key)
+                }
+                if (daysList.isEmpty()) daysList.add("Day 1")
+            }
+
+            AlertDialog.Builder(requireContext())
+                .setTitle("Choose Day")
+                .setItems(daysList.toTypedArray()) { _, which ->
+                    val selectedDay = daysList[which]
+                    addActivityToItinerary(place, itineraryName, selectedDay)
+                }
+                .show()
+        }
+    }
+    
+    private fun addActivityToItinerary(place: PlaceInfo, itineraryName: String, dayName: String) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val dbRef = FirebaseDatabase.getInstance(
+            "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
+        ).getReference("$userId/Itineraries/$itineraryName/$dayName")
+
         dbRef.push().setValue(place)
             .addOnSuccessListener {
-                Toast.makeText(context, "Added to $itineraryName!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Added to $itineraryName → $dayName!", Toast.LENGTH_SHORT).show()
+                dismiss()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(context, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
             }
     }
+
 }
