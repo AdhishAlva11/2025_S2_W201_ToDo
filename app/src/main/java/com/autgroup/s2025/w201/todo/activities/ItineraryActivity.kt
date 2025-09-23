@@ -38,10 +38,7 @@ class ItineraryActivity : AppCompatActivity() {
         }
         recyclerView.adapter = adapter
 
-        // Back button
-        findViewById<ImageButton>(R.id.btnBack).setOnClickListener {
-            finish()
-        }
+
 
         // Add itinerary button
         findViewById<TextView>(R.id.tvAddEvent).setOnClickListener {
@@ -96,14 +93,13 @@ class ItineraryActivity : AppCompatActivity() {
             "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
         ).getReference("$userId/Itineraries")
 
-        // Save the itinerary as a string (name)
-        dbRef.child(name).setValue(name)
+        // Save as an empty itinerary (object)
+        dbRef.child(name).setValue(mapOf<String, Any>())
             .addOnSuccessListener {
                 Toast.makeText(this, "Itinerary '$name' created!", Toast.LENGTH_SHORT).show()
-
             }
             .addOnFailureListener {
-                Toast.makeText(this, "Failed to create itinerary: ${it.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Failed: ${it.message}", Toast.LENGTH_LONG).show()
             }
     }
 

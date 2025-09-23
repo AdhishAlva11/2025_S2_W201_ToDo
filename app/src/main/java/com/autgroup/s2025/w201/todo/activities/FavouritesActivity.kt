@@ -34,10 +34,8 @@ class FavouritesActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = favouritesAdapter
 
-        // Back button
-        findViewById<ImageButton>(R.id.btnBack).setOnClickListener {
-            finish()
-        }
+
+
 
         // --- Bottom Navigation setup ---
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNav)
