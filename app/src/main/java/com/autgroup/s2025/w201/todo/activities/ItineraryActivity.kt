@@ -94,7 +94,7 @@ class ItineraryActivity : AppCompatActivity() {
         ).getReference("$userId/Itineraries")
 
         // Save as an empty itinerary (object)
-        dbRef.child(name).setValue(mapOf<String, Any>())
+        dbRef.child(name).setValue(name)
             .addOnSuccessListener {
                 Toast.makeText(this, "Itinerary '$name' created!", Toast.LENGTH_SHORT).show()
             }
