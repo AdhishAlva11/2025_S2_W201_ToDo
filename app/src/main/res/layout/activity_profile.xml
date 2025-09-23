@@ -46,15 +46,34 @@
             android:orientation="vertical"
             android:gravity="center_horizontal">
 
-            <!-- Profile Picture -->
-            <ImageView
-                android:id="@+id/profile_image"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
-                android:src="@drawable/ic_person"
-                android:contentDescription="Profile Picture"
+            <!-- Profile Picture + Upload Button -->
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="16dp">
+
+                <ImageView
+                    android:id="@+id/profile_image"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:src="@drawable/ic_profile_photo"
+                    android:contentDescription="Profile Picture"
+                    android:scaleType="centerCrop"
+                    android:background="@drawable/profile_circle_bg"
+                    android:clipToOutline="true" />
+
+                <ImageButton
+                    android:id="@+id/btnUploadPhoto"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="bottom|end"
+                    android:src="@drawable/ic_profilepic"
+                    android:background="@android:color/transparent"
+                    android:contentDescription="Upload Profile Photo"
+                    android:padding="4dp"
+                    app:tint="@color/purple_500" />
+            </FrameLayout>
 
             <!-- User Name -->
             <TextView
