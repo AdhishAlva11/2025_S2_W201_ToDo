@@ -70,6 +70,31 @@ class LoginActivity : AppCompatActivity() {
         findViewById<Button>(R.id.googleSigninButton).setOnClickListener {
             signInGoogle()
         }
+
+        binding.tvForgotPassword.setOnClickListener {
+            val email = binding.emailEt.text.toString().trim()
+
+            if (email.isEmpty()) {
+                Toast.makeText(this, "Enter your email to reset password", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            firebaseAuth.sendPasswordResetEmail(email)
+                .addOnSuccessListener {
+                    Toast.makeText(
+                        this,
+                        "Reset link sent to $email. Check your inbox.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(
+                        this,
+                        "Error: ${e.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+        }
     }
 
     // Trigger Google Sign-In flow
