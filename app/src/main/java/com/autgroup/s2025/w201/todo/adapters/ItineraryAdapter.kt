@@ -30,12 +30,12 @@ class ItineraryAdapter(
         val itinerary = itineraries[position]
         holder.txtItineraryName.text = itinerary.name ?: "Unnamed"
 
-        // Click → open details
+        // Click open details
         holder.itemView.setOnClickListener {
             onClick(itinerary)
         }
 
-        // Long-click → delete
+        // Long-click delete
         holder.itemView.setOnLongClickListener {
             AlertDialog.Builder(holder.itemView.context)
                 .setTitle("Delete Itinerary")

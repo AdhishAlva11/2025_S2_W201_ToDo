@@ -44,7 +44,7 @@ class ItineraryDetailActivity : AppCompatActivity() {
         val tvTitle = findViewById<TextView>(R.id.tvItineraryTitle)
         tvTitle.text = itineraryName
 
-        // Days RecyclerView (horizontal)
+        // Days RecyclerView
         recyclerDays = findViewById(R.id.recyclerDays)
         recyclerDays.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         daysAdapter = DayAdapter(daysList) { dayName ->

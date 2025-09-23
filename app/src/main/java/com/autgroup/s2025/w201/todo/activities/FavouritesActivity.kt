@@ -37,7 +37,7 @@ class FavouritesActivity : AppCompatActivity() {
 
 
 
-        // --- Bottom Navigation setup ---
+        // Bottom Navigation setup
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNav)
         bottomNav.selectedItemId = R.id.nav_favourites  // highlight this tab
 
