@@ -40,7 +40,7 @@ class HomePageActivity : AppCompatActivity(), OnMapReadyCallback {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
-        // Search bar click → open SearchActivity
+        // Search bar click - open SearchActivity
         val searchBar = findViewById<EditText>(R.id.search_bar)
         searchBar.setOnClickListener {
             val intent = Intent(this, SearchActivity::class.java)
