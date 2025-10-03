@@ -86,15 +86,31 @@
                 android:textColor="@android:color/black"
                 android:layout_marginBottom="16dp" />
 
-            <!-- Emergency Contact -->
-            <TextView
-                android:id="@+id/emergency_contact"
+            <!-- Emergency Contact Row -->
+            <LinearLayout
+                android:id="@+id/emergency_contact_row"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Emergency Contact: Not Available"
-                android:textSize="16sp"
-                android:textColor="@android:color/holo_red_dark"
-                android:layout_marginBottom="24dp"/>
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/emergency_contact"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Emergency Contact: 111"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/holo_red_dark"/>
+
+                <ImageView
+                    android:id="@+id/arrow_icon"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_chevron_arrow"
+                    app:tint="@android:color/darker_gray"
+                    android:layout_marginStart="4dp"
+                    android:contentDescription="Clickable indicator"/>
+            </LinearLayout>
 
             <!-- Logout Button -->
             <Button
