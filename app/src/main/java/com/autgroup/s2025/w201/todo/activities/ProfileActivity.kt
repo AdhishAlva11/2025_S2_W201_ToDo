@@ -215,6 +215,17 @@ class ProfileActivity : AppCompatActivity() {
                     val countryCode = addresses[0].countryCode
                     val number = emergencyNumbers[countryCode] ?: "Not Available"
                     emergencyContactView.text = "Emergency Contact: $number"
+
+
+                    // Make number clickable if number is valid
+
+                    if(number != "Not Available"){
+                        emergencyContactView.setOnClickListener {
+                            val intent = Intent(Intent.ACTION_DIAL)
+                            intent.data = Uri.parse("tel:$number")
+                            startActivity(intent)
+                        }
+                    }
                 }
             }
         }.addOnFailureListener {
