@@ -41,6 +41,29 @@
         android:padding="16dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
+        <!-- Filter bar -->
+        <LinearLayout
+            android:id="@+id/filterContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingBottom="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Filter by country:"
+                android:textStyle="bold"
+                android:layout_gravity="center_vertical"
+                android:paddingEnd="8dp"/>
+
+            <Spinner
+                android:id="@+id/spinnerCountryFilter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:spinnerMode="dropdown"/>
+        </LinearLayout>
+
         <!-- RecyclerView for favourites -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerFavourites"
