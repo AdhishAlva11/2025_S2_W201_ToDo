@@ -218,7 +218,6 @@ class ProfileActivity : AppCompatActivity() {
 
 
                     // Make number clickable if number is valid
-
                     if(number != "Not Available"){
                         emergencyContactView.setOnClickListener {
                             val intent = Intent(Intent.ACTION_DIAL)
