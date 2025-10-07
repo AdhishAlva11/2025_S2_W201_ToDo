@@ -79,17 +79,25 @@ class FavouritesActivity : AppCompatActivity() {
         favouritesRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 favouritesList.clear()
+
                 for (childSnapshot in snapshot.children) {
                     val favourite = childSnapshot.getValue(Favourite::class.java)
-                    favourite?.let { favouritesList.add(it) }
+
+                    favourite?.let {
+                        // ✅ Extract country from the address string
+                        val parts = it.address?.split(",")?.map { part -> part.trim() }
+                        if (!parts.isNullOrEmpty()) {
+                            it.country = parts.last() // Last element is usually the country
+                        }
+
+                        favouritesList.add(it)
+                    }
                 }
 
-                // Setup spinner after data loads
                 setupCountryFilter()
-
-                // Initially show all favourites
                 applyFilter("All")
             }
+
 
             override fun onCancelled(error: DatabaseError) {
                 Toast.makeText(
