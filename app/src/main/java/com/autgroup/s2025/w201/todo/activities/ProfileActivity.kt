@@ -271,7 +271,7 @@ class ProfileActivity : AppCompatActivity() {
                     fileRef.downloadUrl.addOnSuccessListener { downloadUri ->
                         val dbRef = FirebaseDatabase.getInstance(
                             "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
-                        ).getReference(userId).child("UserData")
+                        ).getReference("$userId/UserData")
 
                         dbRef.child("photoUrl").setValue(downloadUri.toString())
                     }
