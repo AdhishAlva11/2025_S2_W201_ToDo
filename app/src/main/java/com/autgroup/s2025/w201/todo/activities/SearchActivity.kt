@@ -2,9 +2,7 @@ package com.autgroup.s2025.w201.todo.activities
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
-import android.widget.CheckBox
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.autgroup.s2025.w201.todo.R
 import com.autgroup.s2025.w201.todo.classes.Search
@@ -12,7 +10,6 @@ import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
-import java.io.Serializable
 
 class SearchActivity : AppCompatActivity() {
 
@@ -51,7 +48,7 @@ class SearchActivity : AppCompatActivity() {
             } else {
                 val searchData = buildSearchFromUI(currentPlace)
                 val intent = Intent(this, DisplayMapActivity::class.java)
-                intent.putExtra("searchData", searchData as Serializable)
+                intent.putExtra("searchData", searchData)
                 startActivity(intent)
             }
         }
@@ -69,6 +66,9 @@ class SearchActivity : AppCompatActivity() {
             if (findViewById<CheckBox>(id).isChecked) label else null
         }
 
-        return Search.fromPlaceAndInterests(place, selectedInterests)
+        val radiusSpinner = findViewById<Spinner>(R.id.radiusSpinner)
+        val selectedRadius = radiusSpinner.selectedItem.toString().toIntOrNull() ?: 5000
+
+        return Search.fromPlaceAndInterests(place, selectedInterests, selectedRadius)
     }
 }

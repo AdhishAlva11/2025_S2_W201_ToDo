@@ -1,6 +1,7 @@
 package com.autgroup.s2025.w201.todo.activities
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.widget.EditText
@@ -10,17 +11,18 @@ import androidx.appcompat.app.AppCompatActivity
 import com.autgroup.s2025.w201.todo.R
 import com.autgroup.s2025.w201.todo.classes.PlaceInfo
 import com.autgroup.s2025.w201.todo.classes.Search
+import com.autgroup.s2025.w201.todo.classes.Review
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
-import com.autgroup.s2025.w201.todo.classes.Review
+import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import okhttp3.*
 import org.json.JSONObject
 import java.io.IOException
+import android.os.Handler
+import android.os.Looper
 
 class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -41,44 +43,26 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_display_map)
 
-        // --- Toolbar setup ---
         setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
-        // Search bar click → open SearchActivity
-        val searchBar = findViewById<EditText>(R.id.search_bar)
-        searchBar.setOnClickListener {
-            val intent = Intent(this, SearchActivity::class.java)
-            startActivity(intent)
+        findViewById<EditText>(R.id.search_bar).setOnClickListener {
+            startActivity(Intent(this, SearchActivity::class.java))
         }
 
-        // --- Bottom Navigation setup ---
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_navigation)
-        bottomNav.selectedItemId = R.id.nav_home // highlight "Home" or whichever makes sense
-
+        bottomNav.selectedItemId = R.id.nav_home
         bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.nav_home -> {
-                    startActivity(Intent(this, HomePageActivity::class.java))
-                    true
-                }
-                R.id.nav_favourites -> {
-                    startActivity(Intent(this, FavouritesActivity::class.java))
-                    true
-                }
-                R.id.nav_itinerary -> {
-                    startActivity(Intent(this, ItineraryActivity::class.java))
-                    true
-                }
-                R.id.nav_profile -> {
-                    startActivity(Intent(this, ProfileActivity::class.java))
-                    true
-                }
+                R.id.nav_home -> startActivity(Intent(this, HomePageActivity::class.java))
+                R.id.nav_favourites -> startActivity(Intent(this, FavouritesActivity::class.java))
+                R.id.nav_itinerary -> startActivity(Intent(this, ItineraryActivity::class.java))
+                R.id.nav_profile -> startActivity(Intent(this, ProfileActivity::class.java))
                 else -> false
             }
+            true
         }
 
-        // --- Data from intent ---
         searchData = intent.getSerializableExtra("searchData") as? Search
         if (searchData == null) {
             Toast.makeText(this, "No location data received", Toast.LENGTH_SHORT).show()
@@ -106,6 +90,16 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
             googleMap.addMarker(MarkerOptions().position(location).title(placeName))
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 14f))
 
+            // Draw radius circle
+            googleMap.addCircle(
+                CircleOptions()
+                    .center(location)
+                    .radius(searchData?.radius?.toDouble() ?: 5000.0)
+                    .strokeColor(Color.BLUE)
+                    .fillColor(0x220000FF)
+                    .strokeWidth(2f)
+            )
+
             searchData?.interests?.forEach { interest ->
                 interestToType[interest]?.let { type ->
                     fetchNearbyPlaces(location, type)
@@ -125,13 +119,17 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun fetchNearbyPlaces(location: LatLng, type: String) {
+    private fun fetchNearbyPlaces(location: LatLng, type: String, pageToken: String? = null) {
         val apiKey = getString(R.string.project_google_api_key)
+        val radius = searchData?.radius ?: 3000
+        val tokenParam = if (pageToken != null) "&pagetoken=$pageToken" else ""
+
         val url =
             "https://maps.googleapis.com/maps/api/place/nearbysearch/json" +
                     "?location=${location.latitude},${location.longitude}" +
-                    "&radius=5000" +
+                    "&radius=$radius" +
                     "&type=$type" +
+                    "$tokenParam" +
                     "&key=$apiKey"
 
         val request = Request.Builder().url(url).build()
@@ -160,6 +158,14 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
                         }
                     }
                 }
+
+                // Handle pagination
+                val nextPageToken = json.optString("next_page_token", null)
+                if (!nextPageToken.isNullOrEmpty()) {
+                    android.os.Handler(Looper.getMainLooper()).postDelayed({
+                        fetchNearbyPlaces(location, type, nextPageToken)
+                    }, 2000)
+                }
             }
         })
     }
@@ -185,7 +191,9 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
                 val address = json.optString("formatted_address", "No address")
                 val rating = json.optDouble("rating", 0.0)
                 val openNow = if (json.has("opening_hours")) {
-                    if (json.getJSONObject("opening_hours").optBoolean("open_now")) "Open now" else "Closed"
+                    if (json.getJSONObject("opening_hours")
+                            .optBoolean("open_now")
+                    ) "Open now" else "Closed"
                 } else "Hours not available"
 
                 val geometry = json.getJSONObject("geometry").getJSONObject("location")
