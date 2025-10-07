@@ -39,4 +39,10 @@
         <item>Z → A</item>
         <item>Short → Long</item>
     </string-array>
+
+    <string-array name="radius_options">
+        <item>1000</item>
+        <item>3000</item>
+        <item>5000</item>
+    </string-array>
 </resources>
