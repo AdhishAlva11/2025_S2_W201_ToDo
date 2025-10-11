@@ -52,6 +52,14 @@
             android:layout_marginTop="4dp"/>
 
         <TextView
+            android:id="@+id/priceText"
+            android:text="💰 Price info not available"
+            android:textSize="16sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp" />
+
+        <TextView
             android:id="@+id/reviewsHeader"
             android:text="Reviews"
             android:textStyle="bold"
