@@ -89,6 +89,7 @@ class ProfileActivity : AppCompatActivity() {
         "BG" to "112/150/166",
         "UA" to "112/101/102"
     )
+
     companion object {
         private const val STORAGE_PERMISSION_REQUEST = 200
     }
@@ -120,19 +121,29 @@ class ProfileActivity : AppCompatActivity() {
                 "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
             ).getReference(userId).child("UserData")
 
+            //Load cached images instantly
+
+            val sharedPrefs = getSharedPreferences("user_prefs", MODE_PRIVATE)
+            val cachedPhotoUrl = sharedPrefs.getString("photoUrl", null)
+            if (!cachedPhotoUrl.isNullOrEmpty()) {
+                Glide.with(this).load(cachedPhotoUrl).circleCrop().into(profileImage)
+            }
+
+
             dbRef.get().addOnSuccessListener { snapshot ->
                 if (snapshot.exists()) {
-                    val firstName = snapshot.child("userFirstName").getValue(String::class.java) ?: ""
+                    val firstName =
+                        snapshot.child("userFirstName").getValue(String::class.java) ?: ""
                     val lastName = snapshot.child("userLastName").getValue(String::class.java) ?: ""
                     val photoUrl = snapshot.child("photoUrl").getValue(String::class.java)
 
                     userName.text = "$firstName $lastName"
 
                     if (!photoUrl.isNullOrEmpty()) {
-                        Glide.with(this)
-                            .load(photoUrl)
-                            .circleCrop()
-                            .into(profileImage)
+                        Glide.with(this).load(photoUrl).circleCrop().into(profileImage)
+
+                        //Update cache with the latest URL
+                        sharedPrefs.edit().putString("photoUrl", photoUrl).apply()
                     }
                 }
             }
@@ -160,14 +171,17 @@ class ProfileActivity : AppCompatActivity() {
                     startActivity(Intent(this, HomePageActivity::class.java))
                     overridePendingTransition(0, 0); true
                 }
+
                 R.id.nav_favourites -> {
                     startActivity(Intent(this, FavouritesActivity::class.java))
                     overridePendingTransition(0, 0); true
                 }
+
                 R.id.nav_itinerary -> {
                     startActivity(Intent(this, ItineraryActivity::class.java))
                     overridePendingTransition(0, 0); true
                 }
+
                 R.id.nav_profile -> true
                 else -> false
             }
@@ -180,13 +194,19 @@ class ProfileActivity : AppCompatActivity() {
             if (checkSelfPermission(android.Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED) {
                 openGallery()
             } else {
-                requestPermissions(arrayOf(android.Manifest.permission.READ_MEDIA_IMAGES), STORAGE_PERMISSION_REQUEST)
+                requestPermissions(
+                    arrayOf(android.Manifest.permission.READ_MEDIA_IMAGES),
+                    STORAGE_PERMISSION_REQUEST
+                )
             }
         } else {
             if (checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                 openGallery()
             } else {
-                requestPermissions(arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE), STORAGE_PERMISSION_REQUEST)
+                requestPermissions(
+                    arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE),
+                    STORAGE_PERMISSION_REQUEST
+                )
             }
         }
     }
@@ -218,7 +238,7 @@ class ProfileActivity : AppCompatActivity() {
 
 
                     // Make number clickable if number is valid
-                    if(number != "Not Available"){
+                    if (number != "Not Available") {
                         emergencyContactView.setOnClickListener {
                             val intent = Intent(Intent.ACTION_DIAL)
                             intent.data = Uri.parse("tel:$number")
@@ -233,7 +253,9 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     // --- Handle permission result ---
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int, permissions: Array<out String>, grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == STORAGE_PERMISSION_REQUEST && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             openGallery()
@@ -262,11 +284,10 @@ class ProfileActivity : AppCompatActivity() {
     // --- Upload image to Firebase ---
     private fun uploadImageToFirebase() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        val fileRef = storageRef.child("profile_images/$userId.jpg")
+        val fileRef = storageRef.child("profile_images/$userId")
 
         imageUri?.let { uri ->
-            fileRef.putFile(uri)
-                .addOnSuccessListener { taskSnapshot ->
+            fileRef.putFile(uri).addOnSuccessListener { taskSnapshot ->
                     // Now the file is uploaded, get the download URL
                     fileRef.downloadUrl.addOnSuccessListener { downloadUri ->
                         val dbRef = FirebaseDatabase.getInstance(
@@ -274,9 +295,11 @@ class ProfileActivity : AppCompatActivity() {
                         ).getReference("$userId/UserData")
 
                         dbRef.child("photoUrl").setValue(downloadUri.toString())
+                        //Save new photo URL locally for instant loading
+                        getSharedPreferences("user_prefs", MODE_PRIVATE).edit()
+                            .putString("photoUrl", downloadUri.toString()).apply()
                     }
-                }
-                .addOnFailureListener { e ->
+                }.addOnFailureListener { e ->
                     // Show error message
                     Toast.makeText(this, "Upload failed: ${e.message}", Toast.LENGTH_LONG).show()
                 }
