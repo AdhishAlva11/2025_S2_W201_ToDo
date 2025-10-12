@@ -1,18 +1,20 @@
 package com.autgroup.s2025.w201.todo.activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.autgroup.s2025.w201.todo.R
 import com.autgroup.s2025.w201.todo.adapters.DayAdapter
 import com.autgroup.s2025.w201.todo.adapters.PlaceAdapter
 import com.autgroup.s2025.w201.todo.classes.PlaceInfo
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 
@@ -35,10 +37,6 @@ class ItineraryDetailActivity : AppCompatActivity() {
         setContentView(R.layout.activity_itinerary_detail)
 
         itineraryName = intent.getStringExtra("itineraryName") ?: return
-
-        // Back button
-        val btnBack = findViewById<ImageButton>(R.id.btnBack)
-        btnBack.setOnClickListener { finish() }
 
         // Title
         val tvTitle = findViewById<TextView>(R.id.tvItineraryTitle)
@@ -70,6 +68,29 @@ class ItineraryDetailActivity : AppCompatActivity() {
 
         // Populate day chips then load day 1
         loadDays()
+
+        // Bottom navigation setup
+        val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNav)
+        bottomNav.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_home -> {
+                    startActivity(Intent(this, HomePageActivity::class.java))
+                    true
+                }
+                R.id.nav_itinerary -> true
+                R.id.nav_favourites -> {
+                    startActivity(Intent(this, FavouritesActivity::class.java))
+                    true
+                }
+                R.id.nav_profile -> {
+                    startActivity(Intent(this, ProfileActivity::class.java))
+                    overridePendingTransition(0, 0)
+                    true
+                }
+                else -> false
+            }
+        }
+        bottomNav.selectedItemId = R.id.nav_itinerary
     }
 
     private fun loadDays() {

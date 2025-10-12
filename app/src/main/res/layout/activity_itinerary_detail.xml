@@ -1,40 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white">
 
-
-    <!-- Horizontal layout for back button + title -->
-    <LinearLayout
+    <!-- Toolbar header -->
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:padding="16dp">
+        android:fitsSystemWindows="true">
 
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-        <ImageButton
-            android:id="@+id/btnBack"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_media_previous" />
+            <TextView
+                android:id="@+id/tvItineraryTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Itinerary Details"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/white" />
+        </androidx.appcompat.widget.Toolbar>
 
-        <TextView
-            android:id="@+id/tvItineraryTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:text="Itinerary Details"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="@color/black" />
+    </com.google.android.material.appbar.AppBarLayout>
 
-    </LinearLayout>
-
-
+    <!-- Days RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerDays"
         android:layout_width="match_parent"
@@ -42,12 +40,22 @@
         android:padding="8dp"
         android:clipToPadding="false"
         android:orientation="horizontal"/>
-    <!-- RecyclerView for places -->
+
+    <!-- Activities RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewItinerary"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:padding="8dp"
         android:clipToPadding="false" />
+
+    <!-- Bottom navigation footer -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        app:menu="@menu/bottom_nav_menu"/>
 
 </LinearLayout>
