@@ -40,7 +40,8 @@ class FavouritesAdapter(
                 .setTitle("Delete Favourite")
                 .setMessage("Are you sure you want to delete ${favourite.name}?")
                 .setPositiveButton("Yes") { _, _ ->
-                    val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@setPositiveButton
+                    val userId =
+                        FirebaseAuth.getInstance().currentUser?.uid ?: return@setPositiveButton
                     val dbRef = FirebaseDatabase.getInstance(
                         "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
                     ).getReference("$userId/Favourites")
