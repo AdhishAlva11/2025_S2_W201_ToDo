@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".activities.FavouritesActivity">
 
-    <!-- App Bar with Centered Title -->
+    <!-- Toolbar (unchanged) -->
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -32,14 +32,43 @@
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- Main Content -->
+    <!-- Main content -->
     <LinearLayout
         android:id="@+id/main_layout"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp"
+        android:padding="12dp"
+        android:background="@color/white"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <!-- Filter bar -->
+        <LinearLayout
+            android:id="@+id/filterContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/filter_bar_bg"
+            android:padding="10dp"
+            android:layout_marginBottom="8dp"
+            android:elevation="3dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Filter by country:"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:textColor="@color/black"
+                android:paddingEnd="8dp"/>
+
+            <Spinner
+                android:id="@+id/spinnerCountryFilter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:spinnerMode="dropdown"/>
+        </LinearLayout>
 
         <!-- RecyclerView for favourites -->
         <androidx.recyclerview.widget.RecyclerView
@@ -47,7 +76,8 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:paddingTop="12dp"/>
+            android:paddingTop="4dp"
+            android:clipToPadding="false"/>
     </LinearLayout>
 
     <!-- Bottom Navigation -->

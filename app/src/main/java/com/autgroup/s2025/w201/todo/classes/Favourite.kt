@@ -4,5 +4,6 @@ data class Favourite(
     val name: String? = null,
     val address: String? = null,
     val openStatus: String? = null,
-    val rating: Double? = null
+    val rating: Double? = null,
+    var country: String? = null
 )
