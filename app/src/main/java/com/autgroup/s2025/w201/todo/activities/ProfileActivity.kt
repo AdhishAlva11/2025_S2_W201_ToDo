@@ -26,69 +26,32 @@ import com.google.firebase.storage.FirebaseStorage
 
 class ProfileActivity : AppCompatActivity() {
 
-    //For profile photo selection
+    // For profile photo selection
     private val PICK_IMAGE_REQUEST = 100
     private var imageUri: Uri? = null
     private val storageRef = FirebaseStorage.getInstance().reference
 
+    // Local cache for saving the profile photo URL
+    private val sharedPrefs by lazy { getSharedPreferences("user_prefs", MODE_PRIVATE) }
 
     // Country emergency numbers
     private val emergencyNumbers = mapOf(
-        "NZ" to "111",   // New Zealand
-        "AU" to "000",   // Australia
-        "US" to "911",   // United States
-        "CA" to "911",   // Canada
-        "GB" to "999",   // United Kingdom
-        "IE" to "999/112",
-        "IN" to "112",
-        "PK" to "15/1122",
-        "CN" to "110/120",
-        "JP" to "119/110",
-        "KR" to "112/119",
-        "SG" to "999/995",
-        "MY" to "999/991",
-        "TH" to "191/1669",
-        "PH" to "117/911",
-        "ID" to "110/118",
-        "VN" to "113/115/114",
-        "BR" to "190/192/193",
-        "AR" to "911/107",
-        "CL" to "131/132",
-        "CO" to "123",
-        "MX" to "911",
-        "PE" to "105/106",
-        "EC" to "911",
-        "UY" to "911/103",
-        "ZA" to "10111/112",
-        "NG" to "112/199",
-        "EG" to "122/123",
-        "MA" to "19/150",
-        "RU" to "112/102/101",
-        "TR" to "112/155/110",
-        "SA" to "999/997/998",
-        "AE" to "999/998/997",
-        "IL" to "100/101/102",
-        "FR" to "112/15/17/18",
-        "DE" to "112/110",
-        "NL" to "112",
-        "BE" to "112",
-        "LU" to "112",
-        "CH" to "112/117/118",
-        "ES" to "112",
-        "PT" to "112",
-        "IT" to "112/118/113",
-        "SE" to "112",
-        "NO" to "112/110/113",
-        "DK" to "112",
-        "FI" to "112",
-        "PL" to "112/997",
-        "GR" to "112/100/166",
-        "CZ" to "112/155/158",
-        "HU" to "112/104/107",
-        "RO" to "112",
-        "BG" to "112/150/166",
-        "UA" to "112/101/102"
+        "NZ" to "111", "AU" to "000", "US" to "911", "CA" to "911", "GB" to "999",
+        "IE" to "999/112", "IN" to "112", "PK" to "15/1122", "CN" to "110/120",
+        "JP" to "119/110", "KR" to "112/119", "SG" to "999/995", "MY" to "999/991",
+        "TH" to "191/1669", "PH" to "117/911", "ID" to "110/118", "VN" to "113/115/114",
+        "BR" to "190/192/193", "AR" to "911/107", "CL" to "131/132", "CO" to "123",
+        "MX" to "911", "PE" to "105/106", "EC" to "911", "UY" to "911/103",
+        "ZA" to "10111/112", "NG" to "112/199", "EG" to "122/123", "MA" to "19/150",
+        "RU" to "112/102/101", "TR" to "112/155/110", "SA" to "999/997/998",
+        "AE" to "999/998/997", "IL" to "100/101/102", "FR" to "112/15/17/18",
+        "DE" to "112/110", "NL" to "112", "BE" to "112", "LU" to "112",
+        "CH" to "112/117/118", "ES" to "112", "PT" to "112", "IT" to "112/118/113",
+        "SE" to "112", "NO" to "112/110/113", "DK" to "112", "FI" to "112",
+        "PL" to "112/997", "GR" to "112/100/166", "CZ" to "112/155/158",
+        "HU" to "112/104/107", "RO" to "112", "BG" to "112/150/166", "UA" to "112/101/102"
     )
+
     companion object {
         private const val STORAGE_PERMISSION_REQUEST = 200
     }
@@ -107,6 +70,15 @@ class ProfileActivity : AppCompatActivity() {
         val uploadButton = findViewById<ImageButton>(R.id.btnUploadPhoto)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        // --- Load cached profile photo immediately ---
+        val cachedPhotoUrl = sharedPrefs.getString("photoUrl", null)
+        if (!cachedPhotoUrl.isNullOrEmpty()) {
+            Glide.with(this)
+                .load(cachedPhotoUrl)
+                .circleCrop()
+                .into(profileImage)
+        }
 
         // --- Upload profile photo button ---
         uploadButton.setOnClickListener {
@@ -133,6 +105,9 @@ class ProfileActivity : AppCompatActivity() {
                             .load(photoUrl)
                             .circleCrop()
                             .into(profileImage)
+
+                        // Update local cache with latest photo
+                        sharedPrefs.edit().putString("photoUrl", photoUrl).apply()
                     }
                 }
             }
@@ -144,6 +119,10 @@ class ProfileActivity : AppCompatActivity() {
         // --- Logout ---
         logoutButton.setOnClickListener {
             FirebaseAuth.getInstance().signOut()
+
+            // Clear cached photo when user logs out
+            sharedPrefs.edit().clear().apply()
+
             val intent = Intent(this, LoginActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
@@ -216,9 +195,8 @@ class ProfileActivity : AppCompatActivity() {
                     val number = emergencyNumbers[countryCode] ?: "Not Available"
                     emergencyContactView.text = "Emergency Contact: $number"
 
-
-                    // Make number clickable if number is valid
-                    if(number != "Not Available"){
+                    // Make number clickable if valid
+                    if (number != "Not Available") {
                         emergencyContactView.setOnClickListener {
                             val intent = Intent(Intent.ACTION_DIAL)
                             intent.data = Uri.parse("tel:$number")
@@ -262,26 +240,30 @@ class ProfileActivity : AppCompatActivity() {
     // --- Upload image to Firebase ---
     private fun uploadImageToFirebase() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        val fileRef = storageRef.child("profile_images/$userId.jpg")
+        val fileRef = storageRef.child("profile_images/$userId")
 
         imageUri?.let { uri ->
             fileRef.putFile(uri)
-                .addOnSuccessListener { taskSnapshot ->
-                    // Now the file is uploaded, get the download URL
+                .addOnSuccessListener {
+                    // Get download URL
                     fileRef.downloadUrl.addOnSuccessListener { downloadUri ->
+                        val newPhotoUrl = downloadUri.toString()
                         val dbRef = FirebaseDatabase.getInstance(
                             "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
                         ).getReference("$userId/UserData")
 
-                        dbRef.child("photoUrl").setValue(downloadUri.toString())
+                        // Save to Firebase
+                        dbRef.child("photoUrl").setValue(newPhotoUrl)
+
+                        // Save locally for instant loading
+                        sharedPrefs.edit().putString("photoUrl", newPhotoUrl).apply()
+
+                        Toast.makeText(this, "Profile photo updated!", Toast.LENGTH_SHORT).show()
                     }
                 }
                 .addOnFailureListener { e ->
-                    // Show error message
                     Toast.makeText(this, "Upload failed: ${e.message}", Toast.LENGTH_LONG).show()
                 }
         }
     }
-
-
 }
