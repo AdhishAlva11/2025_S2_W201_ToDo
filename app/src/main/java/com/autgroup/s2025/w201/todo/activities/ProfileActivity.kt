@@ -22,6 +22,7 @@ import android.os.Build
 import android.provider.MediaStore
 import android.widget.ImageButton
 import android.widget.Toast
+import com.autgroup.s2025.w201.todo.SettingsActivity
 import com.google.firebase.storage.FirebaseStorage
 
 class ProfileActivity : AppCompatActivity() {
@@ -106,12 +107,18 @@ class ProfileActivity : AppCompatActivity() {
         val profileImage = findViewById<ImageView>(R.id.profile_image)
         val logoutButton = findViewById<Button>(R.id.btnLogout)
         val uploadButton = findViewById<ImageButton>(R.id.btnUploadPhoto)
+        val settingsButton = findViewById<ImageButton>(R.id.btnSettings)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         // --- Upload profile photo button ---
         uploadButton.setOnClickListener {
             checkAndOpenGallery()
+        }
+        // --- Settings button ---
+        settingsButton.setOnClickListener {
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
         }
 
         // --- Firebase user info ---
