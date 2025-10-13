@@ -10,5 +10,6 @@ data class PlaceInfo(
     val openStatus: String? = null,
     val lat: Double? = null,
     val lng: Double? = null,
-    val reviews: List<Review>? = null
+    val reviews: List<Review>? = null,
+    val priceLevel: Int? = null
 ) : Serializable

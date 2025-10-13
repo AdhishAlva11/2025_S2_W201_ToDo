@@ -10,7 +10,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.autgroup.s2025.w201.todo.R
 import com.autgroup.s2025.w201.todo.classes.PlaceInfo
-import com.autgroup.s2025.w201.todo.classes.Review
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
@@ -48,6 +47,7 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
         val ratingText = view.findViewById<TextView>(R.id.ratingText)
         val openStatusText = view.findViewById<TextView>(R.id.openStatusText)
         val reviewsText = view.findViewById<TextView>(R.id.reviewsText)
+        val priceText = view.findViewById<TextView>(R.id.priceText)
         val addFavButton = view.findViewById<Button>(R.id.addFavouriteButton)
         val addToItineraryBtn = view.findViewById<Button>(R.id.btnAddToItinerary)
 
@@ -56,6 +56,9 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
         addressText.text = place.address ?: "No Address"
         ratingText.text = "⭐ ${place.rating ?: 0.0}"
         openStatusText.text = place.openStatus ?: "Hours unknown"
+
+        // Show price level using helper method
+        priceText.text = "💰 ${getPriceText(place.priceLevel)}"
 
         // Show top 3 reviews if available
         reviewsText.text = place.reviews?.take(3)?.joinToString("\n\n") { review ->
@@ -84,6 +87,18 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
         // Add to itinerary
         addToItineraryBtn.setOnClickListener {
             showChooseItineraryDialog(place)
+        }
+    }
+
+    /** Converts Google Places price_level (0–4) to text **/
+    private fun getPriceText(level: Int?): String {
+        return when (level) {
+            0 -> "Free"
+            1 -> "$ (Inexpensive)"
+            2 -> "$$ (Moderate)"
+            3 -> "$$$ (Expensive)"
+            4 -> "$$$$ (Very Expensive)"
+            else -> "Price info not available"
         }
     }
 
@@ -137,7 +152,7 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
                 .show()
         }
     }
-    
+
     private fun addActivityToItinerary(place: PlaceInfo, itineraryName: String, dayName: String) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val dbRef = FirebaseDatabase.getInstance(
@@ -153,5 +168,4 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
                 Toast.makeText(context, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
             }
     }
-
 }
