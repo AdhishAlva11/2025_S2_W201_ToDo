@@ -1,2 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="app_name">Aplicación de Tareas 2025</string>
+    <string name="travel_itinerary">Itinerario de Viaje</string>
+    <string name="hint_event_name">Nombre del Evento</string>
+    <string name="hint_start_date">Fecha de Inicio (aaaa-mm-dd)</string>
+    <string name="hint_duration">Duración (días)</string>
+    <string name="event_name">Nombre del Evento</string>
+    <string name="duration">Duración:</string>
+    <string name="start_date">Fecha de Inicio:</string>
+    <string name="trip_name">Nombre del Viaje</string>
+    <string name="add_event">Agregar Evento +</string>
+    <string name="back_button">Atrás</string>
+    <string name="trip_menu">Menú del Viaje</string>
+    <string name="favourites">Favoritos</string>
+</resources>
