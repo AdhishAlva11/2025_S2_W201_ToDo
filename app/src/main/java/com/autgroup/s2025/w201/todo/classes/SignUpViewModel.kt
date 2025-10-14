@@ -16,7 +16,6 @@ class SignUpViewModel(private val firebaseAuth: FirebaseAuth? = null) {
     private fun isValidEmail(email: String): Boolean {
 
         return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
-        return false
     }
 
     fun registerWithFirebase(email: String, password: String) {
