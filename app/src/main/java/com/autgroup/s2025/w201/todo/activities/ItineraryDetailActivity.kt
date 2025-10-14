@@ -8,9 +8,11 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.autgroup.s2025.w201.todo.R
+import com.autgroup.s2025.w201.todo.ThemeUtils
 import com.autgroup.s2025.w201.todo.adapters.DayAdapter
 import com.autgroup.s2025.w201.todo.adapters.PlaceAdapter
 import com.autgroup.s2025.w201.todo.classes.PlaceInfo
@@ -32,17 +34,32 @@ class ItineraryDetailActivity : AppCompatActivity() {
     private lateinit var itineraryName: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Apply dark/light theme before inflating the layout
+        ThemeUtils.applySavedTheme(this)
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_itinerary_detail)
 
+        // Get itinerary name passed from previous screen
         itineraryName = intent.getStringExtra("itineraryName") ?: return
 
-        // Title
+        // ---------------- Toolbar setup (XML back arrow + centered title) ----------------
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
+
+        val backButton = findViewById<ImageButton>(R.id.btnBack)
+        backButton.setOnClickListener {
+            val intent = Intent(this, ItineraryActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            startActivity(intent)
+            finish()
+        }
+
         val tvTitle = findViewById<TextView>(R.id.tvItineraryTitle)
         tvTitle.text = itineraryName
+        // -------------------------------------------------------------------------------
 
-        // Days RecyclerView
+        // ---------------- Days RecyclerView ----------------
         recyclerDays = findViewById(R.id.recyclerDays)
         recyclerDays.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         daysAdapter = DayAdapter(daysList) { dayName ->
@@ -51,7 +68,7 @@ class ItineraryDetailActivity : AppCompatActivity() {
         }
         recyclerDays.adapter = daysAdapter
 
-        // Activities RecyclerView
+        // ---------------- Activities RecyclerView ----------------
         recyclerView = findViewById(R.id.recyclerViewItinerary)
         recyclerView.layoutManager = LinearLayoutManager(this)
         adapter = PlaceAdapter(activities) { place, position ->
@@ -66,10 +83,10 @@ class ItineraryDetailActivity : AppCompatActivity() {
         }
         recyclerView.adapter = adapter
 
-        // Populate day chips then load day 1
+        // Populate days and load the first day's data
         loadDays()
 
-        // Bottom navigation setup
+        // ---------------- Bottom Navigation ----------------
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNav)
         bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
@@ -93,6 +110,7 @@ class ItineraryDetailActivity : AppCompatActivity() {
         bottomNav.selectedItemId = R.id.nav_itinerary
     }
 
+    // ---------------- Firebase data loading ----------------
     private fun loadDays() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val dbRef = FirebaseDatabase.getInstance(
@@ -115,10 +133,9 @@ class ItineraryDetailActivity : AppCompatActivity() {
                     }
                 }
                 if (daysList.isEmpty()) {
-                    // default single day
-                    daysList.add("Day 1")
+                    daysList.add("Day 1") // default single day
                 } else {
-                    // sort Day 1, Day 2 ...
+                    // sort Day 1, Day 2, ...
                     daysList.sortWith(compareBy {
                         it.removePrefix("Day ").trim().toIntOrNull() ?: Int.MAX_VALUE
                     })
@@ -152,8 +169,11 @@ class ItineraryDetailActivity : AppCompatActivity() {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(this@ItineraryDetailActivity,
-                    "Failed to load activities: ${error.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this@ItineraryDetailActivity,
+                    "Failed to load activities: ${error.message}",
+                    Toast.LENGTH_LONG
+                ).show()
             }
         })
     }
@@ -164,7 +184,6 @@ class ItineraryDetailActivity : AppCompatActivity() {
             "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
         ).getReference("$userId/Itineraries/$itineraryName/$selectedDay")
 
-        // remove children whose name equals place.name
         dbRef.orderByChild("name").equalTo(place.name).get().addOnSuccessListener { snapshot ->
             snapshot.children.forEach { it.ref.removeValue() }
             activities.removeAt(position)

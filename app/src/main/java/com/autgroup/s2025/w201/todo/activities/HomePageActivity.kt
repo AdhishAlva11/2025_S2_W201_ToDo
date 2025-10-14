@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.autgroup.s2025.w201.todo.R
+import com.autgroup.s2025.w201.todo.ThemeUtils
 import com.autgroup.s2025.w201.todo.databinding.ActivityHomePageBinding
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -27,6 +28,7 @@ class HomePageActivity : AppCompatActivity(), OnMapReadyCallback {
     private val LOCATION_PERMISSION_REQUEST_CODE = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        ThemeUtils.applySavedTheme(this)
         super.onCreate(savedInstanceState)
 
         // Initialize location provider

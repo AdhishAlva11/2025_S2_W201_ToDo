@@ -18,6 +18,7 @@ import com.google.firebase.database.*
 import android.view.View
 import android.widget.AdapterView
 import android.widget.Spinner
+import com.autgroup.s2025.w201.todo.ThemeUtils
 
 class ItineraryActivity : AppCompatActivity() {
 
@@ -26,6 +27,7 @@ class ItineraryActivity : AppCompatActivity() {
     private lateinit var adapter: ItineraryAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        ThemeUtils.applySavedTheme(this)
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_itinerary)
@@ -69,11 +71,13 @@ class ItineraryActivity : AppCompatActivity() {
             when (item.itemId) {
                 R.id.nav_home -> {
                     startActivity(Intent(this, HomePageActivity::class.java))
+                    overridePendingTransition(0, 0)
                     true
                 }
                 R.id.nav_itinerary -> true
                 R.id.nav_favourites -> {
                     startActivity(Intent(this, FavouritesActivity::class.java))
+                    overridePendingTransition(0, 0)
                     true
                 }
                 R.id.nav_profile -> {

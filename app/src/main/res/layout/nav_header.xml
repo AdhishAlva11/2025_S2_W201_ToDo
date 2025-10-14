@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="160dp"
     android:orientation="vertical"
     android:gravity="center"
-    android:background="@color/purple_500">
+    android:background="?attr/colorPrimary">
 
     <!-- Profile Icon -->
     <ImageView
@@ -12,9 +14,12 @@
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:src="@drawable/ic_person"
-        android:contentDescription="Profile Icon" />
+        android:contentDescription="Profile Icon"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:padding="4dp"
+        app:tint="@android:color/white" />
 
-    <!-- Username  - leave blank we add later-->
+    <!-- Username (set later in code) -->
     <TextView
         android:id="@+id/user_name"
         android:layout_width="wrap_content"
@@ -22,6 +27,6 @@
         android:text=""
         android:textColor="@android:color/white"
         android:textSize="18sp"
+        android:textStyle="bold"
         android:layout_marginTop="8dp" />
-
 </LinearLayout>

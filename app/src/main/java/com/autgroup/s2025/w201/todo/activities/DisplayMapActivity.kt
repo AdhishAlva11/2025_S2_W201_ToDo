@@ -23,6 +23,7 @@ import org.json.JSONObject
 import java.io.IOException
 import android.os.Handler
 import android.os.Looper
+import com.autgroup.s2025.w201.todo.ThemeUtils
 
 class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -40,6 +41,7 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        ThemeUtils.applySavedTheme(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_display_map)
 

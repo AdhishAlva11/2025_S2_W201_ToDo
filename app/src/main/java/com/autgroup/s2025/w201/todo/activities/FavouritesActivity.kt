@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.autgroup.s2025.w201.todo.R
+import com.autgroup.s2025.w201.todo.ThemeUtils
 import com.autgroup.s2025.w201.todo.adapters.FavouritesAdapter
 import com.autgroup.s2025.w201.todo.classes.Favourite
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -28,6 +29,7 @@ class FavouritesActivity : AppCompatActivity() {
     private lateinit var spinnerCountryFilter: Spinner
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        ThemeUtils.applySavedTheme(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_favourites)
 

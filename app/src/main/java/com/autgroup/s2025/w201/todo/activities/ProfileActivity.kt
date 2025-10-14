@@ -22,6 +22,7 @@ import android.os.Build
 import android.provider.MediaStore
 import android.widget.ImageButton
 import android.widget.Toast
+import com.autgroup.s2025.w201.todo.ThemeUtils
 import com.google.firebase.storage.FirebaseStorage
 
 class ProfileActivity : AppCompatActivity() {
@@ -59,8 +60,14 @@ class ProfileActivity : AppCompatActivity() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        ThemeUtils.applySavedTheme(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
+
+        val settingsButton = findViewById<ImageButton>(R.id.btnSettings)
+        settingsButton.setOnClickListener {
+            startActivity(Intent(this, SettingsActivity::class.java))
+        }
 
         window.decorView.systemUiVisibility = 0
 

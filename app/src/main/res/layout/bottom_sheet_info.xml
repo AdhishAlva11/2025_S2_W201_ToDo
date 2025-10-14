@@ -1,78 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="?android:attr/windowBackground"
+    android:padding="16dp">
 
     <LinearLayout
-        android:orientation="vertical"
-        android:padding="16dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
 
+        <!-- Add to Favourites button -->
         <Button
             android:id="@+id/addFavouriteButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Add to Favourites"/>
+            android:text="Add to Favourites"
+            android:backgroundTint="?attr/colorPrimary"
+            android:textColor="@android:color/white" />
 
+        <!-- Add to Itinerary button -->
         <Button
             android:id="@+id/btnAddToItinerary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="Add to Itinerary" />
+            android:text="Add to Itinerary"
+            android:backgroundTint="?attr/colorPrimary"
+            android:textColor="@android:color/white" />
 
+        <!-- Title -->
         <TextView
             android:id="@+id/titleText"
-            android:textStyle="bold"
-            android:textSize="18sp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"/>
-
-        <TextView
-            android:id="@+id/addressText"
-            android:textSize="16sp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"/>
-
-        <TextView
-            android:id="@+id/ratingText"
-            android:textSize="16sp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"/>
-
-        <TextView
-            android:id="@+id/openStatusText"
-            android:textSize="16sp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"/>
-
-        <TextView
-            android:id="@+id/priceText"
-            android:text="💰 Price info not available"
-            android:textSize="16sp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp" />
-
-        <TextView
-            android:id="@+id/reviewsHeader"
-            android:text="Reviews"
-            android:textStyle="bold"
-            android:textSize="16sp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:paddingBottom="4dp"/>
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:textColor="?android:attr/textColorPrimary" />
 
+        <!-- Address -->
+        <TextView
+            android:id="@+id/addressText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textSize="16sp"
+            android:textColor="?android:attr/textColorSecondary" />
+
+        <!-- Rating -->
+        <TextView
+            android:id="@+id/ratingText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textSize="16sp"
+            android:textColor="?android:attr/textColorSecondary" />
+
+        <!-- Open/Closed Status -->
+        <TextView
+            android:id="@+id/openStatusText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textSize="16sp"
+            android:textColor="?android:attr/textColorSecondary" />
+
+        <!-- Price -->
+        <TextView
+            android:id="@+id/priceText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="💰 Price info not available"
+            android:textSize="16sp"
+            android:textColor="?android:attr/textColorSecondary" />
+
+        <!-- Reviews header -->
+        <TextView
+            android:id="@+id/reviewsHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:paddingBottom="4dp"
+            android:text="Reviews"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="?android:attr/textColorPrimary" />
+
+        <!-- Reviews content -->
         <TextView
             android:id="@+id/reviewsText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="14sp"/>
+            android:textSize="14sp"
+            android:textColor="?android:attr/textColorSecondary" />
     </LinearLayout>
 </ScrollView>

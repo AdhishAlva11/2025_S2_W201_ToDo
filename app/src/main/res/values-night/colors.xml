@@ -1,0 +1,5 @@
+<resources>
+    <color name="colorPrimary">#121212</color>        <!-- dark background -->
+    <color name="colorPrimaryVariant">#3700B3</color> <!-- purple accent -->
+    <color name="colorOnPrimary">#FFFFFF</color>      <!-- white text/icons -->
+</resources>

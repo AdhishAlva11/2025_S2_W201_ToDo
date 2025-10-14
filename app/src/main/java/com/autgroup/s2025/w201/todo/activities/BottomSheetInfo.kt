@@ -9,6 +9,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.autgroup.s2025.w201.todo.R
+import com.autgroup.s2025.w201.todo.ThemeUtils
 import com.autgroup.s2025.w201.todo.classes.PlaceInfo
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.auth.FirebaseAuth
@@ -39,6 +40,8 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        // Apply saved theme so bottom sheet follows dark/light mode
+        ThemeUtils.applySavedTheme(requireContext())
 
         val place = arguments?.getSerializable(ARG_PLACE) as? PlaceInfo ?: return
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme._2025_S2_W201_ToDo" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="Theme._2025_S2_W201_ToDo" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Colors -->
         <item name="colorSecondary">@color/teal_200</item>
         <item name="colorSecondaryVariant">@color/teal_700</item>
@@ -9,11 +9,9 @@
         <item name="colorPrimaryVariant">@color/purple_700</item>
         <item name="colorOnPrimary">@color/white</item>
 
-        <!-- Make sure status bar is visible -->
+        <!-- System bars -->
         <item name="android:windowFullscreen">false</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-
-        <!-- Status bar color -->
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 </resources>
