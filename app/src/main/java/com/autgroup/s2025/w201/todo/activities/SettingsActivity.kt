@@ -1,14 +1,19 @@
-package com.autgroup.s2025.w201.todo
+package com.autgroup.s2025.w201.todo.activities
 
 import android.content.res.Configuration
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.view.View
-import android.widget.*
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.ImageButton
+import android.widget.Spinner
+import android.widget.Switch
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import com.autgroup.s2025.w201.todo.R
-import java.util.*
+import java.util.Locale
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -49,19 +54,31 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         // --- Spinner listener ---
-        languageSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            var isFirst = true // prevents immediate reload on first load
+        var isUserAction = false
 
+        languageSpinner.post {
+            // Set saved language AFTER spinner is ready
+            val langCode = prefs.getString("language_code", "en")
+            val position = when (langCode) {
+                "en" -> 0
+                "zh" -> 1
+                "hi" -> 2
+                "es" -> 3
+                "fr" -> 4
+                else -> 0
+            }
+            languageSpinner.setSelection(position, false)
+            isUserAction = true
+        }
+
+        languageSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>,
                 view: View?,
                 position: Int,
                 id: Long
             ) {
-                if (isFirst) {
-                    isFirst = false
-                    return // ignore the first automatic selection
-                }
+                if (!isUserAction) return  // ignore automatic selection at startup
 
                 val langCode = when (position) {
                     0 -> "en"
@@ -72,7 +89,11 @@ class SettingsActivity : AppCompatActivity() {
                     else -> "en"
                 }
 
-                setLocale(langCode)
+                // Avoid unnecessary reloads if same language
+                val currentCode = prefs.getString("language_code", "en")
+                if (langCode != currentCode) {
+                    setLocale(langCode)
+                }
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {}

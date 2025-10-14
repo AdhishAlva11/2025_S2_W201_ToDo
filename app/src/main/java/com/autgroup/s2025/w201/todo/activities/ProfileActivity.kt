@@ -22,7 +22,7 @@ import android.os.Build
 import android.provider.MediaStore
 import android.widget.ImageButton
 import android.widget.Toast
-import com.autgroup.s2025.w201.todo.SettingsActivity
+import com.autgroup.s2025.w201.todo.activities.SettingsActivity
 import com.google.firebase.storage.FirebaseStorage
 
 class ProfileActivity : AppCompatActivity() {
