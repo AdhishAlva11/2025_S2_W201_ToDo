@@ -162,7 +162,7 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
                 // Handle pagination
                 val nextPageToken = json.optString("next_page_token", null)
                 if (!nextPageToken.isNullOrEmpty()) {
-                    android.os.Handler(Looper.getMainLooper()).postDelayed({
+                    Handler(Looper.getMainLooper()).postDelayed({
                         fetchNearbyPlaces(location, type, nextPageToken)
                     }, 2000)
                 }
@@ -174,7 +174,7 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
         val apiKey = getString(R.string.project_google_api_key)
         val url = "https://maps.googleapis.com/maps/api/place/details/json" +
                 "?place_id=$placeId" +
-                "&fields=name,rating,formatted_address,opening_hours,reviews,geometry" +
+                "&fields=name,rating,formatted_address,opening_hours,reviews,geometry,price_level" +
                 "&key=$apiKey"
 
         val request = Request.Builder().url(url).build()
@@ -191,9 +191,8 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
                 val address = json.optString("formatted_address", "No address")
                 val rating = json.optDouble("rating", 0.0)
                 val openNow = if (json.has("opening_hours")) {
-                    if (json.getJSONObject("opening_hours")
-                            .optBoolean("open_now")
-                    ) "Open now" else "Closed"
+                    if (json.getJSONObject("opening_hours").optBoolean("open_now")) "Open now"
+                    else "Closed"
                 } else "Hours not available"
 
                 val geometry = json.getJSONObject("geometry").getJSONObject("location")
@@ -216,6 +215,9 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
                     }
                 }
 
+                // Fetch price_level if available
+                val priceLevel = if (json.has("price_level")) json.getInt("price_level") else null
+
                 val placeInfo = PlaceInfo(
                     name = name,
                     address = address,
@@ -223,7 +225,8 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
                     openStatus = openNow,
                     lat = lat,
                     lng = lng,
-                    reviews = reviewsList
+                    reviews = reviewsList,
+                    priceLevel = priceLevel
                 )
 
                 onResult(placeInfo)
