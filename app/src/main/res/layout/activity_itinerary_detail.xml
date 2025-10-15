@@ -13,6 +13,7 @@
         android:layout_height="wrap_content"
         android:fitsSystemWindows="true">
 
+        <!-- Toolbar with ConstraintLayout inside to allow perfect centering -->
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
@@ -22,30 +23,60 @@
             app:contentInsetStartWithNavigation="0dp"
             app:contentInsetStart="0dp"
             app:contentInsetLeft="0dp"
-            app:titleMarginStart="0dp">
+            app:title=""
+            >
 
-            <!-- Back button (left side) -->
-            <ImageButton
-                android:id="@+id/btnBack"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="start|center_vertical"
-                android:background="@android:color/transparent"
-                android:padding="12dp"
-                android:src="@drawable/ic_arrow_back"
-                android:contentDescription="Back"
-                app:tint="@android:color/white" />
-
-            <!-- Centered title -->
-            <TextView
-                android:id="@+id/tvItineraryTitle"
+            <!-- Use ConstraintLayout inside the Toolbar to center the title -->
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="Itinerary Details"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="@android:color/white" />
+                android:layout_height="match_parent">
+
+                <!-- Back button on the left -->
+                <ImageButton
+                    android:id="@+id/btnBack"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginLeft="8dp"
+                    android:background="@android:color/transparent"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_arrow_back"
+                    android:contentDescription="Back"
+                    app:tint="@android:color/white"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+
+                <!-- Centered title -->
+                <TextView
+                    android:id="@+id/tvItineraryTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Itinerary Details"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/white"
+                    android:gravity="center"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    />
+
+                <!-- Invisible spacer on the right to balance the back button -->
+                <!-- Matches the back button width so the title is truly centered -->
+                <View
+                    android:id="@+id/rightSpacer"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:visibility="invisible"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
