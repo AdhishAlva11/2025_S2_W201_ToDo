@@ -21,23 +21,25 @@
             android:background="?attr/colorPrimary"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
+            <!-- Title -->
             <TextView
                 android:id="@+id/toolbar_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="Profile"
+                android:text="@string/profile_title"
                 android:textColor="@android:color/white"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
+            <!-- Settings Button -->
             <ImageButton
                 android:id="@+id/btnSettings"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
                 android:background="@android:color/transparent"
-                android:contentDescription="Settings"
+                android:contentDescription="@string/settings_button"
                 android:padding="8dp"
                 android:src="@drawable/ic_settings"
                 app:tint="@android:color/white" />
@@ -72,7 +74,7 @@
                     android:layout_height="120dp"
                     android:background="@drawable/profile_circle_bg"
                     android:clipToOutline="true"
-                    android:contentDescription="Profile Picture"
+                    android:contentDescription="@string/profile_picture"
                     android:scaleType="centerCrop"
                     android:src="@drawable/ic_profile_photo" />
 
@@ -82,7 +84,7 @@
                     android:layout_height="40dp"
                     android:layout_gravity="bottom|end"
                     android:background="@android:color/transparent"
-                    android:contentDescription="Upload Profile Photo"
+                    android:contentDescription="@string/upload_photo"
                     android:padding="4dp"
                     android:src="@drawable/ic_profilepic"
                     app:tint="?attr/colorPrimary" />
@@ -94,7 +96,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:text="User Name"
+                android:text="@string/default_user_name"
                 android:textColor="?android:attr/textColorPrimary"
                 android:textSize="20sp"
                 android:textStyle="bold" />
@@ -111,7 +113,7 @@
                     android:id="@+id/emergency_contact"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Emergency Contact: 111"
+                    android:text="@string/emergency_contact_label"
                     android:textColor="?attr/colorError"
                     android:textSize="16sp" />
 
@@ -120,7 +122,7 @@
                     android:layout_width="16dp"
                     android:layout_height="16dp"
                     android:layout_marginStart="4dp"
-                    android:contentDescription="Clickable indicator"
+                    android:contentDescription="@string/contact_arrow_description"
                     android:src="@drawable/ic_chevron_arrow"
                     app:tint="?android:attr/textColorSecondary" />
             </LinearLayout>
@@ -131,7 +133,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:backgroundTint="?attr/colorPrimary"
-                android:text="LOG OUT"
+                android:text="@string/logout_button"
                 android:textAllCaps="true"
                 android:textColor="@android:color/white" />
         </LinearLayout>

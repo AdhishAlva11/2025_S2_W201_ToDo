@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- App Information -->
+    <string name="app_name">2025_S2_W201_ToDo</string>
+
+    <!-- Activity Titles -->
+    <string name="title_activity_display_map">मानचित्र दिखाएं</string>
+    <string name="title_activity_home_page">मुख्य पृष्ठ</string>
+    <string name="favourites">पसंदीदा</string>
+
+    <!-- Navigation Drawer -->
+    <string name="navigation_drawer_open">नेविगेशन ड्रॉअर खोलें</string>
+    <string name="navigation_drawer_close">नेविगेशन ड्रॉअर बंद करें</string>
+
+    <!-- FavouritesActivity -->
+    <string name="filter_by_country">देश के अनुसार फ़िल्टर करें:</string>
+
+    <!-- ItineraryActivity -->
+    <string name="travel_itinerary">यात्रा कार्यक्रम</string>
+    <string name="japan_adventure">जापान एडवेंचर</string>
+    <string name="hint_event_name">कार्यक्रम का नाम</string>
+    <string name="hint_start_date">प्रारंभ तिथि (yyyy-mm-dd)</string>
+    <string name="hint_duration">अवधि (दिनों में)</string>
+    <string name="event_name">कार्यक्रम का नाम</string>
+    <string name="duration">अवधि:</string>
+    <string name="start_date">प्रारंभ तिथि:</string>
+    <string name="trip_name">यात्रा का नाम</string>
+    <string name="add_event">कार्यक्रम जोड़ें +</string>
+    <string name="back_button">वापस</string>
+    <string name="trip_menu">यात्रा मेनू</string>
+    <string name="trip_start_date">प्रारंभ तिथि: %s</string>
+    <string name="trip_duration">अवधि: %d दिन</string>
+
+    <!-- Authentication / Firebase -->
+    <string name="default_web_client_id">598254263424-te0dvjnufdifkgbj9fj0gjgjjvgnkq79.apps.googleusercontent.com</string>
+
+    <!-- Google Maps API Key -->
+    <string name="project_google_api_key">AIzaSyBJvIhFs-ZgMJIuhrPCUH2M33zdvyj-Od4</string>
+
+    <!-- Dropdown Lists -->
+    <string-array name="itinerary_filters">
+        <item>ए → ज़ेड</item>
+        <item>ज़ेड → ए</item>
+        <item>छोटी → लंबी</item>
+    </string-array>
+    <!-- ItineraryActivity UI -->
+    <string name="itineraries">यात्राएँ</string>
+    <string name="add_itinerary">+ यात्रा जोड़ें</string>
+    <string name="filter_label">फ़िल्टर:</string>
+
+    <!-- ItineraryActivity Details -->
+    <string name="itinerary_details">यात्रा विवरण</string>
+
+    <!-- Search Page -->
+    <string name="select_interests">रुचियाँ चुनें</string>
+    <string name="restaurants">रेस्तरां</string>
+    <string name="walking">पैदल चलना</string>
+    <string name="sports">खेल</string>
+    <string name="landmarks">प्रसिद्ध स्थल</string>
+    <string name="family_attractions">पारिवारिक आकर्षण</string>
+    <string name="culture">संस्कृति</string>
+    <string name="search_radius_label">खोज त्रिज्या (मीटर)</string>
+    <string name="search_button">खोजें</string>
+
+    <!-- Settings Page -->
+    <string name="settings_title">सेटिंग्स</string>
+    <string name="dark_mode">डार्क मोड</string>
+    <string name="language">भाषा</string>
+
+    <!-- Profile Page -->
+    <string name="profile_title">प्रोफ़ाइल</string>
+    <string name="settings_button">सेटिंग्स</string>
+    <string name="profile_picture">प्रोफ़ाइल तस्वीर</string>
+    <string name="upload_photo">प्रोफ़ाइल फ़ोटो अपलोड करें</string>
+    <string name="default_user_name">उपयोगकर्ता नाम</string>
+    <string name="emergency_contact_label">आपातकालीन संपर्क: 111</string>
+    <string name="contact_arrow_description">क्लिक करने योग्य संकेतक</string>
+    <string name="logout_button">लॉग आउट</string>
+
+    <!-- Place Detail Screen -->
+    <string name="add_to_favourites">पसंदीदा में जोड़ें</string>
+    <string name="add_to_itinerary">यात्रा कार्यक्रम में जोड़ें</string>
+    <string name="price_info_unavailable"> मूल्य जानकारी उपलब्ध नहीं है</string>
+    <string name="reviews_header">समीक्षाएँ</string>
+
+    <!-- Add Itinerary Dialog-->
+    <string name="itinerary_name_hint">यात्रा कार्यक्रम का नाम</string>
+    <string name="number_of_days_hint">दिनों की संख्या</string>
+
+    <!-- Favourite Item Card-->
+    <string name="fav_name_label">नाम</string>
+    <string name="fav_address_label">पता</string>
+    <string name="fav_status_label">स्थिति</string>
+    <string name="fav_rating_label">★ 4.5</string>
+
+    <!-- Itinerary card strings -->
+    <string name="sample_itinerary_name">ऑकलैंड की यात्रा</string> <!-- “Trip to Auckland” in Hindi -->
+
+    <!-- Place card strings -->
+    <string name="place_name_label">स्थान का नाम</string>
+    <string name="place_address_label">पता</string>
+    <string name="place_status_label">खुला या बंद</string>
+    <string name="place_rating_label">रेटिंग</string>
+
+    <!-- BottomSheetInfo strings -->
+    <string name="no_name">कोई नाम नहीं</string>
+    <string name="no_address">कोई पता नहीं</string>
+    <string name="hours_unknown">घंटे अज्ञात हैं</string>
+    <string name="price_with_symbol">💰 %1$s</string>
+    <string name="no_reviews_available">कोई समीक्षा उपलब्ध नहीं</string>
+    <string name="rating_with_star">⭐ %1$.1f</string>
+
+    <!-- Price levels -->
+    <string name="price_free">नि:शुल्क</string>
+    <string name="price_inexpensive">₹ (सस्ता)</string>
+    <string name="price_moderate">₹₹ (मध्यम)</string>
+    <string name="price_expensive">₹₹₹ (महंगा)</string>
+    <string name="price_very_expensive">₹₹₹₹ (बहुत महंगा)</string>
+    <string name="price_not_available">मूल्य जानकारी उपलब्ध नहीं</string>
+
+    <!-- Dialog and toast messages -->
+    <string name="choose_itinerary">यात्रा चुनें</string>
+    <string name="choose_day">दिन चुनें</string>
+    <string name="day_number">दिन %1$d</string>
+    <string name="added_to_favourites">पसंदीदा में जोड़ा गया!</string>
+    <string name="added_to_itinerary">%1$s → %2$s में जोड़ा गया!</string>
+    <string name="failed_generic">विफल: %1$s</string>
+
+    <!-- BottomSheetInfo strings -->
+
+    <!-- DisplayMapActivity layout strings -->
+    <string name="search_hint">खोजें...</string>
+    <string name="interests_overlay_label">रुचियाँ</string>
+
+    <!-- DisplayMapActivity logic strings -->
+    <string name="no_location_data">कोई स्थान डेटा प्राप्त नहीं हुआ</string>
+    <string name="selected_location">चयनित स्थान</string>
+    <string name="invalid_coordinates">अमान्य निर्देशांक</string>
+    <string name="request_failed">अनुरोध विफल हुआ</string>
+
+
+    <string name="open_now">खुला है</string>
+    <string name="closed">बंद है</string>
+    <string name="hours_not_available">घंटे उपलब्ध नहीं</string>
+
+    <!-- DisplayMapActivity layout strings -->
+
+    <!-- Favourites Activity Kotlin Code String Values-->
+    <string name="all_label">सभी</string>
+    <string name="failed_load_favourites">पसंदीदा लोड करने में विफल: %1$s</string>
+    <string name="no_favourites_message">अभी तक कोई पसंदीदा नहीं जोड़ा गया</string>
+    <!-- Favourites Activity Kotlin Code String Values-->
+
+    <!-- ItineraryActivity Kotlin Code String Values-->
+    <string name="add">जोड़ें</string>
+    <string name="cancel">रद्द करें</string>
+    <string name="itinerary_created">यात्रा \'%1$s\' बनाई गई!</string>
+    <!-- ItineraryActivity Kotlin Code String Values-->
+
+    <!--Itinerary String messages -->
+    <string name="add_itinerary_title">यात्रा जोड़ें</string>
+    <string name="failed_create_itinerary">यात्रा बनाने में विफल: %1$s</string>
+    <string name="failed_load_itineraries">यात्राएँ लोड करने में विफल: %1$s</string>
+    <!--Itinerary String messages -->
+
+    <!-- ItineraryDetailActivity -->
+    <string name="delete_activity_title">गतिविधि हटाएं</string>
+    <string name="confirm_delete_activity">क्या आप वाकई \'%1$s\' को %2$s से हटाना चाहते हैं?</string>
+    <string name="delete">हटाएं</string>
+    <string name="failed_load_days">दिन लोड करने में विफल: %1$s</string>
+    <string name="failed_load_activities">गतिविधियाँ लोड करने में विफल: %1$s</string>
+    <string name="activity_removed">%1$s हटाया गया</string>
+    <!-- ItineraryDetailActivity -->
+
+    <!-- ProfileActivity -->
+    <string name="emergency_contact_not_available">आपातकालीन संपर्क: उपलब्ध नहीं</string>
+    <string name="not_available">उपलब्ध नहीं</string>
+    <string name="profile_photo_updated">प्रोफ़ाइल फ़ोटो अपडेट हो गई!</string>
+    <string name="upload_failed">अपलोड विफल: %1$s</string>
+    <!-- ProfileActivity -->
+
+    <!-- SearchActivity toasts -->
+    <string name="selected_place_toast">चयनित: %1$s</string>
+    <string name="autocomplete_error_toast">त्रुटि: %1$s</string>
+    <string name="please_select_location">कृपया कोई स्थान चुनें</string>
+    <!-- SearchActivity toasts -->
+
+
+    <!--  SettingsActivity  Language Spinner Options -->
+    <string-array name="language_options">
+        <item>अंग्रेज़ी</item>
+        <item>स्पैनिश</item>
+        <item>फ़्रेंच</item>
+        <item>हिन्दी</item>
+        <item>चीनी</item>
+    </string-array>
+
+    <!-- Bottom Navigation View-->
+    <string name="nav_home">मुख्य पृष्ठ</string>
+    <string name="nav_favourites">पसंदीदा</string>
+    <string name="nav_itinerary">यात्रा कार्यक्रम</string>
+    <string name="nav_profile">प्रोफ़ाइल</string>
+    <!-- Bottom Navigation View-->
+
+    <!-- Itinerary Toast Messages-->
+    <string name="delete_activity_message">क्या आप वाकई \'%1$s\' को %2$s से हटाना चाहते हैं?</string>
+    <string name="load_days_failed">दिन लोड करने में विफल: %1$s</string>
+    <string name="load_activities_failed">गतिविधियाँ लोड करने में विफल: %1$s</string>
+    <!-- Itinerary Toast Messages-->
+
+    <!-- Itinerary detail activity display (for day format)-->
+    <string name="day_format">दिन %1$d</string>
+    <!-- Itinerary detail activity display (for day format)-->
+
+    <!-- FavouritesAdapter localization -->
+    <string name="delete_favourite_title">पसंदीदा हटाएं</string>
+    <string name="delete_favourite_message">क्या आप वाकई %1$s को हटाना चाहते हैं?</string>
+    <string name="yes">हाँ</string>
+    <string name="no">नहीं</string>
+    <!-- FavouritesAdapter localization -->
+
+    <!-- ItineraryAdapter localization -->
+    <string name="delete_itinerary_title">यात्रा हटाएँ</string>
+    <string name="delete_itinerary_message">क्या आप वाकई %1$s को हटाना चाहते हैं?</string>
+    <string name="unnamed">बिना नाम</string>
+    <!-- ItineraryAdapter localization -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <string-array name="radius_options">
+        <item>1000</item>
+        <item>3000</item>
+        <item>5000</item>
+    </string-array>
+
+</resources>

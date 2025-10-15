@@ -35,14 +35,13 @@ class ItineraryActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.recyclerItineraries)
         recyclerView.layoutManager = LinearLayoutManager(this)
         adapter = ItineraryAdapter(itineraries) { itinerary ->
-            // On click: open itinerary details
             val intent = Intent(this, ItineraryDetailActivity::class.java)
             intent.putExtra("itineraryName", itinerary.name)
             startActivity(intent)
         }
         recyclerView.adapter = adapter
 
-        // Filter spinner setup
+        // Filter spinner
         val spinnerFilter: Spinner = findViewById(R.id.spinnerFilter)
         spinnerFilter.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
@@ -62,7 +61,7 @@ class ItineraryActivity : AppCompatActivity() {
             showAddItineraryDialog()
         }
 
-        // Load itineraries from Firebase
+        // Load itineraries
         loadItineraries()
 
         // Bottom navigation
@@ -97,18 +96,17 @@ class ItineraryActivity : AppCompatActivity() {
         val etDays = dialogView.findViewById<TextView>(R.id.etDays)
 
         AlertDialog.Builder(this)
-            .setTitle("Add Itinerary")
+            .setTitle(getString(R.string.add_itinerary_title))
             .setView(dialogView)
-            .setPositiveButton("Add") { _, _ ->
+            .setPositiveButton(getString(R.string.add)) { _, _ ->
                 val name = etEventName.text.toString().trim()
                 val daysStr = etDays.text.toString().trim()
                 val days = daysStr.toIntOrNull() ?: 1
                 if (name.isNotEmpty()) addItinerary(name, days)
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(getString(R.string.cancel), null)
             .show()
     }
-
 
     private fun addItinerary(name: String, days: Int) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
@@ -116,22 +114,28 @@ class ItineraryActivity : AppCompatActivity() {
             "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
         ).getReference("$userId/Itineraries")
 
-        // Build the itinerary map: { "days": <n>, "Day 1": {}, "Day 2": {}, ... }
         val itineraryMap = mutableMapOf<String, Any>()
         itineraryMap["days"] = days
         for (i in 1..days) {
-            itineraryMap["Day $i"] = mapOf<String, Any>() // empty map for activities
+            itineraryMap["Day $i"] = mapOf<String, Any>()
         }
 
         dbRef.child(name).setValue(itineraryMap)
             .addOnSuccessListener {
-                Toast.makeText(this, "Itinerary '$name' created!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    this,
+                    getString(R.string.itinerary_created, name),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
             .addOnFailureListener {
-                Toast.makeText(this, "Failed: ${it.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this,
+                    getString(R.string.failed_create_itinerary, it.message),
+                    Toast.LENGTH_LONG
+                ).show()
             }
     }
-
 
     private fun loadItineraries() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
@@ -150,7 +154,11 @@ class ItineraryActivity : AppCompatActivity() {
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(this@ItineraryActivity, "Failed: ${error.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this@ItineraryActivity,
+                    getString(R.string.failed_load_itineraries, error.message),
+                    Toast.LENGTH_LONG
+                ).show()
             }
         })
     }

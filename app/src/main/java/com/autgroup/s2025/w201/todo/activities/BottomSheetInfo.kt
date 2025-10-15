@@ -40,7 +40,6 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // Apply saved theme so bottom sheet follows dark/light mode
         ThemeUtils.applySavedTheme(requireContext())
 
         val place = arguments?.getSerializable(ARG_PLACE) as? PlaceInfo ?: return
@@ -55,22 +54,18 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
         val addToItineraryBtn = view.findViewById<Button>(R.id.btnAddToItinerary)
 
         // Populate text views
-        titleText.text = place.name ?: "No Name"
-        addressText.text = place.address ?: "No Address"
-        ratingText.text = "⭐ ${place.rating ?: 0.0}"
-        openStatusText.text = place.openStatus ?: "Hours unknown"
-
-        // Show price level using helper method
-        priceText.text = "💰 ${getPriceText(place.priceLevel)}"
-
-        // Show top 3 reviews if available
+        titleText.text = place.name ?: getString(R.string.no_name)
+        addressText.text = place.address ?: getString(R.string.no_address)
+        ratingText.text = getString(R.string.rating_with_star, place.rating ?: 0.0)
+        openStatusText.text = place.openStatus ?: getString(R.string.hours_unknown)
+        priceText.text = getString(R.string.price_with_symbol, getPriceText(place.priceLevel))
         reviewsText.text = place.reviews?.take(3)?.joinToString("\n\n") { review ->
             "${review.authorName} ⭐${review.rating}\n${review.text}"
-        } ?: "No reviews available"
+        } ?: getString(R.string.no_reviews_available)
 
         firebaseAuth = FirebaseAuth.getInstance()
 
-        // Add to favorites
+        // Add to favourites
         addFavButton.setOnClickListener {
             val userId = firebaseAuth.currentUser?.uid ?: return@setOnClickListener
             val dbRef = FirebaseDatabase.getInstance(
@@ -79,11 +74,11 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
 
             dbRef.push().setValue(place)
                 .addOnSuccessListener {
-                    Toast.makeText(context, "Added to favourites!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, getString(R.string.added_to_favourites), Toast.LENGTH_SHORT).show()
                     dismiss()
                 }
                 .addOnFailureListener { e ->
-                    Toast.makeText(context, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, getString(R.string.failed_generic, e.message), Toast.LENGTH_LONG).show()
                 }
         }
 
@@ -93,15 +88,14 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
         }
     }
 
-    /** Converts Google Places price_level (0–4) to text **/
     private fun getPriceText(level: Int?): String {
         return when (level) {
-            0 -> "Free"
-            1 -> "$ (Inexpensive)"
-            2 -> "$$ (Moderate)"
-            3 -> "$$$ (Expensive)"
-            4 -> "$$$$ (Very Expensive)"
-            else -> "Price info not available"
+            0 -> getString(R.string.price_free)
+            1 -> getString(R.string.price_inexpensive)
+            2 -> getString(R.string.price_moderate)
+            3 -> getString(R.string.price_expensive)
+            4 -> getString(R.string.price_very_expensive)
+            else -> getString(R.string.price_not_available)
         }
     }
 
@@ -115,10 +109,9 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
             val itineraryNames = snapshot.children.map { it.key ?: "" }
 
             AlertDialog.Builder(requireContext())
-                .setTitle("Choose Itinerary")
+                .setTitle(getString(R.string.choose_itinerary))
                 .setItems(itineraryNames.toTypedArray()) { _, which ->
                     val selectedItinerary = itineraryNames[which]
-                    // after itinerary selected, ask for day
                     showChooseDayDialog(place, selectedItinerary)
                 }
                 .show()
@@ -132,22 +125,21 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
         ).getReference("$userId/Itineraries/$itineraryName")
 
         dbRef.get().addOnSuccessListener { snapshot ->
-            // Build the list of days. Prefer "days" count if present:
             val daysCount = snapshot.child("days").getValue(Int::class.java)
             val daysList = mutableListOf<String>()
+
             if (daysCount != null && daysCount > 0) {
-                for (i in 1..daysCount) daysList.add("Day $i")
+                for (i in 1..daysCount) daysList.add(getString(R.string.day_number, i))
             } else {
-                // fallback: any keys starting with Day
                 for (child in snapshot.children) {
                     val key = child.key ?: continue
                     if (key.startsWith("Day ", true)) daysList.add(key)
                 }
-                if (daysList.isEmpty()) daysList.add("Day 1")
+                if (daysList.isEmpty()) daysList.add(getString(R.string.day_number, 1))
             }
 
             AlertDialog.Builder(requireContext())
-                .setTitle("Choose Day")
+                .setTitle(getString(R.string.choose_day))
                 .setItems(daysList.toTypedArray()) { _, which ->
                     val selectedDay = daysList[which]
                     addActivityToItinerary(place, itineraryName, selectedDay)
@@ -164,11 +156,15 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
 
         dbRef.push().setValue(place)
             .addOnSuccessListener {
-                Toast.makeText(context, "Added to $itineraryName → $dayName!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    getString(R.string.added_to_itinerary, itineraryName, dayName),
+                    Toast.LENGTH_SHORT
+                ).show()
                 dismiss()
             }
             .addOnFailureListener { e ->
-                Toast.makeText(context, "Failed: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, getString(R.string.failed_generic, e.message), Toast.LENGTH_LONG).show()
             }
     }
 }

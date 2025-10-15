@@ -27,7 +27,7 @@
             android:id="@+id/interestsLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Select Interests"
+            android:text="@string/select_interests"
             android:textSize="16sp"
             android:textStyle="bold"
             android:layout_marginTop="12dp"
@@ -49,7 +49,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <!-- Reusable CardViews -->
             <androidx.cardview.widget.CardView
                 android:layout_width="0dp"
                 android:layout_height="140dp"
@@ -60,7 +59,7 @@
                     android:id="@+id/checkboxFood"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="Restaurants"
+                    android:text="@string/restaurants"
                     android:gravity="center"
                     android:textSize="18sp"/>
             </androidx.cardview.widget.CardView>
@@ -75,7 +74,7 @@
                     android:id="@+id/checkboxWalking"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="Walking"
+                    android:text="@string/walking"
                     android:gravity="center"
                     android:textSize="18sp"/>
             </androidx.cardview.widget.CardView>
@@ -90,7 +89,7 @@
                     android:id="@+id/checkboxSports"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="Sports"
+                    android:text="@string/sports"
                     android:gravity="center"
                     android:textSize="18sp"/>
             </androidx.cardview.widget.CardView>
@@ -105,7 +104,7 @@
                     android:id="@+id/checkboxViews"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="Landmarks"
+                    android:text="@string/landmarks"
                     android:gravity="center"
                     android:textSize="18sp"/>
             </androidx.cardview.widget.CardView>
@@ -120,7 +119,7 @@
                     android:id="@+id/checkboxFamily"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="Family Attractions"
+                    android:text="@string/family_attractions"
                     android:gravity="center"
                     android:textSize="18sp"/>
             </androidx.cardview.widget.CardView>
@@ -135,7 +134,7 @@
                     android:id="@+id/checkboxCulture"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:text="Culture"
+                    android:text="@string/culture"
                     android:gravity="center"
                     android:textSize="18sp"/>
             </androidx.cardview.widget.CardView>
@@ -146,7 +145,7 @@
             android:id="@+id/radiusLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Search Radius (meters)"
+            android:text="@string/search_radius_label"
             android:textSize="16sp"
             android:textStyle="bold"
             android:layout_marginTop="12dp"
@@ -170,7 +169,7 @@
             android:id="@+id/searchButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="SEARCH"
+            android:text="@string/search_button"
             android:textAllCaps="true"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="24dp"

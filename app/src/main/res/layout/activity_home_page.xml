@@ -9,6 +9,7 @@
 
     <!-- AppBar with Toolbar -->
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fitsSystemWindows="true">
@@ -24,17 +25,18 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="center_vertical"
+                android:gravity="center"
                 android:orientation="horizontal">
 
                 <EditText
                     android:id="@+id/search_bar"
                     android:layout_width="0dp"
                     android:layout_height="32dp"
-                    android:layout_weight="1"
                     android:layout_marginStart="8dp"
                     android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
                     android:background="@drawable/search_edittext_bg"
+                    android:backgroundTint="@android:color/white"
                     android:cursorVisible="false"
                     android:drawableEnd="@android:drawable/ic_menu_search"
                     android:focusable="false"
@@ -43,8 +45,7 @@
                     android:paddingStart="6dp"
                     android:paddingEnd="6dp"
                     android:singleLine="true"
-                    android:textColor="@android:color/black"
-                    android:backgroundTint="@android:color/white"/>
+                    android:textColor="@android:color/black" />
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>

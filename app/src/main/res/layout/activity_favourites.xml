@@ -57,7 +57,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Filter by country:"
+                android:text="@string/filter_by_country"
                 android:textStyle="bold"
                 android:textSize="15sp"
                 android:textColor="?android:attr/textColorPrimary"

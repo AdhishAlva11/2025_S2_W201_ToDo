@@ -48,10 +48,12 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
         setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
+        // Open search page
         findViewById<EditText>(R.id.search_bar).setOnClickListener {
             startActivity(Intent(this, SearchActivity::class.java))
         }
 
+        // Handle bottom navigation bar
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_navigation)
         bottomNav.selectedItemId = R.id.nav_home
         bottomNav.setOnItemSelectedListener { item ->
@@ -65,13 +67,15 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
             true
         }
 
+        // Handle incoming intent data
         searchData = intent.getSerializableExtra("searchData") as? Search
         if (searchData == null) {
-            Toast.makeText(this, "No location data received", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.no_location_data), Toast.LENGTH_SHORT).show()
             finish()
             return
         }
 
+        // Initialize map
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.mapFragment) as SupportMapFragment
         mapFragment.getMapAsync(this)
@@ -85,7 +89,7 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         val lat = searchData?.lat
         val lng = searchData?.lng
-        val placeName = searchData?.placeName ?: "Selected Location"
+        val placeName = searchData?.placeName ?: getString(R.string.selected_location)
 
         if (lat != null && lng != null) {
             val location = LatLng(lat, lng)
@@ -108,9 +112,10 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
             }
         } else {
-            Toast.makeText(this, "Invalid coordinates", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.invalid_coordinates), Toast.LENGTH_SHORT).show()
         }
 
+        // Show info when clicking a marker
         googleMap.setOnMarkerClickListener { marker ->
             val info = marker.tag as? PlaceInfo
             if (info != null) {
@@ -137,7 +142,7 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
         val request = Request.Builder().url(url).build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.e("PlacesAPI", "Request failed", e)
+                Log.e("PlacesAPI", getString(R.string.request_failed), e)
             }
 
             override fun onResponse(call: Call, response: Response) {
@@ -161,7 +166,7 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
                     }
                 }
 
-                // Handle pagination
+                // Handle pagination for next page results
                 val nextPageToken = json.optString("next_page_token", null)
                 if (!nextPageToken.isNullOrEmpty()) {
                     Handler(Looper.getMainLooper()).postDelayed({
@@ -182,20 +187,21 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
         val request = Request.Builder().url(url).build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.e("PlaceDetailsAPI", "Request failed", e)
+                Log.e("PlaceDetailsAPI", getString(R.string.request_failed), e)
             }
 
             override fun onResponse(call: Call, response: Response) {
                 val body = response.body?.string() ?: return
                 val json = JSONObject(body).getJSONObject("result")
 
-                val name = json.optString("name", "No name")
-                val address = json.optString("formatted_address", "No address")
+                val name = json.optString("name", getString(R.string.no_name))
+                val address = json.optString("formatted_address", getString(R.string.no_address))
                 val rating = json.optDouble("rating", 0.0)
                 val openNow = if (json.has("opening_hours")) {
-                    if (json.getJSONObject("opening_hours").optBoolean("open_now")) "Open now"
-                    else "Closed"
-                } else "Hours not available"
+                    if (json.getJSONObject("opening_hours").optBoolean("open_now"))
+                        getString(R.string.open_now)
+                    else getString(R.string.closed)
+                } else getString(R.string.hours_not_available)
 
                 val geometry = json.getJSONObject("geometry").getJSONObject("location")
                 val lat = geometry.getDouble("lat")
@@ -217,7 +223,6 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
                     }
                 }
 
-                // Fetch price_level if available
                 val priceLevel = if (json.has("price_level")) json.getInt("price_level") else null
 
                 val placeInfo = PlaceInfo(

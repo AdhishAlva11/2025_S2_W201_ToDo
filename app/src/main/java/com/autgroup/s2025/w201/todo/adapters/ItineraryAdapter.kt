@@ -28,19 +28,22 @@ class ItineraryAdapter(
 
     override fun onBindViewHolder(holder: ItineraryViewHolder, position: Int) {
         val itinerary = itineraries[position]
-        holder.txtItineraryName.text = itinerary.name ?: "Unnamed"
+        val context = holder.itemView.context
 
-        // Click open details
+        // Use localized "Unnamed" fallback
+        holder.txtItineraryName.text = itinerary.name ?: context.getString(R.string.unnamed)
+
+        // Click to open details
         holder.itemView.setOnClickListener {
             onClick(itinerary)
         }
 
-        // Long-click delete
+        // Long-click delete (localized dialog)
         holder.itemView.setOnLongClickListener {
-            AlertDialog.Builder(holder.itemView.context)
-                .setTitle("Delete Itinerary")
-                .setMessage("Are you sure you want to delete '${itinerary.name}'?")
-                .setPositiveButton("Yes") { _, _ ->
+            AlertDialog.Builder(context)
+                .setTitle(context.getString(R.string.delete_itinerary_title))
+                .setMessage(context.getString(R.string.delete_itinerary_message, itinerary.name))
+                .setPositiveButton(context.getString(R.string.yes)) { _, _ ->
                     val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@setPositiveButton
                     val dbRef = FirebaseDatabase.getInstance(
                         "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
@@ -50,7 +53,7 @@ class ItineraryAdapter(
                     itineraries.removeAt(position)
                     notifyItemRemoved(position)
                 }
-                .setNegativeButton("No", null)
+                .setNegativeButton(context.getString(R.string.no), null)
                 .show()
             true
         }
