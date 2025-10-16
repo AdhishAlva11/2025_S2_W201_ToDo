@@ -228,6 +228,16 @@
     <!-- ItineraryAdapter localization -->
 
 
+    <!-- Itinerary-related strings -->
+    <!-- Feedback / error messages -->
+    <string name="failed_delete_itinerary">删除行程失败：%1$s</string>
+    <string name="invalid_itinerary_id">无效的行程 ID</string>
+    <!-- Itinerary-related strings -->
+
+    <!--Bottom Info String file-->
+    <string name="no_itineraries_found">未找到行程</string>
+
+
 
 
 

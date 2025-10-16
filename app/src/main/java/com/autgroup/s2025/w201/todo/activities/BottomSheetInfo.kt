@@ -20,11 +20,9 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
 
     private lateinit var firebaseAuth: FirebaseAuth
 
-    // Correct override for locale handling in Fragments
+    // --- Correct locale handling for Fragments ---
     override fun onAttach(context: Context) {
         super.onAttach(context)
-
-        // Apply saved locale safely after attach
         val localizedContext = com.autgroup.s2025.w201.todo.LocaleUtils.applySavedLocale(context)
         val newConfig = localizedContext.resources.configuration
         requireContext().resources.updateConfiguration(
@@ -67,7 +65,7 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
         val addFavButton = view.findViewById<Button>(R.id.addFavouriteButton)
         val addToItineraryBtn = view.findViewById<Button>(R.id.btnAddToItinerary)
 
-        // Populate text views
+        // --- Populate place info ---
         titleText.text = place.name ?: getString(R.string.no_name)
         addressText.text = place.address ?: getString(R.string.no_address)
         ratingText.text = getString(R.string.rating_with_star, place.rating ?: 0.0)
@@ -79,7 +77,7 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
 
         firebaseAuth = FirebaseAuth.getInstance()
 
-        // Add to favourites
+        // --- Add to favourites ---
         addFavButton.setOnClickListener {
             val userId = firebaseAuth.currentUser?.uid ?: return@setOnClickListener
             val dbRef = FirebaseDatabase.getInstance(
@@ -88,15 +86,23 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
 
             dbRef.push().setValue(place)
                 .addOnSuccessListener {
-                    Toast.makeText(context, getString(R.string.added_to_favourites), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        context,
+                        getString(R.string.added_to_favourites),
+                        Toast.LENGTH_SHORT
+                    ).show()
                     dismiss()
                 }
                 .addOnFailureListener { e ->
-                    Toast.makeText(context, getString(R.string.failed_generic, e.message), Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        context,
+                        getString(R.string.failed_generic, e.message),
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
         }
 
-        // Add to itinerary
+        // --- Add to itinerary ---
         addToItineraryBtn.setOnClickListener {
             showChooseItineraryDialog(place)
         }
@@ -113,6 +119,7 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
         }
     }
 
+    // --- Step 1: Choose itinerary ---
     private fun showChooseItineraryDialog(place: PlaceInfo) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val dbRef = FirebaseDatabase.getInstance(
@@ -120,23 +127,39 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
         ).getReference("$userId/Itineraries")
 
         dbRef.get().addOnSuccessListener { snapshot ->
-            val itineraryNames = snapshot.children.map { it.key ?: "" }
+            val itineraryNames = mutableListOf<String>()
+            val itineraryIds = mutableListOf<String>()
+
+            // Collect both ID and display name
+            for (child in snapshot.children) {
+                val id = child.key ?: continue
+                val name = child.child("name").getValue(String::class.java) ?: getString(R.string.unnamed)
+                itineraryIds.add(id)
+                itineraryNames.add(name)
+            }
+
+            if (itineraryIds.isEmpty()) {
+                Toast.makeText(context, getString(R.string.no_itineraries_found), Toast.LENGTH_SHORT).show()
+                return@addOnSuccessListener
+            }
 
             AlertDialog.Builder(requireContext())
                 .setTitle(getString(R.string.choose_itinerary))
                 .setItems(itineraryNames.toTypedArray()) { _, which ->
-                    val selectedItinerary = itineraryNames[which]
-                    showChooseDayDialog(place, selectedItinerary)
+                    val selectedId = itineraryIds[which]
+                    val selectedName = itineraryNames[which]
+                    showChooseDayDialog(place, selectedId, selectedName)
                 }
                 .show()
         }
     }
 
-    private fun showChooseDayDialog(place: PlaceInfo, itineraryName: String) {
+    // --- Step 2: Choose day ---
+    private fun showChooseDayDialog(place: PlaceInfo, itineraryId: String, itineraryName: String) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val dbRef = FirebaseDatabase.getInstance(
             "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
-        ).getReference("$userId/Itineraries/$itineraryName")
+        ).getReference("$userId/Itineraries/$itineraryId")
 
         dbRef.get().addOnSuccessListener { snapshot ->
             val daysCount = snapshot.child("days").getValue(Int::class.java)
@@ -147,7 +170,7 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
             } else {
                 for (child in snapshot.children) {
                     val key = child.key ?: continue
-                    if (key.startsWith("Day ", true)) daysList.add(key)
+                    if (key.startsWith("day_", true)) daysList.add(key.replace("day_", getString(R.string.day_number, key.removePrefix("day_").toIntOrNull() ?: 1)))
                 }
                 if (daysList.isEmpty()) daysList.add(getString(R.string.day_number, 1))
             }
@@ -156,29 +179,41 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
                 .setTitle(getString(R.string.choose_day))
                 .setItems(daysList.toTypedArray()) { _, which ->
                     val selectedDay = daysList[which]
-                    addActivityToItinerary(place, itineraryName, selectedDay)
+                    val dayNumber = selectedDay.filter { it.isDigit() }.toIntOrNull() ?: 1
+                    addActivityToItinerary(place, itineraryId, itineraryName, "day_$dayNumber", selectedDay)
                 }
                 .show()
         }
     }
 
-    private fun addActivityToItinerary(place: PlaceInfo, itineraryName: String, dayName: String) {
+    // --- Step 3: Add place to itinerary/day ---
+    private fun addActivityToItinerary(
+        place: PlaceInfo,
+        itineraryId: String,
+        itineraryName: String,
+        dayKey: String,
+        dayLabel: String
+    ) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val dbRef = FirebaseDatabase.getInstance(
             "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
-        ).getReference("$userId/Itineraries/$itineraryName/$dayName")
+        ).getReference("$userId/Itineraries/$itineraryId/$dayKey")
 
         dbRef.push().setValue(place)
             .addOnSuccessListener {
                 Toast.makeText(
                     context,
-                    getString(R.string.added_to_itinerary, itineraryName, dayName),
+                    getString(R.string.added_to_itinerary, itineraryName, dayLabel),
                     Toast.LENGTH_SHORT
                 ).show()
                 dismiss()
             }
             .addOnFailureListener { e ->
-                Toast.makeText(context, getString(R.string.failed_generic, e.message), Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    context,
+                    getString(R.string.failed_generic, e.message),
+                    Toast.LENGTH_LONG
+                ).show()
             }
     }
 }

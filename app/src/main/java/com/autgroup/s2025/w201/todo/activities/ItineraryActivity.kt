@@ -3,6 +3,9 @@ package com.autgroup.s2025.w201.todo.activities
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.widget.AdapterView
+import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -11,16 +14,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.autgroup.s2025.w201.todo.R
+import com.autgroup.s2025.w201.todo.ThemeUtils
+import com.autgroup.s2025.w201.todo.LocaleUtils
 import com.autgroup.s2025.w201.todo.adapters.ItineraryAdapter
 import com.autgroup.s2025.w201.todo.classes.Itinerary
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
-import android.view.View
-import android.widget.AdapterView
-import android.widget.Spinner
-import com.autgroup.s2025.w201.todo.ThemeUtils
-import com.autgroup.s2025.w201.todo.LocaleUtils
 
 class ItineraryActivity : AppCompatActivity() {
 
@@ -28,13 +28,13 @@ class ItineraryActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: ItineraryAdapter
 
-    // ensure locale is applied before onCreate()
+    // Ensure locale is applied before onCreate()
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(LocaleUtils.applySavedLocale(newBase))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Apply saved theme for dark/light mode
+        // Apply saved theme before view inflation
         ThemeUtils.applySavedTheme(this)
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -44,12 +44,13 @@ class ItineraryActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
         adapter = ItineraryAdapter(itineraries) { itinerary ->
             val intent = Intent(this, ItineraryDetailActivity::class.java)
+            intent.putExtra("itineraryId", itinerary.id)   // pass ID
             intent.putExtra("itineraryName", itinerary.name)
             startActivity(intent)
         }
         recyclerView.adapter = adapter
 
-        // Filter spinner
+        // --- Filter spinner setup ---
         val spinnerFilter: Spinner = findViewById(R.id.spinnerFilter)
         spinnerFilter.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
@@ -64,15 +65,15 @@ class ItineraryActivity : AppCompatActivity() {
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
 
-        // Add itinerary button
+        // --- Add itinerary button ---
         findViewById<TextView>(R.id.tvAddEvent).setOnClickListener {
             showAddItineraryDialog()
         }
 
-        // Load itineraries
+        // --- Load itineraries ---
         loadItineraries()
 
-        // Bottom navigation
+        // --- Bottom navigation setup ---
         val bottomNav: BottomNavigationView = findViewById(R.id.bottomNav)
         bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
@@ -98,6 +99,7 @@ class ItineraryActivity : AppCompatActivity() {
         bottomNav.selectedItemId = R.id.nav_itinerary
     }
 
+    // --- Dialog to add new itinerary ---
     private fun showAddItineraryDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_event, null)
         val etEventName = dialogView.findViewById<TextView>(R.id.etEventName)
@@ -116,19 +118,24 @@ class ItineraryActivity : AppCompatActivity() {
             .show()
     }
 
+    // --- Add itinerary using unique ID (no overwriting) ---
     private fun addItinerary(name: String, days: Int) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val dbRef = FirebaseDatabase.getInstance(
             "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
         ).getReference("$userId/Itineraries")
 
+        val itineraryId = dbRef.push().key ?: return  // unique ID
+
         val itineraryMap = mutableMapOf<String, Any>()
+        itineraryMap["id"] = itineraryId
+        itineraryMap["name"] = name
         itineraryMap["days"] = days
         for (i in 1..days) {
-            itineraryMap["Day $i"] = mapOf<String, Any>()
+            itineraryMap["day_$i"] = mapOf<String, Any>()
         }
 
-        dbRef.child(name).setValue(itineraryMap)
+        dbRef.child(itineraryId).setValue(itineraryMap)
             .addOnSuccessListener {
                 Toast.makeText(
                     this,
@@ -145,6 +152,7 @@ class ItineraryActivity : AppCompatActivity() {
             }
     }
 
+    // --- Load itineraries with ID + name ---
     private fun loadItineraries() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val dbRef = FirebaseDatabase.getInstance(
@@ -155,8 +163,11 @@ class ItineraryActivity : AppCompatActivity() {
             override fun onDataChange(snapshot: DataSnapshot) {
                 itineraries.clear()
                 for (child in snapshot.children) {
-                    val name = child.key ?: continue
-                    itineraries.add(Itinerary(name))
+                    val id = child.child("id").getValue(String::class.java)
+                    val name = child.child("name").getValue(String::class.java)
+                    if (!id.isNullOrEmpty() && !name.isNullOrEmpty()) {
+                        itineraries.add(Itinerary(id = id, name = name))
+                    }
                 }
                 adapter.notifyDataSetChanged()
             }

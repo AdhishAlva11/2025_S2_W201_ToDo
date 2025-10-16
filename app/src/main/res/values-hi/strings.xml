@@ -227,6 +227,16 @@
     <!-- ItineraryAdapter localization -->
 
 
+    <!-- Itinerary-related strings -->
+    <!-- Feedback / error messages -->
+    <string name="failed_delete_itinerary">यात्रा हटाने में विफल: %1$s</string>
+    <string name="invalid_itinerary_id">अमान्य यात्रा आईडी</string>
+    <!-- Itinerary-related strings -->
+
+    <!--Bottom Info String file-->
+    <string name="no_itineraries_found">कोई यात्रा कार्यक्रम नहीं मिला</string>
+
+
 
 
 

@@ -33,6 +33,7 @@ class ItineraryDetailActivity : AppCompatActivity() {
     private val daysList = mutableListOf<String>()
     private var selectedDay: String = ""
 
+    private lateinit var itineraryId: String
     private lateinit var itineraryName: String
 
     // Apply saved locale before layout inflation
@@ -48,7 +49,9 @@ class ItineraryDetailActivity : AppCompatActivity() {
         setContentView(R.layout.activity_itinerary_detail)
 
         // ---------------- Toolbar setup ----------------
-        itineraryName = intent.getStringExtra("itineraryName") ?: return
+        itineraryId = intent.getStringExtra("itineraryId") ?: return
+        itineraryName = intent.getStringExtra("itineraryName") ?: "Itinerary"
+
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
 
@@ -89,8 +92,7 @@ class ItineraryDetailActivity : AppCompatActivity() {
         }
         recyclerView.adapter = adapter
 
-        // --- STEP 1 + 2: Run migration once before loading days ---
-        migrateOldDayKeys()
+        // --- Load itinerary details ---
         loadDays()
 
         // ---------------- Bottom Navigation ----------------
@@ -117,34 +119,12 @@ class ItineraryDetailActivity : AppCompatActivity() {
         bottomNav.selectedItemId = R.id.nav_itinerary
     }
 
-    // --- Temporary migration (rename "Day 1" → "day_1") ---
-    private fun migrateOldDayKeys() {
-        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        val dbRef = FirebaseDatabase.getInstance(
-            "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
-        ).getReference("$userId/Itineraries/$itineraryName")
-
-        dbRef.get().addOnSuccessListener { snapshot ->
-            for (child in snapshot.children) {
-                val key = child.key ?: continue
-                if (key.startsWith("Day ", ignoreCase = true)) {
-                    val number = key.removePrefix("Day ").trim().toIntOrNull() ?: continue
-                    val newKey = "day_$number"
-
-                    val data = child.value
-                    dbRef.child(newKey).setValue(data)
-                    dbRef.child(key).removeValue()
-                }
-            }
-        }
-    }
-
     // ---------------- Firebase: Load Days ----------------
     private fun loadDays() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val dbRef = FirebaseDatabase.getInstance(
             "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
-        ).getReference("$userId/Itineraries/$itineraryName")
+        ).getReference("$userId/Itineraries/$itineraryId")
 
         dbRef.get().addOnSuccessListener { snapshot ->
             daysList.clear()
@@ -152,10 +132,11 @@ class ItineraryDetailActivity : AppCompatActivity() {
             val daysCount = snapshot.child("days").getValue(Int::class.java)
             if (daysCount != null && daysCount > 0) {
                 for (i in 1..daysCount) {
-                    val label = getString(R.string.day_format, i) // e.g., “Day 1”, “第 1 天”
+                    val label = getString(R.string.day_format, i)
                     daysList.add(label)
                 }
             } else {
+                // fallback if missing "days" field
                 for (child in snapshot.children) {
                     val key = child.key ?: continue
                     if (key.startsWith("day_", ignoreCase = true)) {
@@ -180,13 +161,12 @@ class ItineraryDetailActivity : AppCompatActivity() {
     // ---------------- Firebase: Load Activities ----------------
     private fun loadActivities(day: String) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-
         val dayNumber = day.filter { it.isDigit() }.toIntOrNull() ?: 1
         val dayKey = "day_$dayNumber"
 
         val dbRef = FirebaseDatabase.getInstance(
             "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
-        ).getReference("$userId/Itineraries/$itineraryName/$dayKey")
+        ).getReference("$userId/Itineraries/$itineraryId/$dayKey")
 
         dbRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -211,13 +191,12 @@ class ItineraryDetailActivity : AppCompatActivity() {
     // ---------------- Firebase: Delete Activity ----------------
     private fun deletePlace(place: PlaceInfo, position: Int) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-
         val dayNumber = selectedDay.filter { it.isDigit() }.toIntOrNull() ?: 1
         val dayKey = "day_$dayNumber"
 
         val dbRef = FirebaseDatabase.getInstance(
             "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
-        ).getReference("$userId/Itineraries/$itineraryName/$dayKey")
+        ).getReference("$userId/Itineraries/$itineraryId/$dayKey")
 
         dbRef.orderByChild("name").equalTo(place.name).get().addOnSuccessListener { snapshot ->
             snapshot.children.forEach { it.ref.removeValue() }

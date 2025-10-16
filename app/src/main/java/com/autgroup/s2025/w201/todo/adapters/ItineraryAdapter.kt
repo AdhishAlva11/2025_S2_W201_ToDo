@@ -30,15 +30,15 @@ class ItineraryAdapter(
         val itinerary = itineraries[position]
         val context = holder.itemView.context
 
-        // Use localized "Unnamed" fallback
+        // Localized fallback name
         holder.txtItineraryName.text = itinerary.name ?: context.getString(R.string.unnamed)
 
-        // Click to open details
+        // --- Click to open itinerary details ---
         holder.itemView.setOnClickListener {
             onClick(itinerary)
         }
 
-        // Long-click delete (localized dialog)
+        // --- Long-click to delete itinerary ---
         holder.itemView.setOnLongClickListener {
             AlertDialog.Builder(context)
                 .setTitle(context.getString(R.string.delete_itinerary_title))
@@ -49,9 +49,28 @@ class ItineraryAdapter(
                         "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
                     ).getReference("$userId/Itineraries")
 
-                    dbRef.child(itinerary.name ?: "").removeValue()
-                    itineraries.removeAt(position)
-                    notifyItemRemoved(position)
+                    //  Delete using ID instead of name
+                    val itineraryId = itinerary.id
+                    if (!itineraryId.isNullOrEmpty()) {
+                        dbRef.child(itineraryId).removeValue()
+                            .addOnSuccessListener {
+                                itineraries.removeAt(position)
+                                notifyItemRemoved(position)
+                            }
+                            .addOnFailureListener { e ->
+                                android.widget.Toast.makeText(
+                                    context,
+                                    context.getString(R.string.failed_delete_itinerary, e.message),
+                                    android.widget.Toast.LENGTH_LONG
+                                ).show()
+                            }
+                    } else {
+                        android.widget.Toast.makeText(
+                            context,
+                            context.getString(R.string.invalid_itinerary_id),
+                            android.widget.Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
                 .setNegativeButton(context.getString(R.string.no), null)
                 .show()

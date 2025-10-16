@@ -226,6 +226,20 @@
     <string name="unnamed">Unnamed</string>
     <!-- ItineraryAdapter localization -->
 
+    <!-- Itinerary-related strings -->
+
+    <!-- Feedback / error messages -->
+    <string name="failed_delete_itinerary">Failed to delete itinerary: %1$s</string>
+    <string name="invalid_itinerary_id">Invalid itinerary ID</string>
+
+
+
+    <!--Bottom Info String file-->
+    <string name="no_itineraries_found">No itineraries found</string>
+
+
+
+
 
 
 
