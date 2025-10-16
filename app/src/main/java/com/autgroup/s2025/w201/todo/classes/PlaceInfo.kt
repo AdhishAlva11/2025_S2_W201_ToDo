@@ -1,6 +1,5 @@
 package com.autgroup.s2025.w201.todo.classes
 
-import com.autgroup.s2025.w201.todo.classes.Review
 import java.io.Serializable
 
 data class PlaceInfo(
@@ -11,5 +10,7 @@ data class PlaceInfo(
     val lat: Double? = null,
     val lng: Double? = null,
     val reviews: List<Review>? = null,
-    val priceLevel: Int? = null
+    val priceLevel: Int? = null,
+    var isCompleted: Boolean = false,
+    var firebaseKey: String? = null
 ) : Serializable

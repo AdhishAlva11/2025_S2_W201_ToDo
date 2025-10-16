@@ -8,7 +8,9 @@
     card_view:cardCornerRadius="12dp"
     card_view:cardElevation="6dp"
     card_view:cardBackgroundColor="@android:color/white"
-    android:foreground="?attr/selectableItemBackground">
+    android:foreground="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -52,6 +54,13 @@
             android:textColor="@color/black"
             android:layout_marginTop="2dp"/>
 
+        <!-- Checkbox for marking completed -->
+        <CheckBox
+            android:id="@+id/chkCompleted"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Completed"
+            android:layout_marginTop="8dp"/>
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>
