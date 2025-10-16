@@ -1,5 +1,7 @@
 package com.autgroup.s2025.w201.todo.activities
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -40,11 +42,13 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // Apply saved theme so bottom sheet follows dark/light mode
+
+        // Apply saved theme
         ThemeUtils.applySavedTheme(requireContext())
 
-        val place = arguments?.getSerializable(ARG_PLACE) as? PlaceInfo ?: return
+        firebaseAuth = FirebaseAuth.getInstance()
 
+        // Get views
         val titleText = view.findViewById<TextView>(R.id.titleText)
         val addressText = view.findViewById<TextView>(R.id.addressText)
         val ratingText = view.findViewById<TextView>(R.id.ratingText)
@@ -54,23 +58,40 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
         val addFavButton = view.findViewById<Button>(R.id.addFavouriteButton)
         val addToItineraryBtn = view.findViewById<Button>(R.id.btnAddToItinerary)
 
+        val place = arguments?.getSerializable(ARG_PLACE) as? PlaceInfo ?: return
+
         // Populate text views
         titleText.text = place.name ?: "No Name"
         addressText.text = place.address ?: "No Address"
         ratingText.text = "⭐ ${place.rating ?: 0.0}"
         openStatusText.text = place.openStatus ?: "Hours unknown"
-
-        // Show price level using helper method
         priceText.text = "💰 ${getPriceText(place.priceLevel)}"
+
+        addressText.paintFlags = addressText.paintFlags or android.graphics.Paint.UNDERLINE_TEXT_FLAG
+
+        // Clickable address to open Google Maps
+        addressText.setOnClickListener {
+            if (place.lat != null && place.lng != null) {
+                val gmmIntentUri = Uri.parse("geo:${place.lat},${place.lng}?q=${Uri.encode(place.address)}")
+                val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+                mapIntent.setPackage("com.google.android.apps.maps")
+                try {
+                    startActivity(mapIntent)
+                } catch (e: Exception) {
+                    val browserUri = Uri.parse("https://www.google.com/maps/search/?api=1&query=${Uri.encode(place.address)}")
+                    startActivity(Intent(Intent.ACTION_VIEW, browserUri))
+                }
+            } else {
+                Toast.makeText(context, "No location data available", Toast.LENGTH_SHORT).show()
+            }
+        }
 
         // Show top 3 reviews if available
         reviewsText.text = place.reviews?.take(3)?.joinToString("\n\n") { review ->
             "${review.authorName} ⭐${review.rating}\n${review.text}"
         } ?: "No reviews available"
 
-        firebaseAuth = FirebaseAuth.getInstance()
-
-        // Add to favorites
+        // Add to favourites
         addFavButton.setOnClickListener {
             val userId = firebaseAuth.currentUser?.uid ?: return@setOnClickListener
             val dbRef = FirebaseDatabase.getInstance(
@@ -93,7 +114,6 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
         }
     }
 
-    /** Converts Google Places price_level (0–4) to text **/
     private fun getPriceText(level: Int?): String {
         return when (level) {
             0 -> "Free"
@@ -106,7 +126,7 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
     }
 
     private fun showChooseItineraryDialog(place: PlaceInfo) {
-        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val userId = firebaseAuth.currentUser?.uid ?: return
         val dbRef = FirebaseDatabase.getInstance(
             "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
         ).getReference("$userId/Itineraries")
@@ -118,7 +138,6 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
                 .setTitle("Choose Itinerary")
                 .setItems(itineraryNames.toTypedArray()) { _, which ->
                     val selectedItinerary = itineraryNames[which]
-                    // after itinerary selected, ask for day
                     showChooseDayDialog(place, selectedItinerary)
                 }
                 .show()
@@ -126,19 +145,17 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
     }
 
     private fun showChooseDayDialog(place: PlaceInfo, itineraryName: String) {
-        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val userId = firebaseAuth.currentUser?.uid ?: return
         val dbRef = FirebaseDatabase.getInstance(
             "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
         ).getReference("$userId/Itineraries/$itineraryName")
 
         dbRef.get().addOnSuccessListener { snapshot ->
-            // Build the list of days. Prefer "days" count if present:
             val daysCount = snapshot.child("days").getValue(Int::class.java)
             val daysList = mutableListOf<String>()
             if (daysCount != null && daysCount > 0) {
                 for (i in 1..daysCount) daysList.add("Day $i")
             } else {
-                // fallback: any keys starting with Day
                 for (child in snapshot.children) {
                     val key = child.key ?: continue
                     if (key.startsWith("Day ", true)) daysList.add(key)
@@ -157,7 +174,7 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
     }
 
     private fun addActivityToItinerary(place: PlaceInfo, itineraryName: String, dayName: String) {
-        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val userId = firebaseAuth.currentUser?.uid ?: return
         val dbRef = FirebaseDatabase.getInstance(
             "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
         ).getReference("$userId/Itineraries/$itineraryName/$dayName")
