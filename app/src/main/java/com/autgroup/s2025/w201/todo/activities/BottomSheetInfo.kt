@@ -133,7 +133,11 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
             // Collect both ID and display name
             for (child in snapshot.children) {
                 val id = child.key ?: continue
-                val name = child.child("name").getValue(String::class.java) ?: getString(R.string.unnamed)
+                val name = child.child("name").getValue(String::class.java)
+
+                // Skip any nodes that don't have a valid name or look like a day subnode
+                if (name.isNullOrBlank() || id.startsWith("day_", true)) continue
+
                 itineraryIds.add(id)
                 itineraryNames.add(name)
             }
