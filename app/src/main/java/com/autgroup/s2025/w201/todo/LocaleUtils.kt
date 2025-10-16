@@ -23,6 +23,7 @@ object LocaleUtils {
         val config = Configuration(context.resources.configuration)
         config.setLocale(locale)
 
+        // Return a new configuration context with the updated locale
         return context.createConfigurationContext(config)
     }
 }
