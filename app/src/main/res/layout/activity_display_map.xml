@@ -7,13 +7,13 @@
     android:layout_height="match_parent"
     tools:context=".activities.DisplayMapActivity">
 
-    <!-- AppBar with Toolbar -->
+    <!-- AppBar containing Toolbar and Search bar -->
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fitsSystemWindows="true">
 
-        <!-- Toolbar with Search Bar -->
+        <!-- Toolbar with custom search field -->
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
@@ -27,6 +27,7 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
+                <!-- Non-editable Search Bar -->
                 <EditText
                     android:id="@+id/search_bar"
                     android:layout_width="0dp"
@@ -38,32 +39,32 @@
                     android:cursorVisible="false"
                     android:drawableEnd="@android:drawable/ic_menu_search"
                     android:focusable="false"
-                    android:hint="Search..."
+                    android:hint="@string/search_hint"
                     android:imeOptions="actionSearch"
                     android:paddingStart="6dp"
                     android:paddingEnd="6dp"
                     android:singleLine="true"
                     android:textColor="@android:color/black"
-                    android:backgroundTint="@android:color/white"/>
+                    android:backgroundTint="@android:color/white" />
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- Main Content (Map fills available space under AppBar) -->
+    <!-- Map content -->
     <FrameLayout
         android:id="@+id/content_frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <!-- Google Map fragment -->
+        <!-- Google Maps Fragment -->
         <fragment
             android:id="@+id/mapFragment"
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <!-- Overlay for selected interests -->
+        <!-- Overlay showing selected interests -->
         <TextView
             android:id="@+id/interestOverlay"
             android:layout_width="wrap_content"
@@ -71,16 +72,16 @@
             android:layout_margin="16dp"
             android:background="#AAFFFFFF"
             android:padding="8dp"
-            android:text="Interests"
+            android:text="@string/interests_overlay_label"
             android:textColor="#000000"
             android:textSize="14sp" />
     </FrameLayout>
 
-    <!-- Bottom Navigation (fixed at bottom) -->
+    <!-- Bottom Navigation Menu -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        app:menu="@menu/bottom_nav_menu"/>
+        app:menu="@menu/bottom_nav_menu" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

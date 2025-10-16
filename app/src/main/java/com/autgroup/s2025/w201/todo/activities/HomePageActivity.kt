@@ -1,5 +1,6 @@
 package com.autgroup.s2025.w201.todo.activities
 
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -9,6 +10,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.autgroup.s2025.w201.todo.R
 import com.autgroup.s2025.w201.todo.ThemeUtils
+import com.autgroup.s2025.w201.todo.LocaleUtils
 import com.autgroup.s2025.w201.todo.databinding.ActivityHomePageBinding
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -24,10 +26,15 @@ class HomePageActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityHomePageBinding
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-
     private val LOCATION_PERMISSION_REQUEST_CODE = 1
 
+    // Apply locale before anything else
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleUtils.applySavedLocale(newBase))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Apply saved theme before layout inflation
         ThemeUtils.applySavedTheme(this)
         super.onCreate(savedInstanceState)
 
@@ -42,16 +49,15 @@ class HomePageActivity : AppCompatActivity(), OnMapReadyCallback {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
-        // Search bar click - open SearchActivity
+        // --- Search bar click ---
         val searchBar = findViewById<EditText>(R.id.search_bar)
         searchBar.setOnClickListener {
-            val intent = Intent(this, SearchActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, SearchActivity::class.java))
         }
 
-        // --- Bottom Navigation Setup ---
+        // --- Bottom Navigation ---
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_navigation)
-        bottomNav.selectedItemId = R.id.nav_home // highlight Home
+        bottomNav.selectedItemId = R.id.nav_home
 
         bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {

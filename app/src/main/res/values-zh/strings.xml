@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- App Information -->
+    <string name="app_name">2025_S2_W201_ToDo</string>
+
+    <!-- Activity Titles -->
+    <string name="title_activity_display_map">显示地图</string>
+    <string name="title_activity_home_page">主页</string>
+    <string name="favourites">收藏夹</string>
+
+    <!-- Navigation Drawer -->
+    <string name="navigation_drawer_open">打开导航抽屉</string>
+    <string name="navigation_drawer_close">关闭导航抽屉</string>
+
+    <!-- FavouritesActivity -->
+    <string name="filter_by_country">按国家筛选：</string>
+
+    <!-- ItineraryActivity -->
+    <string name="travel_itinerary">旅行行程</string>
+    <string name="japan_adventure">日本探险</string>
+    <string name="hint_event_name">活动名称</string>
+    <string name="hint_start_date">开始日期 (yyyy-mm-dd)</string>
+    <string name="hint_duration">持续时间 (天)</string>
+    <string name="event_name">活动名称</string>
+    <string name="duration">持续时间：</string>
+    <string name="start_date">开始日期：</string>
+    <string name="trip_name">行程名称</string>
+    <string name="add_event">添加活动 +</string>
+    <string name="back_button">返回</string>
+    <string name="trip_menu">行程菜单</string>
+    <string name="trip_start_date">开始日期: %s</string>
+    <string name="trip_duration">持续时间: %d 天</string>
+
+    <!-- Authentication / Firebase -->
+    <string name="default_web_client_id">598254263424-te0dvjnufdifkgbj9fj0gjgjjvgnkq79.apps.googleusercontent.com</string>
+
+    <!-- Google Maps API Key -->
+    <string name="project_google_api_key">AIzaSyBJvIhFs-ZgMJIuhrPCUH2M33zdvyj-Od4</string>
+
+    <!-- Dropdown Lists -->
+    <string-array name="itinerary_filters">
+        <item>A → Z</item>
+        <item>Z → A</item>
+        <item>短 → 长</item>
+    </string-array>
+
+    <!-- ItineraryActivity UI -->
+    <string name="itineraries">行程</string>
+    <string name="add_itinerary">+ 添加行程</string>
+    <string name="filter_label">筛选：</string>
+
+    <!-- ItineraryActivity Details -->
+    <string name="itinerary_details">行程详情</string>
+
+    <!-- Search Page -->
+    <string name="select_interests">选择兴趣</string>
+    <string name="restaurants">餐厅</string>
+    <string name="walking">步行</string>
+    <string name="sports">运动</string>
+    <string name="landmarks">地标</string>
+    <string name="family_attractions">家庭景点</string>
+    <string name="culture">文化</string>
+    <string name="search_radius_label">搜索半径（米）</string>
+    <string name="search_button">搜索</string>
+
+    <!-- Settings Page -->
+    <string name="settings_title">设置</string>
+    <string name="dark_mode">深色模式</string>
+    <string name="language">语言</string>
+
+    <!-- Profile Page -->
+    <string name="profile_title">个人资料</string>
+    <string name="settings_button">设置</string>
+    <string name="profile_picture">个人照片</string>
+    <string name="upload_photo">上传个人照片</string>
+    <string name="default_user_name">用户名</string>
+    <string name="emergency_contact_label">紧急联系人：111</string>
+    <string name="contact_arrow_description">可点击指示器</string>
+    <string name="logout_button">登出</string>
+
+    <!-- Place Detail Screen -->
+    <string name="add_to_favourites">添加到收藏</string>
+    <string name="add_to_itinerary">添加到行程</string>
+    <string name="price_info_unavailable"> 价格信息不可用</string>
+    <string name="reviews_header">评论</string>
+
+    <!-- Add Itinerary Dialog-->
+    <string name="itinerary_name_hint">行程名称</string>
+    <string name="number_of_days_hint">天数</string>
+
+    <!-- Favourite Item Card-->
+    <string name="fav_name_label">名称</string>
+    <string name="fav_address_label">地址</string>
+    <string name="fav_status_label">状态</string>
+    <string name="fav_rating_label">★ 4.5</string>
+
+    <!-- Itinerary card strings -->
+    <string name="sample_itinerary_name">奥克兰之旅</string> <!-- “Trip to Auckland” in Chinese -->
+
+    <!-- Place card strings -->
+    <string name="place_name_label">地点名称</string>
+    <string name="place_address_label">地址</string>
+    <string name="place_status_label">营业状态</string>
+    <string name="place_rating_label">评分</string>
+
+    <!-- BottomSheetInfo strings -->
+    <string name="no_name">无名称</string>
+    <string name="no_address">无地址</string>
+    <string name="hours_unknown">营业时间未知</string>
+    <string name="price_with_symbol">💰 %1$s</string>
+    <string name="no_reviews_available">暂无评论</string>
+    <string name="rating_with_star">⭐ %1$.1f</string>
+
+    <!-- Price levels -->
+    <string name="price_free">免费</string>
+    <string name="price_inexpensive">¥ (便宜)</string>
+    <string name="price_moderate">¥¥ (中等)</string>
+    <string name="price_expensive">¥¥¥ (昂贵)</string>
+    <string name="price_very_expensive">¥¥¥¥ (非常昂贵)</string>
+    <string name="price_not_available">无价格信息</string>
+
+    <!-- Dialog and toast messages -->
+    <string name="choose_itinerary">选择行程</string>
+    <string name="choose_day">选择天数</string>
+    <string name="day_number">第 %1$d 天</string>
+    <string name="added_to_favourites">已添加到收藏！</string>
+    <string name="added_to_itinerary">已添加到 %1$s → %2$s！</string>
+    <string name="failed_generic">失败：%1$s</string>
+
+    <!-- BottomSheetInfo strings -->
+
+    <!-- DisplayMapActivity layout strings -->
+    <string name="search_hint">搜索...</string>
+    <string name="interests_overlay_label">兴趣点</string>
+
+    <!-- DisplayMapActivity logic strings -->
+    <string name="no_location_data">未接收到位置信息</string>
+    <string name="selected_location">选择的位置</string>
+    <string name="invalid_coordinates">坐标无效</string>
+    <string name="request_failed">请求失败</string>
+
+
+    <string name="open_now">正在营业</string>
+    <string name="closed">已关闭</string>
+    <string name="hours_not_available">营业时间不可用</string>
+
+    <!-- DisplayMapActivity layout strings -->
+
+    <!-- Favourites Activity Kotlin Code String Values-->
+    <string name="all_label">全部</string>
+    <string name="failed_load_favourites">加载收藏失败：%1$s</string>
+    <string name="no_favourites_message">尚未添加收藏</string>
+    <!-- Favourites Activity Kotlin Code String Values-->
+
+
+    <!-- ItineraryActivity Kotlin Code String Values-->
+    <string name="add">添加</string>
+    <string name="cancel">取消</string>
+    <string name="itinerary_created">行程“%1$s”已创建！</string>
+    <!-- ItineraryActivity Kotlin Code String Values-->
+
+    <!--Itinerary String messages -->
+    <string name="add_itinerary_title">添加行程</string>
+    <string name="failed_create_itinerary">创建行程失败：%1$s</string>
+    <string name="failed_load_itineraries">加载行程失败：%1$s</string>
+    <!--Itinerary String messages -->
+
+    <!-- ItineraryDetailActivity -->
+    <string name="delete_activity_title">删除活动</string>
+    <string name="confirm_delete_activity">确定要从 %2$s 删除“%1$s”吗？</string>
+    <string name="delete">删除</string>
+    <string name="failed_load_days">加载天数失败：%1$s</string>
+    <string name="failed_load_activities">加载活动失败：%1$s</string>
+    <string name="activity_removed">已删除 %1$s</string>
+    <!-- ItineraryDetailActivity -->
+
+    <!-- ProfileActivity -->
+    <string name="emergency_contact_not_available">紧急联系人：不可用</string>
+    <string name="not_available">不可用</string>
+    <string name="profile_photo_updated">个人照片已更新！</string>
+    <string name="upload_failed">上传失败：%1$s</string>
+    <!-- ProfileActivity -->
+
+    <!-- SearchActivity toasts -->
+    <string name="selected_place_toast">已选择：%1$s</string>
+    <string name="autocomplete_error_toast">错误：%1$s</string>
+    <string name="please_select_location">请选择一个位置</string>
+    <!-- SearchActivity toasts -->
+
+    <!-- SettingsActivity Language Spinner Options -->
+    <string-array name="language_options">
+        <item>英语</item>
+        <item>西班牙语</item>
+        <item>法语</item>
+        <item>印地语</item>
+        <item>中文</item>
+    </string-array>
+
+    <!-- Bottom Navigation View-->
+    <string name="nav_home">主页</string>
+    <string name="nav_favourites">收藏</string>
+    <string name="nav_itinerary">行程</string>
+    <string name="nav_profile">个人资料</string>
+    <!-- Bottom Navigation View-->
+
+    <!-- Itinerary Toast Messages-->
+    <string name="delete_activity_message">确定要从 %2$s 删除“%1$s”吗？</string>
+    <string name="load_days_failed">加载天数失败：%1$s</string>
+    <string name="load_activities_failed">加载活动失败：%1$s</string>
+    <!-- Itinerary Toast Messages-->
+
+    <!-- Itinerary detail activity display (for day format)-->
+    <string name="day_format">第 %1$d 天</string>
+    <!-- Itinerary detail activity display (for day format)-->
+
+    <!-- FavouritesAdapter localization -->
+    <string name="delete_favourite_title">删除收藏</string>
+    <string name="delete_favourite_message">您确定要删除 %1$s 吗？</string>
+    <string name="yes">是</string>
+    <string name="no">否</string>
+    <!-- FavouritesAdapter localization -->
+
+    <!-- ItineraryAdapter localization -->
+    <string name="delete_itinerary_title">删除行程</string>
+    <string name="delete_itinerary_message">您确定要删除 %1$s 吗？</string>
+    <string name="unnamed">未命名</string>
+    <!-- ItineraryAdapter localization -->
+
+
+    <!-- Itinerary-related strings -->
+    <!-- Feedback / error messages -->
+    <string name="failed_delete_itinerary">删除行程失败：%1$s</string>
+    <string name="invalid_itinerary_id">无效的行程 ID</string>
+    <!-- Itinerary-related strings -->
+
+    <!--Bottom Info String file-->
+    <string name="no_itineraries_found">未找到行程</string>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <string-array name="radius_options">
+        <item>1000</item>
+        <item>3000</item>
+        <item>5000</item>
+    </string-array>
+
+</resources>

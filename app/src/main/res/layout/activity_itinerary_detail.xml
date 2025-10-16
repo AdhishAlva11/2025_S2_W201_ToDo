@@ -23,8 +23,7 @@
             app:contentInsetStartWithNavigation="0dp"
             app:contentInsetStart="0dp"
             app:contentInsetLeft="0dp"
-            app:title=""
-            >
+            app:title="">
 
             <!-- Use ConstraintLayout inside the Toolbar to center the title -->
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -37,11 +36,10 @@
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:layout_marginStart="8dp"
-                    android:layout_marginLeft="8dp"
                     android:background="@android:color/transparent"
                     android:padding="8dp"
                     android:src="@drawable/ic_arrow_back"
-                    android:contentDescription="Back"
+                    android:contentDescription="@string/back_button"
                     app:tint="@android:color/white"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -52,7 +50,7 @@
                     android:id="@+id/tvItineraryTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Itinerary Details"
+                    android:text="@string/itinerary_details"
                     android:textSize="20sp"
                     android:textStyle="bold"
                     android:textColor="@android:color/white"
@@ -62,11 +60,9 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    />
+                    app:layout_constraintEnd_toEndOf="parent" />
 
                 <!-- Invisible spacer on the right to balance the back button -->
-                <!-- Matches the back button width so the title is truly centered -->
                 <View
                     android:id="@+id/rightSpacer"
                     android:layout_width="40dp"

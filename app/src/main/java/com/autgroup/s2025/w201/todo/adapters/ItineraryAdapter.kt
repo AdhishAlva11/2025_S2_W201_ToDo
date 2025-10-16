@@ -28,29 +28,51 @@ class ItineraryAdapter(
 
     override fun onBindViewHolder(holder: ItineraryViewHolder, position: Int) {
         val itinerary = itineraries[position]
-        holder.txtItineraryName.text = itinerary.name ?: "Unnamed"
+        val context = holder.itemView.context
 
-        // Click open details
+        // Localized fallback name
+        holder.txtItineraryName.text = itinerary.name ?: context.getString(R.string.unnamed)
+
+        // --- Click to open itinerary details ---
         holder.itemView.setOnClickListener {
             onClick(itinerary)
         }
 
-        // Long-click delete
+        // --- Long-click to delete itinerary ---
         holder.itemView.setOnLongClickListener {
-            AlertDialog.Builder(holder.itemView.context)
-                .setTitle("Delete Itinerary")
-                .setMessage("Are you sure you want to delete '${itinerary.name}'?")
-                .setPositiveButton("Yes") { _, _ ->
+            AlertDialog.Builder(context)
+                .setTitle(context.getString(R.string.delete_itinerary_title))
+                .setMessage(context.getString(R.string.delete_itinerary_message, itinerary.name))
+                .setPositiveButton(context.getString(R.string.yes)) { _, _ ->
                     val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@setPositiveButton
                     val dbRef = FirebaseDatabase.getInstance(
                         "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
                     ).getReference("$userId/Itineraries")
 
-                    dbRef.child(itinerary.name ?: "").removeValue()
-                    itineraries.removeAt(position)
-                    notifyItemRemoved(position)
+                    //  Delete using ID instead of name
+                    val itineraryId = itinerary.id
+                    if (!itineraryId.isNullOrEmpty()) {
+                        dbRef.child(itineraryId).removeValue()
+                            .addOnSuccessListener {
+                                itineraries.removeAt(position)
+                                notifyItemRemoved(position)
+                            }
+                            .addOnFailureListener { e ->
+                                android.widget.Toast.makeText(
+                                    context,
+                                    context.getString(R.string.failed_delete_itinerary, e.message),
+                                    android.widget.Toast.LENGTH_LONG
+                                ).show()
+                            }
+                    } else {
+                        android.widget.Toast.makeText(
+                            context,
+                            context.getString(R.string.invalid_itinerary_id),
+                            android.widget.Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
-                .setNegativeButton("No", null)
+                .setNegativeButton(context.getString(R.string.no), null)
                 .show()
             true
         }

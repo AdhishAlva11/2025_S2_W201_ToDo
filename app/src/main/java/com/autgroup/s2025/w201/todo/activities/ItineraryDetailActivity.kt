@@ -1,5 +1,6 @@
 package com.autgroup.s2025.w201.todo.activities
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.ImageButton
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.autgroup.s2025.w201.todo.R
 import com.autgroup.s2025.w201.todo.ThemeUtils
+import com.autgroup.s2025.w201.todo.LocaleUtils
 import com.autgroup.s2025.w201.todo.adapters.DayAdapter
 import com.autgroup.s2025.w201.todo.adapters.PlaceAdapter
 import com.autgroup.s2025.w201.todo.classes.PlaceInfo
@@ -31,19 +33,25 @@ class ItineraryDetailActivity : AppCompatActivity() {
     private val daysList = mutableListOf<String>()
     private var selectedDay: String = ""
 
+    private lateinit var itineraryId: String
     private lateinit var itineraryName: String
 
+    // Apply saved locale before layout inflation
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleUtils.applySavedLocale(newBase))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Apply dark/light theme before inflating the layout
+        // Apply saved theme before UI creation
         ThemeUtils.applySavedTheme(this)
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_itinerary_detail)
 
-        // Get itinerary name passed from previous screen
-        itineraryName = intent.getStringExtra("itineraryName") ?: return
+        // ---------------- Toolbar setup ----------------
+        itineraryId = intent.getStringExtra("itineraryId") ?: return
+        itineraryName = intent.getStringExtra("itineraryName") ?: "Itinerary"
 
-        // ---------------- Toolbar setup (XML back arrow + centered title) ----------------
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
 
@@ -57,11 +65,12 @@ class ItineraryDetailActivity : AppCompatActivity() {
 
         val tvTitle = findViewById<TextView>(R.id.tvItineraryTitle)
         tvTitle.text = itineraryName
-        // -------------------------------------------------------------------------------
+        // ------------------------------------------------
 
         // ---------------- Days RecyclerView ----------------
         recyclerDays = findViewById(R.id.recyclerDays)
-        recyclerDays.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        recyclerDays.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         daysAdapter = DayAdapter(daysList) { dayName ->
             selectedDay = dayName
             loadActivities(dayName)
@@ -73,17 +82,17 @@ class ItineraryDetailActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
         adapter = PlaceAdapter(activities) { place, position ->
             AlertDialog.Builder(this)
-                .setTitle("Delete Activity")
-                .setMessage("Are you sure you want to delete '${place.name}' from $selectedDay?")
-                .setPositiveButton("Delete") { _, _ ->
+                .setTitle(getString(R.string.delete_activity_title))
+                .setMessage(getString(R.string.delete_activity_message, place.name, selectedDay))
+                .setPositiveButton(getString(R.string.delete)) { _, _ ->
                     deletePlace(place, position)
                 }
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(getString(R.string.cancel), null)
                 .show()
         }
         recyclerView.adapter = adapter
 
-        // Populate days and load the first day's data
+        // --- Load itinerary details ---
         loadDays()
 
         // ---------------- Bottom Navigation ----------------
@@ -110,53 +119,54 @@ class ItineraryDetailActivity : AppCompatActivity() {
         bottomNav.selectedItemId = R.id.nav_itinerary
     }
 
-    // ---------------- Firebase data loading ----------------
+    // ---------------- Firebase: Load Days ----------------
     private fun loadDays() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val dbRef = FirebaseDatabase.getInstance(
             "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
-        ).getReference("$userId/Itineraries/$itineraryName")
+        ).getReference("$userId/Itineraries/$itineraryId")
 
         dbRef.get().addOnSuccessListener { snapshot ->
             daysList.clear()
 
-            // Prefer explicit "days" property if present
             val daysCount = snapshot.child("days").getValue(Int::class.java)
             if (daysCount != null && daysCount > 0) {
-                for (i in 1..daysCount) daysList.add("Day $i")
+                for (i in 1..daysCount) {
+                    val label = getString(R.string.day_format, i)
+                    daysList.add(label)
+                }
             } else {
-                // fallback: infer Day keys that start with "Day "
+                // fallback if missing "days" field
                 for (child in snapshot.children) {
                     val key = child.key ?: continue
-                    if (key.startsWith("Day ", ignoreCase = true)) {
-                        daysList.add(key)
+                    if (key.startsWith("day_", ignoreCase = true)) {
+                        val num = key.removePrefix("day_").toIntOrNull() ?: continue
+                        val label = getString(R.string.day_format, num)
+                        daysList.add(label)
                     }
                 }
                 if (daysList.isEmpty()) {
-                    daysList.add("Day 1") // default single day
-                } else {
-                    // sort Day 1, Day 2, ...
-                    daysList.sortWith(compareBy {
-                        it.removePrefix("Day ").trim().toIntOrNull() ?: Int.MAX_VALUE
-                    })
+                    daysList.add(getString(R.string.day_format, 1))
                 }
             }
 
             daysAdapter.notifyDataSetChanged()
-
-            // Auto-select first day
             selectedDay = daysList.first()
             loadActivities(selectedDay)
         }.addOnFailureListener { e ->
-            Toast.makeText(this, "Failed to load days: ${e.message}", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.load_days_failed, e.message), Toast.LENGTH_LONG).show()
         }
     }
 
+    // ---------------- Firebase: Load Activities ----------------
     private fun loadActivities(day: String) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val dayNumber = day.filter { it.isDigit() }.toIntOrNull() ?: 1
+        val dayKey = "day_$dayNumber"
+
         val dbRef = FirebaseDatabase.getInstance(
             "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
-        ).getReference("$userId/Itineraries/$itineraryName/$day")
+        ).getReference("$userId/Itineraries/$itineraryId/$dayKey")
 
         dbRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -171,24 +181,28 @@ class ItineraryDetailActivity : AppCompatActivity() {
             override fun onCancelled(error: DatabaseError) {
                 Toast.makeText(
                     this@ItineraryDetailActivity,
-                    "Failed to load activities: ${error.message}",
+                    getString(R.string.load_activities_failed, error.message),
                     Toast.LENGTH_LONG
                 ).show()
             }
         })
     }
 
+    // ---------------- Firebase: Delete Activity ----------------
     private fun deletePlace(place: PlaceInfo, position: Int) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val dayNumber = selectedDay.filter { it.isDigit() }.toIntOrNull() ?: 1
+        val dayKey = "day_$dayNumber"
+
         val dbRef = FirebaseDatabase.getInstance(
             "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
-        ).getReference("$userId/Itineraries/$itineraryName/$selectedDay")
+        ).getReference("$userId/Itineraries/$itineraryId/$dayKey")
 
         dbRef.orderByChild("name").equalTo(place.name).get().addOnSuccessListener { snapshot ->
             snapshot.children.forEach { it.ref.removeValue() }
             activities.removeAt(position)
             adapter.notifyItemRemoved(position)
-            Toast.makeText(this, "${place.name} removed", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.activity_removed, place.name), Toast.LENGTH_SHORT).show()
         }
     }
 }

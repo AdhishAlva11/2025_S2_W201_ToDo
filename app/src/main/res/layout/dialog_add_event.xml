@@ -1,21 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Layout for Add Itinerary dialog -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="16dp">
 
+    <!-- EditText for itinerary name -->
     <EditText
         android:id="@+id/etEventName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Itinerary Name" />
+        android:hint="@string/itinerary_name_hint"
+        android:inputType="textCapWords" />
 
+    <!-- EditText for number of days -->
     <EditText
         android:id="@+id/etDays"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Number of days"
-        android:inputType="number"
-        android:layout_marginTop="12dp" />
+        android:layout_marginTop="12dp"
+        android:hint="@string/number_of_days_hint"
+        android:inputType="number" />
 </LinearLayout>

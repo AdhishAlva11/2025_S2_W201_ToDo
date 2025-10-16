@@ -1,121 +1,99 @@
 package com.autgroup.s2025.w201.todo.activities
 
+import android.Manifest
+import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Geocoder
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
+import android.provider.MediaStore
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.autgroup.s2025.w201.todo.R
+import com.autgroup.s2025.w201.todo.ThemeUtils
+import com.autgroup.s2025.w201.todo.LocaleUtils
+import com.bumptech.glide.Glide
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
-import com.bumptech.glide.Glide
-import android.location.Geocoder
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
-import java.util.Locale
-import android.app.Activity
-import android.net.Uri
-import android.os.Build
-import android.provider.MediaStore
-import android.widget.ImageButton
-import android.widget.Toast
-import com.autgroup.s2025.w201.todo.ThemeUtils
 import com.google.firebase.storage.FirebaseStorage
+import java.util.*
 
 class ProfileActivity : AppCompatActivity() {
 
-    // For profile photo selection
     private val PICK_IMAGE_REQUEST = 100
     private var imageUri: Uri? = null
     private val storageRef = FirebaseStorage.getInstance().reference
-
-    // Local cache for saving the profile photo URL
     private val sharedPrefs by lazy { getSharedPreferences("user_prefs", MODE_PRIVATE) }
-
-    // Country emergency numbers
-    private val emergencyNumbers = mapOf(
-        "NZ" to "111", "AU" to "000", "US" to "911", "CA" to "911", "GB" to "999",
-        "IE" to "999/112", "IN" to "112", "PK" to "15/1122", "CN" to "110/120",
-        "JP" to "119/110", "KR" to "112/119", "SG" to "999/995", "MY" to "999/991",
-        "TH" to "191/1669", "PH" to "117/911", "ID" to "110/118", "VN" to "113/115/114",
-        "BR" to "190/192/193", "AR" to "911/107", "CL" to "131/132", "CO" to "123",
-        "MX" to "911", "PE" to "105/106", "EC" to "911", "UY" to "911/103",
-        "ZA" to "10111/112", "NG" to "112/199", "EG" to "122/123", "MA" to "19/150",
-        "RU" to "112/102/101", "TR" to "112/155/110", "SA" to "999/997/998",
-        "AE" to "999/998/997", "IL" to "100/101/102", "FR" to "112/15/17/18",
-        "DE" to "112/110", "NL" to "112", "BE" to "112", "LU" to "112",
-        "CH" to "112/117/118", "ES" to "112", "PT" to "112", "IT" to "112/118/113",
-        "SE" to "112", "NO" to "112/110/113", "DK" to "112", "FI" to "112",
-        "PL" to "112/997", "GR" to "112/100/166", "CZ" to "112/155/158",
-        "HU" to "112/104/107", "RO" to "112", "BG" to "112/150/166", "UA" to "112/101/102"
-    )
-
-    companion object {
-        private const val STORAGE_PERMISSION_REQUEST = 200
-    }
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
+    companion object {
+        private const val STORAGE_PERMISSION_REQUEST = 200
+        private const val LOCATION_PERMISSION_REQUEST = 1
+    }
+
+    // Emergency number mapping by country
+    private val emergencyNumbers = mapOf(
+        "NZ" to "111", "AU" to "000", "US" to "911", "IN" to "112",
+        "CN" to "110/120", "JP" to "119/110", "GB" to "999", "SG" to "999/995"
+    )
+
+    // Apply locale before onCreate()
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleUtils.applySavedLocale(newBase))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Apply theme before layout inflation
         ThemeUtils.applySavedTheme(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
 
         val settingsButton = findViewById<ImageButton>(R.id.btnSettings)
-        settingsButton.setOnClickListener {
-            startActivity(Intent(this, SettingsActivity::class.java))
-        }
-
-        window.decorView.systemUiVisibility = 0
-
         val userName = findViewById<TextView>(R.id.user_name)
         val profileImage = findViewById<ImageView>(R.id.profile_image)
         val logoutButton = findViewById<Button>(R.id.btnLogout)
         val uploadButton = findViewById<ImageButton>(R.id.btnUploadPhoto)
+        val emergencyContactView = findViewById<TextView>(R.id.emergency_contact)
+        val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_navigation)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-        // --- Load cached profile photo immediately ---
-        val cachedPhotoUrl = sharedPrefs.getString("photoUrl", null)
-        if (!cachedPhotoUrl.isNullOrEmpty()) {
-            Glide.with(this)
-                .load(cachedPhotoUrl)
-                .circleCrop()
-                .into(profileImage)
+        // --- Toolbar Settings Button ---
+        settingsButton.setOnClickListener {
+            startActivity(Intent(this, SettingsActivity::class.java))
         }
 
-        // --- Upload profile photo button ---
-        uploadButton.setOnClickListener {
-            checkAndOpenGallery()
+        // --- Cached profile photo ---
+        sharedPrefs.getString("photoUrl", null)?.let {
+            Glide.with(this).load(it).circleCrop().into(profileImage)
         }
 
-        // --- Firebase user info ---
+        // --- Upload photo ---
+        uploadButton.setOnClickListener { checkAndOpenGallery() }
+
+        // --- Load user info from Firebase ---
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         if (userId != null) {
             val dbRef = FirebaseDatabase.getInstance(
                 "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
-            ).getReference(userId).child("UserData")
+            ).getReference("$userId/UserData")
 
             dbRef.get().addOnSuccessListener { snapshot ->
-                if (snapshot.exists()) {
-                    val firstName = snapshot.child("userFirstName").getValue(String::class.java) ?: ""
-                    val lastName = snapshot.child("userLastName").getValue(String::class.java) ?: ""
-                    val photoUrl = snapshot.child("photoUrl").getValue(String::class.java)
+                val first = snapshot.child("userFirstName").getValue(String::class.java) ?: ""
+                val last = snapshot.child("userLastName").getValue(String::class.java) ?: ""
+                val photoUrl = snapshot.child("photoUrl").getValue(String::class.java)
 
-                    userName.text = "$firstName $lastName"
-
-                    if (!photoUrl.isNullOrEmpty()) {
-                        Glide.with(this)
-                            .load(photoUrl)
-                            .circleCrop()
-                            .into(profileImage)
-
-                        // Update local cache with latest photo
-                        sharedPrefs.edit().putString("photoUrl", photoUrl).apply()
-                    }
+                userName.text = "$first $last"
+                if (!photoUrl.isNullOrEmpty()) {
+                    Glide.with(this).load(photoUrl).circleCrop().into(profileImage)
+                    sharedPrefs.edit().putString("photoUrl", photoUrl).apply()
                 }
             }
         }
@@ -123,57 +101,48 @@ class ProfileActivity : AppCompatActivity() {
         // --- Emergency contact setup ---
         getEmergencyContact()
 
-        // --- Logout ---
+        // --- Logout logic ---
         logoutButton.setOnClickListener {
             FirebaseAuth.getInstance().signOut()
-
-            // Clear cached photo when user logs out
             sharedPrefs.edit().clear().apply()
-
-            val intent = Intent(this, LoginActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intent)
+            startActivity(Intent(this, LoginActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            })
             finish()
         }
 
         // --- Bottom Navigation ---
-        val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_navigation)
         bottomNav.selectedItemId = R.id.nav_profile
-
         bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.nav_home -> {
-                    startActivity(Intent(this, HomePageActivity::class.java))
-                    overridePendingTransition(0, 0); true
-                }
-                R.id.nav_favourites -> {
-                    startActivity(Intent(this, FavouritesActivity::class.java))
-                    overridePendingTransition(0, 0); true
-                }
-                R.id.nav_itinerary -> {
-                    startActivity(Intent(this, ItineraryActivity::class.java))
-                    overridePendingTransition(0, 0); true
-                }
-                R.id.nav_profile -> true
-                else -> false
+                R.id.nav_home -> startActivity(Intent(this, HomePageActivity::class.java))
+                R.id.nav_favourites -> startActivity(Intent(this, FavouritesActivity::class.java))
+                R.id.nav_itinerary -> startActivity(Intent(this, ItineraryActivity::class.java))
+                R.id.nav_profile -> return@setOnItemSelectedListener true
             }
+            overridePendingTransition(0, 0)
+            true
         }
     }
 
-    // --- Check permissions and open gallery ---
+    // --- Permission check ---
     private fun checkAndOpenGallery() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (checkSelfPermission(android.Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED) {
-                openGallery()
-            } else {
-                requestPermissions(arrayOf(android.Manifest.permission.READ_MEDIA_IMAGES), STORAGE_PERMISSION_REQUEST)
-            }
+            if (checkSelfPermission(Manifest.permission.READ_MEDIA_IMAGES) ==
+                PackageManager.PERMISSION_GRANTED
+            ) openGallery()
+            else requestPermissions(
+                arrayOf(Manifest.permission.READ_MEDIA_IMAGES),
+                STORAGE_PERMISSION_REQUEST
+            )
         } else {
-            if (checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                openGallery()
-            } else {
-                requestPermissions(arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE), STORAGE_PERMISSION_REQUEST)
-            }
+            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) ==
+                PackageManager.PERMISSION_GRANTED
+            ) openGallery()
+            else requestPermissions(
+                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                STORAGE_PERMISSION_REQUEST
+            )
         }
     }
 
@@ -182,69 +151,76 @@ class ProfileActivity : AppCompatActivity() {
         startActivityForResult(intent, PICK_IMAGE_REQUEST)
     }
 
-    // --- Emergency contact ---
+    // --- Emergency Contact logic ---
     private fun getEmergencyContact() {
         val emergencyContactView = findViewById<TextView>(R.id.emergency_contact)
-        emergencyContactView.text = "Emergency Contact: Not Available"
+        emergencyContactView.text = getString(R.string.emergency_contact_not_available)
 
-        if (checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), 1)
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermissions(
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                LOCATION_PERMISSION_REQUEST
+            )
             return
         }
 
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-            if (location != null) {
-                val geocoder = Geocoder(this, Locale.getDefault())
-                val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)
+            location ?: return@addOnSuccessListener
+            val geocoder = Geocoder(this, Locale.getDefault())
+            val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)
 
-                if (!addresses.isNullOrEmpty()) {
-                    val countryCode = addresses[0].countryCode
-                    val number = emergencyNumbers[countryCode] ?: "Not Available"
-                    emergencyContactView.text = "Emergency Contact: $number"
+            if (!addresses.isNullOrEmpty()) {
+                val countryCode = addresses[0].countryCode ?: return@addOnSuccessListener
+                val number = emergencyNumbers[countryCode]
+                    ?: getString(R.string.emergency_contact_not_available)
+                emergencyContactView.text =
+                    getString(R.string.emergency_contact_label, number)
 
-                    // Make number clickable if valid
-                    if (number != "Not Available") {
-                        emergencyContactView.setOnClickListener {
-                            val intent = Intent(Intent.ACTION_DIAL)
-                            intent.data = Uri.parse("tel:$number")
-                            startActivity(intent)
-                        }
+                if (number != getString(R.string.not_available)) {
+                    emergencyContactView.setOnClickListener {
+                        val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:$number"))
+                        startActivity(intent)
                     }
                 }
             }
         }.addOnFailureListener {
-            emergencyContactView.text = "Emergency Contact: Not Available"
+            emergencyContactView.text = getString(R.string.emergency_contact_not_available)
         }
     }
 
-    // --- Handle permission result ---
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    // --- Permission result handler ---
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == STORAGE_PERMISSION_REQUEST && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        if (requestCode == STORAGE_PERMISSION_REQUEST &&
+            grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED
+        ) {
             openGallery()
         }
-        if (requestCode == 1 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        if (requestCode == LOCATION_PERMISSION_REQUEST &&
+            grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED
+        ) {
             getEmergencyContact()
         }
     }
 
-    // --- Handle gallery result ---
+    // --- Gallery result handler ---
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
-            imageUri = data.data
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK) {
+            imageUri = data?.data ?: return
             val profileImage = findViewById<ImageView>(R.id.profile_image)
-
-            // Show selected image immediately
             Glide.with(this).load(imageUri).circleCrop().into(profileImage)
-
-            // Upload to Firebase Storage
             uploadImageToFirebase()
         }
     }
 
-    // --- Upload image to Firebase ---
+    // --- Firebase upload ---
     private fun uploadImageToFirebase() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val fileRef = storageRef.child("profile_images/$userId")
@@ -252,24 +228,28 @@ class ProfileActivity : AppCompatActivity() {
         imageUri?.let { uri ->
             fileRef.putFile(uri)
                 .addOnSuccessListener {
-                    // Get download URL
                     fileRef.downloadUrl.addOnSuccessListener { downloadUri ->
                         val newPhotoUrl = downloadUri.toString()
                         val dbRef = FirebaseDatabase.getInstance(
                             "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
                         ).getReference("$userId/UserData")
 
-                        // Save to Firebase
                         dbRef.child("photoUrl").setValue(newPhotoUrl)
-
-                        // Save locally for instant loading
                         sharedPrefs.edit().putString("photoUrl", newPhotoUrl).apply()
 
-                        Toast.makeText(this, "Profile photo updated!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this,
+                            getString(R.string.profile_photo_updated),
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
                 .addOnFailureListener { e ->
-                    Toast.makeText(this, "Upload failed: ${e.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        this,
+                        getString(R.string.upload_failed, e.message),
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
         }
     }

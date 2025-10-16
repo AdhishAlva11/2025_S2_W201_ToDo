@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- CardView layout for displaying a favourite location item -->
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -17,40 +19,44 @@
         android:padding="14dp"
         android:background="@drawable/favourite_card_background">
 
+        <!-- Favourite Title -->
         <TextView
             android:id="@+id/txtFavTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Name"
+            android:text="@string/fav_name_label"
             android:textColor="@color/black"
             android:textStyle="bold"
             android:textSize="17sp"
             android:layout_marginBottom="4dp" />
 
+        <!-- Favourite Address -->
         <TextView
             android:id="@+id/txtFavAddress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@string/fav_address_label"
             android:textColor="#555555"
-            android:text="Address"
             android:textSize="14sp"
             android:layout_marginBottom="2dp" />
 
+        <!-- Open/Closed Status -->
         <TextView
             android:id="@+id/txtFavStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@string/fav_status_label"
             android:textColor="#777777"
-            android:text="Status"
             android:textSize="14sp"
             android:layout_marginBottom="2dp" />
 
+        <!-- Rating Display -->
         <TextView
             android:id="@+id/txtFavRating"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@string/fav_rating_label"
             android:textColor="#FFA000"
-            android:text="★ 4.5"
             android:textSize="14sp" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>
