@@ -1,5 +1,6 @@
 package com.autgroup.s2025.w201.todo.activities
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.autgroup.s2025.w201.todo.R
 import com.autgroup.s2025.w201.todo.ThemeUtils
+import com.autgroup.s2025.w201.todo.LocaleUtils
 import com.autgroup.s2025.w201.todo.adapters.FavouritesAdapter
 import com.autgroup.s2025.w201.todo.classes.Favourite
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -28,6 +30,11 @@ class FavouritesActivity : AppCompatActivity() {
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var spinnerCountryFilter: Spinner
 
+    // ensure locale is applied before onCreate()
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleUtils.applySavedLocale(newBase))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         // Apply saved theme for dark/light mode
         ThemeUtils.applySavedTheme(this)
@@ -37,7 +44,6 @@ class FavouritesActivity : AppCompatActivity() {
         firebaseAuth = FirebaseAuth.getInstance()
         spinnerCountryFilter = findViewById(R.id.spinnerCountryFilter)
 
-        // RecyclerView setup with filtered list
         recyclerView = findViewById(R.id.recyclerFavourites)
         favouritesAdapter = FavouritesAdapter(filteredList)
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -89,10 +95,9 @@ class FavouritesActivity : AppCompatActivity() {
                 for (childSnapshot in snapshot.children) {
                     val favourite = childSnapshot.getValue(Favourite::class.java)
                     favourite?.let {
-                        // Extract country from address
                         val parts = it.address?.split(",")?.map { part -> part.trim() }
                         if (!parts.isNullOrEmpty()) {
-                            it.country = parts.last() // Last element is usually the country
+                            it.country = parts.last()
                         }
                         favouritesList.add(it)
                     }

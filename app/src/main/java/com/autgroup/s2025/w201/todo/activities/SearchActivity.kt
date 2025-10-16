@@ -1,6 +1,8 @@
 package com.autgroup.s2025.w201.todo.activities
 
+import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.widget.Button
 import android.widget.CheckBox
@@ -9,27 +11,46 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.autgroup.s2025.w201.todo.R
 import com.autgroup.s2025.w201.todo.ThemeUtils
+import com.autgroup.s2025.w201.todo.LocaleUtils
 import com.autgroup.s2025.w201.todo.classes.Search
 import com.google.android.gms.common.api.Status
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
+import java.util.*
 
 class SearchActivity : AppCompatActivity() {
 
     private var currentPlace: Place? = null
 
+    // Apply saved locale before Activity creation
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleUtils.applySavedLocale(newBase))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Apply saved theme before inflating layout
         ThemeUtils.applySavedTheme(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
         val apiKey = getString(R.string.project_google_api_key)
+
+        // Initialize Google Places with your app’s locale (API 23+ compatible)
         if (!Places.isInitialized()) {
-            Places.initialize(applicationContext, apiKey)
+            val currentLocale: Locale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                // For Android 7.0 and above
+                LocaleUtils.applySavedLocale(this).resources.configuration.locales[0]
+            } else {
+                // For Android 6.0 and below
+                LocaleUtils.applySavedLocale(this).resources.configuration.locale
+            }
+
+            Places.initialize(applicationContext, apiKey, currentLocale)
         }
 
+        // --- Setup Autocomplete fragment ---
         val autocompleteFragment = supportFragmentManager
             .findFragmentById(R.id.autocompleteFragment) as AutocompleteSupportFragment
 
@@ -56,6 +77,7 @@ class SearchActivity : AppCompatActivity() {
             }
         })
 
+        // --- Search button click ---
         findViewById<Button>(R.id.searchButton).setOnClickListener {
             if (currentPlace == null) {
                 Toast.makeText(
@@ -73,7 +95,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun buildSearchFromUI(place: Place?): Search {
-        // Use localized strings for labels so filtering stays consistent across languages
+        // Use localized strings so filtering is consistent with app language
         val selectedInterests = listOf(
             R.id.checkboxFood   to getString(R.string.restaurants),
             R.id.checkboxWalking to getString(R.string.walking),

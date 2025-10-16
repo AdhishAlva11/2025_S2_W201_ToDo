@@ -1,5 +1,6 @@
 package com.autgroup.s2025.w201.todo.activities
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.TextView
@@ -19,6 +20,7 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.Spinner
 import com.autgroup.s2025.w201.todo.ThemeUtils
+import com.autgroup.s2025.w201.todo.LocaleUtils
 
 class ItineraryActivity : AppCompatActivity() {
 
@@ -26,7 +28,13 @@ class ItineraryActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: ItineraryAdapter
 
+    // ensure locale is applied before onCreate()
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleUtils.applySavedLocale(newBase))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Apply saved theme for dark/light mode
         ThemeUtils.applySavedTheme(this)
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()

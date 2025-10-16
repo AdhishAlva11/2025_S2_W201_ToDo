@@ -2,6 +2,7 @@ package com.autgroup.s2025.w201.todo.activities
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Geocoder
@@ -13,6 +14,7 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.autgroup.s2025.w201.todo.R
 import com.autgroup.s2025.w201.todo.ThemeUtils
+import com.autgroup.s2025.w201.todo.LocaleUtils
 import com.bumptech.glide.Glide
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -42,7 +44,13 @@ class ProfileActivity : AppCompatActivity() {
         "CN" to "110/120", "JP" to "119/110", "GB" to "999", "SG" to "999/995"
     )
 
+    // Apply locale before onCreate()
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleUtils.applySavedLocale(newBase))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Apply theme before layout inflation
         ThemeUtils.applySavedTheme(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
@@ -151,7 +159,10 @@ class ProfileActivity : AppCompatActivity() {
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
             != PackageManager.PERMISSION_GRANTED
         ) {
-            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST)
+            requestPermissions(
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                LOCATION_PERMISSION_REQUEST
+            )
             return
         }
 
@@ -162,8 +173,10 @@ class ProfileActivity : AppCompatActivity() {
 
             if (!addresses.isNullOrEmpty()) {
                 val countryCode = addresses[0].countryCode ?: return@addOnSuccessListener
-                val number = emergencyNumbers[countryCode] ?: getString(R.string.emergency_contact_not_available)
-                emergencyContactView.text = getString(R.string.emergency_contact_label, number)
+                val number = emergencyNumbers[countryCode]
+                    ?: getString(R.string.emergency_contact_not_available)
+                emergencyContactView.text =
+                    getString(R.string.emergency_contact_label, number)
 
                 if (number != getString(R.string.not_available)) {
                     emergencyContactView.setOnClickListener {
@@ -178,12 +191,20 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     // --- Permission result handler ---
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == STORAGE_PERMISSION_REQUEST && grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED) {
+        if (requestCode == STORAGE_PERMISSION_REQUEST &&
+            grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED
+        ) {
             openGallery()
         }
-        if (requestCode == LOCATION_PERMISSION_REQUEST && grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED) {
+        if (requestCode == LOCATION_PERMISSION_REQUEST &&
+            grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED
+        ) {
             getEmergencyContact()
         }
     }
@@ -216,11 +237,19 @@ class ProfileActivity : AppCompatActivity() {
                         dbRef.child("photoUrl").setValue(newPhotoUrl)
                         sharedPrefs.edit().putString("photoUrl", newPhotoUrl).apply()
 
-                        Toast.makeText(this, getString(R.string.profile_photo_updated), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this,
+                            getString(R.string.profile_photo_updated),
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
                 .addOnFailureListener { e ->
-                    Toast.makeText(this, getString(R.string.upload_failed, e.message), Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        this,
+                        getString(R.string.upload_failed, e.message),
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
         }
     }

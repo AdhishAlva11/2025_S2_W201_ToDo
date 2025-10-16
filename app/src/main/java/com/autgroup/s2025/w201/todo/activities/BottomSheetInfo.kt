@@ -1,5 +1,6 @@
 package com.autgroup.s2025.w201.todo.activities
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -18,6 +19,19 @@ import com.google.firebase.database.FirebaseDatabase
 class BottomSheetInfo : BottomSheetDialogFragment() {
 
     private lateinit var firebaseAuth: FirebaseAuth
+
+    // Correct override for locale handling in Fragments
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        // Apply saved locale safely after attach
+        val localizedContext = com.autgroup.s2025.w201.todo.LocaleUtils.applySavedLocale(context)
+        val newConfig = localizedContext.resources.configuration
+        requireContext().resources.updateConfiguration(
+            newConfig,
+            localizedContext.resources.displayMetrics
+        )
+    }
 
     companion object {
         private const val ARG_PLACE = "place"

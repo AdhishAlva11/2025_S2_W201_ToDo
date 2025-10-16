@@ -6,24 +6,32 @@ import java.util.*
 
 object LocaleUtils {
 
-    // Applies the language saved in SharedPreferences to the given context
+    private const val PREFS_NAME = "app_settings"
+    private const val KEY_LANGUAGE = "language"
+
+    // Save and apply the selected language (stores "en", "hi", "zh")
+    fun setLocale(context: Context, languageCode: String): Context {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit().putString(KEY_LANGUAGE, languageCode).apply()
+
+        return updateLocale(context, languageCode)
+    }
+
+    // Apply the saved language when app starts
     fun applySavedLocale(context: Context): Context {
-        val pref = context.getSharedPreferences("app_settings", Context.MODE_PRIVATE)
-        val language = pref.getString("language", "English")
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val languageCode = prefs.getString(KEY_LANGUAGE, "en") ?: "en"
+        return updateLocale(context, languageCode)
+    }
 
-        val localeCode = when (language) {
-            "Hindi" -> "hi"
-            "Chinese" -> "zh"
-            else -> "en"
-        }
-
-        val locale = Locale(localeCode)
+    // Internal helper to apply locale
+    private fun updateLocale(context: Context, languageCode: String): Context {
+        val locale = Locale(languageCode)
         Locale.setDefault(locale)
 
         val config = Configuration(context.resources.configuration)
         config.setLocale(locale)
 
-        // Return a new configuration context with the updated locale
         return context.createConfigurationContext(config)
     }
 }

@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import com.autgroup.s2025.w201.todo.R
 import com.autgroup.s2025.w201.todo.ThemeUtils
+import com.autgroup.s2025.w201.todo.LocaleUtils
 import java.util.*
 
 class SettingsActivity : AppCompatActivity() {
@@ -47,22 +48,24 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         // --- Supported languages ---
-        val languages = arrayOf("English", "Hindi", "Chinese")
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, languages)
+        val displayLanguages = arrayOf("English", "Hindi", "Chinese")
+        val languageCodes = arrayOf("en", "hi", "zh")
+
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, displayLanguages)
         languageSpinner.adapter = adapter
 
         // --- Preselect saved language ---
-        val savedLang = pref.getString("language", "English")
-        val savedIndex = languages.indexOf(savedLang)
+        val savedLangCode = pref.getString("language", "en")
+        val savedIndex = languageCodes.indexOf(savedLangCode)
         if (savedIndex >= 0) languageSpinner.setSelection(savedIndex)
 
         // --- Language selection logic ---
         languageSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                val selectedLang = languages[position]
-                if (selectedLang != savedLang) {
-                    pref.edit().putString("language", selectedLang).apply()
-                    setLocale(selectedLang)
+                val selectedLangCode = languageCodes[position]
+                if (selectedLangCode != savedLangCode) {
+                    pref.edit().putString("language", selectedLangCode).apply()
+                    setLocale(selectedLangCode)
 
                     // Delay refresh slightly for configuration to apply cleanly
                     Handler(Looper.getMainLooper()).postDelayed({
@@ -85,19 +88,13 @@ class SettingsActivity : AppCompatActivity() {
     // --- Reads saved language and applies on startup ---
     private fun applySavedLanguage() {
         val pref = getSharedPreferences("app_settings", MODE_PRIVATE)
-        val language = pref.getString("language", "English")
-        setLocale(language ?: "English")
+        val languageCode = pref.getString("language", "en") ?: "en"
+        setLocale(languageCode)
     }
 
-    // --- Applies locale for given language ---
-    private fun setLocale(language: String) {
-        val localeCode = when (language) {
-            "Hindi" -> "hi"
-            "Chinese" -> "zh"
-            else -> "en"
-        }
-
-        val locale = Locale(localeCode)
+    // --- Applies locale for given language code ---
+    private fun setLocale(languageCode: String) {
+        val locale = Locale(languageCode)
         Locale.setDefault(locale)
 
         val config = Configuration(resources.configuration)

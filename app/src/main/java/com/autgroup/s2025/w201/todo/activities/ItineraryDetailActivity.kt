@@ -1,5 +1,6 @@
 package com.autgroup.s2025.w201.todo.activities
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.ImageButton
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.autgroup.s2025.w201.todo.R
 import com.autgroup.s2025.w201.todo.ThemeUtils
+import com.autgroup.s2025.w201.todo.LocaleUtils
 import com.autgroup.s2025.w201.todo.adapters.DayAdapter
 import com.autgroup.s2025.w201.todo.adapters.PlaceAdapter
 import com.autgroup.s2025.w201.todo.classes.PlaceInfo
@@ -33,8 +35,13 @@ class ItineraryDetailActivity : AppCompatActivity() {
 
     private lateinit var itineraryName: String
 
+    // Apply saved locale before layout inflation
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleUtils.applySavedLocale(newBase))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Apply theme before layout inflation
+        // Apply saved theme before UI creation
         ThemeUtils.applySavedTheme(this)
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -59,7 +66,8 @@ class ItineraryDetailActivity : AppCompatActivity() {
 
         // ---------------- Days RecyclerView ----------------
         recyclerDays = findViewById(R.id.recyclerDays)
-        recyclerDays.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        recyclerDays.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         daysAdapter = DayAdapter(daysList) { dayName ->
             selectedDay = dayName
             loadActivities(dayName)
@@ -123,7 +131,6 @@ class ItineraryDetailActivity : AppCompatActivity() {
                     val number = key.removePrefix("Day ").trim().toIntOrNull() ?: continue
                     val newKey = "day_$number"
 
-                    // Copy data and remove old key
                     val data = child.value
                     dbRef.child(newKey).setValue(data)
                     dbRef.child(key).removeValue()
@@ -174,7 +181,6 @@ class ItineraryDetailActivity : AppCompatActivity() {
     private fun loadActivities(day: String) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
-        // Convert localized “Day 1” / “第 1 天” → stable “day_1”
         val dayNumber = day.filter { it.isDigit() }.toIntOrNull() ?: 1
         val dayKey = "day_$dayNumber"
 
