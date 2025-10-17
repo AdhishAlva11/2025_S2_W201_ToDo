@@ -33,7 +33,7 @@ class FavouritesAdapter(
         holder.txtName.text = favourite.name
         holder.txtAddress.text = favourite.address
         holder.txtStatus.text = favourite.openStatus
-        holder.txtRating.text = favourite.rating?.toString() ?: "N/A"
+        holder.txtRating.text = favourite.rating?.let { "$it ⭐" } ?: "N/A"
 
         holder.itemView.setOnLongClickListener {
             AlertDialog.Builder(holder.itemView.context)

@@ -1,17 +1,15 @@
 package com.autgroup.s2025.w201.todo.adapters
 
-import android.app.AlertDialog
-import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.autgroup.s2025.w201.todo.R
 import com.autgroup.s2025.w201.todo.classes.Itinerary
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import android.app.AlertDialog
 
 class ItineraryAdapter(
     private val itineraries: MutableList<Itinerary>,
@@ -20,7 +18,6 @@ class ItineraryAdapter(
 
     inner class ItineraryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val txtItineraryName: TextView = itemView.findViewById(R.id.itineraryName)
-        val btnMarkCompleted: Button = itemView.findViewById(R.id.btnMarkCompleted)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItineraryViewHolder {
@@ -33,32 +30,12 @@ class ItineraryAdapter(
         val itinerary = itineraries[position]
         holder.txtItineraryName.text = itinerary.name ?: "Unnamed"
 
-        // Temporary "completed" flag (not saved in DB)
-        var isCompleted = false
-
-        // Handle Mark as Completed button
-        holder.btnMarkCompleted.setOnClickListener {
-            isCompleted = !isCompleted
-
-            if (isCompleted) {
-                holder.txtItineraryName.paintFlags =
-                    holder.txtItineraryName.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-                holder.btnMarkCompleted.text = "Completed ✅"
-                holder.btnMarkCompleted.isEnabled = false // Optional: disable after marking
-            } else {
-                holder.txtItineraryName.paintFlags =
-                    holder.txtItineraryName.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
-                holder.btnMarkCompleted.text = "Mark as Completed"
-                holder.btnMarkCompleted.isEnabled = true
-            }
-        }
-
-        // Click open details
+        // Click to open details
         holder.itemView.setOnClickListener {
             onClick(itinerary)
         }
 
-        // Long-click delete
+        // Long-click to delete
         holder.itemView.setOnLongClickListener {
             AlertDialog.Builder(holder.itemView.context)
                 .setTitle("Delete Itinerary")

@@ -11,6 +11,7 @@ data class PlaceInfo(
     val lng: Double? = null,
     val reviews: List<Review>? = null,
     val priceLevel: Int? = null,
-    var isCompleted: Boolean = false,
+    val completed: Boolean = false,
     var firebaseKey: String? = null
 ) : Serializable
+
