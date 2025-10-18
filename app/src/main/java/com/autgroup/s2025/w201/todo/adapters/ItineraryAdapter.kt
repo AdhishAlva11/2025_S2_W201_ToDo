@@ -54,8 +54,10 @@ class ItineraryAdapter(
                     if (!itineraryId.isNullOrEmpty()) {
                         dbRef.child(itineraryId).removeValue()
                             .addOnSuccessListener {
-                                itineraries.removeAt(position)
-                                notifyItemRemoved(position)
+                                if (position in itineraries.indices) {
+                                    itineraries.removeAt(position)
+                                    notifyItemRemoved(position)
+                                }
                             }
                             .addOnFailureListener { e ->
                                 android.widget.Toast.makeText(

@@ -126,23 +126,31 @@ class ItineraryActivity : AppCompatActivity() {
             "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
         ).getReference("$userId/Itineraries")
 
-        // Create the structure with the itinerary name as the parent
+        // Generate a unique ID for this itinerary
+        val itineraryId = dbRef.push().key ?: return
+
+        // Prepare the data with the name included
         val itineraryData = mutableMapOf<String, Any>()
+        itineraryData["id"] = itineraryId       // unique ID
+        itineraryData["name"] = name            // required for BottomSheetInfo
         itineraryData["days"] = days
 
-        // Create empty "Day 1", "Day 2", etc.
+        // Create empty day objects with "Day 1" format
         for (i in 1..days) {
-            itineraryData["Day $i"] = mapOf<String, Any>()
+            val dayKey = "Day$i"
+            itineraryData[dayKey] = mapOf<String, Any>()
         }
 
-        // Save under the itinerary *name* instead of auto ID
-        dbRef.child(name).setValue(itineraryData)
+        // Save under the generated ID
+        dbRef.child(itineraryId).setValue(itineraryData)
             .addOnSuccessListener {
                 Toast.makeText(
                     this,
                     getString(R.string.itinerary_created, name),
                     Toast.LENGTH_SHORT
                 ).show()
+                // Refresh the local list to ensure BottomSheetInfo sees it
+                loadItineraries()
             }
             .addOnFailureListener {
                 Toast.makeText(
@@ -165,13 +173,19 @@ class ItineraryActivity : AppCompatActivity() {
             override fun onDataChange(snapshot: DataSnapshot) {
                 itineraries.clear()
                 for (itinerarySnapshot in snapshot.children) {
-                    val name = itinerarySnapshot.key // now the name is the key
+                    val id = itinerarySnapshot.child("id").getValue(String::class.java) ?: continue
+                    val name = itinerarySnapshot.child("name").getValue(String::class.java) ?: continue
                     val days = itinerarySnapshot.child("days").getValue(Int::class.java) ?: 0
 
-                    if (!name.isNullOrEmpty()) {
-                        // Use name as ID as well (since it’s the unique key)
-                        itineraries.add(Itinerary(id = name, name = name, days = days))
+                    // Count activities across all days
+                    var activityCount = 0
+                    for (daySnapshot in itinerarySnapshot.children) {
+                        if (daySnapshot.key?.startsWith("day_") == true) {
+                            activityCount += daySnapshot.childrenCount.toInt()
+                        }
                     }
+
+                    itineraries.add(Itinerary(id = id, name = name, days = days, activityCount = activityCount))
                 }
                 adapter.notifyDataSetChanged()
             }

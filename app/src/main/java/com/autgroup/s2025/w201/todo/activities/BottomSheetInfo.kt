@@ -167,24 +167,30 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
 
         dbRef.get().addOnSuccessListener { snapshot ->
             val daysCount = snapshot.child("days").getValue(Int::class.java)
-            val daysList = mutableListOf<String>()
+            val daysList = mutableListOf<Pair<String, String>>() // Pair<dayKey, dayLabel>
 
             if (daysCount != null && daysCount > 0) {
-                for (i in 1..daysCount) daysList.add(getString(R.string.day_number, i))
+                for (i in 1..daysCount) {
+                    val dayKey = "Day$i"                                // DB key
+                    val dayLabel = getString(R.string.day_number, i)    // Localized label
+                    daysList.add(Pair(dayKey, dayLabel))
+                }
             } else {
                 for (child in snapshot.children) {
                     val key = child.key ?: continue
-                    if (key.startsWith("day_", true)) daysList.add(key.replace("day_", getString(R.string.day_number, key.removePrefix("day_").toIntOrNull() ?: 1)))
+                    if (key.startsWith("Day", ignoreCase = true)) {    // match DB keys
+                        val num = key.removePrefix("Day").toIntOrNull() ?: 1
+                        val dayLabel = getString(R.string.day_number, num)
+                        daysList.add(Pair(key, dayLabel))
+                    }
                 }
-                if (daysList.isEmpty()) daysList.add(getString(R.string.day_number, 1))
             }
 
             AlertDialog.Builder(requireContext())
                 .setTitle(getString(R.string.choose_day))
-                .setItems(daysList.toTypedArray()) { _, which ->
-                    val selectedDay = daysList[which]
-                    val dayNumber = selectedDay.filter { it.isDigit() }.toIntOrNull() ?: 1
-                    addActivityToItinerary(place, itineraryId, itineraryName, "day_$dayNumber", selectedDay)
+                .setItems(daysList.map { it.second }.toTypedArray()) { _, which ->
+                    val (dayKey, dayLabel) = daysList[which]
+                    addActivityToItinerary(place, itineraryId, itineraryName, dayKey, dayLabel)
                 }
                 .show()
         }

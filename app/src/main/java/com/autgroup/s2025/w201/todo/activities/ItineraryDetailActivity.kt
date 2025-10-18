@@ -30,7 +30,7 @@ class ItineraryDetailActivity : AppCompatActivity() {
 
     private lateinit var recyclerDays: RecyclerView
     private lateinit var daysAdapter: DayAdapter
-    private val daysList = mutableListOf<String>()
+    private val daysList = mutableListOf<Pair<String, String>>() // Pair<dayKey, dayLabel>
     private var selectedDay: String = ""
 
     private lateinit var itineraryId: String
@@ -38,19 +38,16 @@ class ItineraryDetailActivity : AppCompatActivity() {
     private val firebaseUrl = "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
     private val database by lazy { FirebaseDatabase.getInstance(firebaseUrl) }
 
-    // Apply saved locale before layout inflation
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(LocaleUtils.applySavedLocale(newBase))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Apply saved theme before UI creation
         ThemeUtils.applySavedTheme(this)
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_itinerary_detail)
 
-        // ---------------- Toolbar setup ----------------
         itineraryId = intent.getStringExtra("itineraryId") ?: return
         itineraryName = intent.getStringExtra("itineraryName") ?: "Itinerary"
 
@@ -66,43 +63,33 @@ class ItineraryDetailActivity : AppCompatActivity() {
 
         val tvTitle = findViewById<TextView>(R.id.tvItineraryTitle)
         tvTitle.text = itineraryName
-        // ------------------------------------------------
 
         setupDaysRecycler()
         setupActivitiesRecycler()
         loadDays()
 
-        // ---------------- Bottom Navigation ----------------
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNav)
         bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.nav_home -> {
-                    startActivity(Intent(this, HomePageActivity::class.java))
-                    true
-                }
+                R.id.nav_home -> { startActivity(Intent(this, HomePageActivity::class.java)); true }
                 R.id.nav_itinerary -> true
-                R.id.nav_favourites -> {
-                    startActivity(Intent(this, FavouritesActivity::class.java))
-                    true
-                }
-                R.id.nav_profile -> {
-                    startActivity(Intent(this, ProfileActivity::class.java))
-                    true
-                }
+                R.id.nav_favourites -> { startActivity(Intent(this, FavouritesActivity::class.java)); true }
+                R.id.nav_profile -> { startActivity(Intent(this, ProfileActivity::class.java)); true }
                 else -> false
             }
         }
         bottomNav.selectedItemId = R.id.nav_itinerary
     }
 
-    // ---------------- Recycler setups ----------------
     private fun setupDaysRecycler() {
         recyclerDays = findViewById(R.id.recyclerDays)
-        recyclerDays.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        daysAdapter = DayAdapter(daysList) { dayName ->
-            selectedDay = dayName
-            loadActivities(dayName)
+        recyclerDays.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+
+        // Initialize with empty mutable list
+        daysAdapter = DayAdapter(mutableListOf()) { dayLabel ->
+            val key = daysList.find { it.second == dayLabel }?.first ?: "Day1"
+            selectedDay = key
+            loadActivities(selectedDay)
         }
         recyclerDays.adapter = daysAdapter
     }
@@ -119,61 +106,59 @@ class ItineraryDetailActivity : AppCompatActivity() {
                 AlertDialog.Builder(this)
                     .setTitle(getString(R.string.delete_activity_title))
                     .setMessage(getString(R.string.delete_activity_message, place.name, selectedDay))
-                    .setPositiveButton(getString(R.string.delete)) { _, _ ->
-                        deletePlace(place, position)
-                    }
+                    .setPositiveButton(getString(R.string.delete)) { _, _ -> deletePlace(place, position) }
                     .setNegativeButton(getString(R.string.cancel), null)
                     .show()
             },
-            onToggleCompleted = { place ->
-                toggleCompletion(place)
-            }
+            onToggleCompleted = { place -> toggleCompletion(place) }
         )
-
         recyclerView.adapter = adapter
     }
 
-    // ---------------- Firebase: Load Days ----------------
     private fun loadDays() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val dbRef = database.getReference("$userId/Itineraries/$itineraryId")
 
         dbRef.get().addOnSuccessListener { snapshot ->
             daysList.clear()
-
             val daysCount = snapshot.child("days").getValue(Int::class.java)
+
             if (daysCount != null && daysCount > 0) {
                 for (i in 1..daysCount) {
-                    daysList.add(getString(R.string.day_format, i))
+                    val dayKey = "Day$i"
+                    val dayLabel = getString(R.string.day_format, i)
+                    daysList.add(Pair(dayKey, dayLabel))
                 }
             } else {
-                // fallback if missing "days" field
                 for (child in snapshot.children) {
                     val key = child.key ?: continue
-                    if (key.startsWith("day_", ignoreCase = true)) {
-                        val num = key.removePrefix("day_").toIntOrNull() ?: continue
-                        daysList.add(getString(R.string.day_format, num))
+                    if (key.startsWith("Day", ignoreCase = true)) {
+                        val num = key.removePrefix("Day").toIntOrNull() ?: 1
+                        val dayLabel = getString(R.string.day_format, num)
+                        daysList.add(Pair(key, dayLabel))
                     }
                 }
                 if (daysList.isEmpty()) {
-                    daysList.add(getString(R.string.day_format, 1))
+                    daysList.add(Pair("Day1", getString(R.string.day_format, 1)))
                 }
             }
 
+            // Default selected day
+            selectedDay = daysList.first().first
+
+            // Update adapter with the labels
+            daysAdapter.updateList(daysList.map { it.second })
             daysAdapter.notifyDataSetChanged()
-            selectedDay = daysList.first()
+
+            // Load activities for first day
             loadActivities(selectedDay)
         }.addOnFailureListener { e ->
             Toast.makeText(this, getString(R.string.load_days_failed, e.message), Toast.LENGTH_LONG).show()
         }
     }
 
-    // ---------------- Firebase: Load Activities ----------------
-    private fun loadActivities(day: String) {
+    private fun loadActivities(dayKey: String) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        val dayNumber = day.filter { it.isDigit() }.toIntOrNull() ?: 1
-        val dayKey = "Day $dayNumber"
-
         val dbRef = database.getReference("$userId/Itineraries/$itineraryId/$dayKey")
 
         dbRef.get().addOnSuccessListener { snapshot ->
@@ -187,51 +172,40 @@ class ItineraryDetailActivity : AppCompatActivity() {
             }
             adapter.notifyDataSetChanged()
         }.addOnFailureListener { e ->
-            Toast.makeText(
-                this,
-                getString(R.string.load_activities_failed, e.message),
-                Toast.LENGTH_LONG
-            ).show()
+            Toast.makeText(this, getString(R.string.load_activities_failed, e.message), Toast.LENGTH_LONG).show()
         }
     }
 
-    // ---------------- Firebase: Delete Activity ----------------
     private fun deletePlace(place: PlaceInfo, position: Int) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val key = place.firebaseKey ?: return
         val dbRef = database.getReference("$userId/Itineraries/$itineraryId/$selectedDay/$key")
 
-        dbRef.removeValue()
-            .addOnSuccessListener {
-                activities.removeAt(position)
-                adapter.notifyItemRemoved(position)
-                Toast.makeText(this, "${place.name} removed", Toast.LENGTH_SHORT).show()
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Failed to remove place: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
+        dbRef.removeValue().addOnSuccessListener {
+            activities.removeAt(position)
+            adapter.notifyItemRemoved(position)
+            Toast.makeText(this, "${place.name} removed", Toast.LENGTH_SHORT).show()
+        }.addOnFailureListener { e ->
+            Toast.makeText(this, "Failed to remove place: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
     }
 
-    // ---------------- Toggle completion ----------------
     private fun toggleCompletion(place: PlaceInfo) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val key = place.firebaseKey ?: return
         val dbRef = database.getReference("$userId/Itineraries/$itineraryId/$selectedDay/$key")
 
-        val updatedPlace = place.copy(completed = !place.completed)
-        val index = activities.indexOfFirst { it.firebaseKey == place.firebaseKey }
-
-        if (index != -1) {
-            activities[index] = updatedPlace
-            adapter.notifyItemChanged(index)
-        }
-
-        dbRef.child("completed").setValue(updatedPlace.completed)
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Failed to update: ${e.message}", Toast.LENGTH_SHORT).show()
+        val newCompleted = !(place.completed ?: false)
+        dbRef.child("completed").setValue(newCompleted).addOnSuccessListener {
+            val index = activities.indexOfFirst { it.firebaseKey == key }
+            if (index != -1) {
+                activities[index] = place.copy(completed = newCompleted)
+                adapter.notifyItemChanged(index)
             }
+        }.addOnFailureListener { e ->
+            Toast.makeText(this, "Failed to update: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
     }
 
-    // ---------------- Helper ----------------
     private fun getUserId(): String? = FirebaseAuth.getInstance().currentUser?.uid
 }
