@@ -201,7 +201,7 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val dbRef = FirebaseDatabase.getInstance(
             "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
-        ).getReference("$userId/Itineraries/$itineraryName/$dayKey")
+        ).getReference("$userId/Itineraries/$itineraryId/$dayKey")
 
         dbRef.push().setValue(place)
             .addOnSuccessListener {
