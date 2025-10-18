@@ -119,24 +119,23 @@ class ItineraryActivity : AppCompatActivity() {
     }
 
     // --- Add itinerary using unique ID (no overwriting) ---
-    // --- Add itinerary using itinerary name as the key ---
     private fun addItinerary(name: String, days: Int) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val dbRef = FirebaseDatabase.getInstance(
             "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
         ).getReference("$userId/Itineraries")
 
-        // Create the structure with the itinerary name as the parent
-        val itineraryData = mutableMapOf<String, Any>()
-        itineraryData["days"] = days
+        val itineraryId = dbRef.push().key ?: return  // unique ID
 
-        // Create empty "Day 1", "Day 2", etc.
+        val itineraryMap = mutableMapOf<String, Any>()
+        itineraryMap["id"] = itineraryId
+        itineraryMap["name"] = name
+        itineraryMap["days"] = days
         for (i in 1..days) {
-            itineraryData["Day $i"] = mapOf<String, Any>()
+            itineraryMap["day_$i"] = mapOf<String, Any>()
         }
 
-        // Save under the itinerary *name* instead of auto ID
-        dbRef.child(name).setValue(itineraryData)
+        dbRef.child(itineraryId).setValue(itineraryMap)
             .addOnSuccessListener {
                 Toast.makeText(
                     this,
@@ -154,7 +153,6 @@ class ItineraryActivity : AppCompatActivity() {
     }
 
     // --- Load itineraries with ID + name ---
-    // --- Load itineraries (using itinerary name as the key) ---
     private fun loadItineraries() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val dbRef = FirebaseDatabase.getInstance(
@@ -164,13 +162,11 @@ class ItineraryActivity : AppCompatActivity() {
         dbRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 itineraries.clear()
-                for (itinerarySnapshot in snapshot.children) {
-                    val name = itinerarySnapshot.key // now the name is the key
-                    val days = itinerarySnapshot.child("days").getValue(Int::class.java) ?: 0
-
-                    if (!name.isNullOrEmpty()) {
-                        // Use name as ID as well (since it’s the unique key)
-                        itineraries.add(Itinerary(id = name, name = name, days = days))
+                for (child in snapshot.children) {
+                    val id = child.child("id").getValue(String::class.java)
+                    val name = child.child("name").getValue(String::class.java)
+                    if (!id.isNullOrEmpty() && !name.isNullOrEmpty()) {
+                        itineraries.add(Itinerary(id = id, name = name))
                     }
                 }
                 adapter.notifyDataSetChanged()
