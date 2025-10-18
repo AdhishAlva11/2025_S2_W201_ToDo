@@ -1,5 +1,6 @@
 package com.autgroup.s2025.w201.todo.activities
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.autgroup.s2025.w201.todo.R
 import com.autgroup.s2025.w201.todo.ThemeUtils
+import com.autgroup.s2025.w201.todo.LocaleUtils
 import com.autgroup.s2025.w201.todo.adapters.FavouritesAdapter
 import com.autgroup.s2025.w201.todo.classes.Favourite
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -28,7 +30,13 @@ class FavouritesActivity : AppCompatActivity() {
     private lateinit var firebaseAuth: FirebaseAuth
     private lateinit var spinnerCountryFilter: Spinner
 
+    // ensure locale is applied before onCreate()
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleUtils.applySavedLocale(newBase))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Apply saved theme for dark/light mode
         ThemeUtils.applySavedTheme(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_favourites)
@@ -36,7 +44,6 @@ class FavouritesActivity : AppCompatActivity() {
         firebaseAuth = FirebaseAuth.getInstance()
         spinnerCountryFilter = findViewById(R.id.spinnerCountryFilter)
 
-        // Adapter must use filteredList!
         recyclerView = findViewById(R.id.recyclerFavourites)
         favouritesAdapter = FavouritesAdapter(filteredList)
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -46,9 +53,11 @@ class FavouritesActivity : AppCompatActivity() {
         loadFavourites()
     }
 
+    /** Sets up the bottom navigation bar to switch between pages */
     private fun setupBottomNavigation() {
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNav)
         bottomNav.selectedItemId = R.id.nav_favourites
+
         bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_home -> {
@@ -72,6 +81,7 @@ class FavouritesActivity : AppCompatActivity() {
         }
     }
 
+    /** Loads user's favourites from Firebase */
     private fun loadFavourites() {
         val userId = firebaseAuth.currentUser?.uid ?: return
         val favouritesRef = FirebaseDatabase.getInstance(
@@ -84,27 +94,23 @@ class FavouritesActivity : AppCompatActivity() {
 
                 for (childSnapshot in snapshot.children) {
                     val favourite = childSnapshot.getValue(Favourite::class.java)
-
                     favourite?.let {
-                        // ✅ Extract country from the address string
                         val parts = it.address?.split(",")?.map { part -> part.trim() }
                         if (!parts.isNullOrEmpty()) {
-                            it.country = parts.last() // Last element is usually the country
+                            it.country = parts.last()
                         }
-
                         favouritesList.add(it)
                     }
                 }
 
                 setupCountryFilter()
-                applyFilter("All")
+                applyFilter(getString(R.string.all_label))
             }
-
 
             override fun onCancelled(error: DatabaseError) {
                 Toast.makeText(
                     this@FavouritesActivity,
-                    "Failed to load favourites: ${error.message}",
+                    getString(R.string.failed_load_favourites, error.message),
                     Toast.LENGTH_SHORT
                 ).show()
                 Log.e("FavouritesActivity", "Firebase error: ${error.message}")
@@ -112,14 +118,21 @@ class FavouritesActivity : AppCompatActivity() {
         })
     }
 
+    /** Populates the country spinner dynamically */
     private fun setupCountryFilter() {
         val countries = favouritesList.mapNotNull { it.country }.distinct().sorted()
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, listOf("All") + countries)
+        val adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_item,
+            listOf(getString(R.string.all_label)) + countries
+        )
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerCountryFilter.adapter = adapter
 
         spinnerCountryFilter.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+            override fun onItemSelected(
+                parent: AdapterView<*>, view: View?, position: Int, id: Long
+            ) {
                 val selected = parent.getItemAtPosition(position) as String
                 applyFilter(selected)
             }
@@ -128,20 +141,25 @@ class FavouritesActivity : AppCompatActivity() {
         }
     }
 
+    /** Filters the favourites list by selected country */
     private fun applyFilter(selectedCountry: String) {
         filteredList.clear()
-        if (selectedCountry == "All") {
+        if (selectedCountry == getString(R.string.all_label)) {
             filteredList.addAll(favouritesList)
         } else {
             filteredList.addAll(favouritesList.filter { it.country == selectedCountry })
         }
 
-        // Sort by country then name
-        filteredList.sortWith(compareBy({ it.country?.lowercase() ?: "" }, { it.name?.lowercase() ?: "" }))
+        filteredList.sortWith(
+            compareBy(
+                { it.country?.lowercase() ?: "" },
+                { it.name?.lowercase() ?: "" }
+            )
+        )
         favouritesAdapter.notifyDataSetChanged()
 
         if (filteredList.isEmpty()) {
-            Toast.makeText(this, "No favourites added yet", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.no_favourites_message), Toast.LENGTH_SHORT).show()
         }
     }
 }

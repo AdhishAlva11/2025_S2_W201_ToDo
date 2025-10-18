@@ -8,7 +8,7 @@
     android:background="?android:attr/windowBackground"
     tools:context=".activities.SettingsActivity">
 
-    <!-- Top AppBar (Toolbar styled like Profile screen) -->
+    <!-- Top AppBar -->
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -29,7 +29,7 @@
                 android:layout_gravity="start"
                 android:background="@android:color/transparent"
                 android:src="@drawable/ic_arrow_back"
-                android:contentDescription="Back"
+                android:contentDescription="@string/back_button"
                 android:padding="8dp"
                 app:tint="@android:color/white" />
 
@@ -37,7 +37,7 @@
                 android:id="@+id/toolbar_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Settings"
+                android:text="@string/settings_title"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:textColor="@android:color/white"
@@ -45,7 +45,7 @@
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- Main scrollable settings content -->
+    <!-- Scrollable content -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -73,7 +73,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Dark Mode"
+                    android:text="@string/dark_mode"
                     android:textSize="18sp"
                     android:textColor="?android:attr/textColorPrimary" />
 
@@ -83,7 +83,7 @@
                     android:layout_height="wrap_content" />
             </LinearLayout>
 
-            <!-- Language selection dropdown -->
+            <!-- Language dropdown -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -96,7 +96,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Language"
+                    android:text="@string/language"
                     android:textSize="18sp"
                     android:textColor="?android:attr/textColorPrimary" />
 

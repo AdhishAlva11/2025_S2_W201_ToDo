@@ -12,26 +12,26 @@
         android:orientation="vertical"
         android:gravity="center_horizontal">
 
-        <!-- Add to Favourites button -->
+        <!-- Button: Add to Favourites -->
         <Button
             android:id="@+id/addFavouriteButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Add to Favourites"
+            android:text="@string/add_to_favourites"
             android:backgroundTint="?attr/colorPrimary"
             android:textColor="@android:color/white" />
 
-        <!-- Add to Itinerary button -->
+        <!-- Button: Add to Itinerary -->
         <Button
             android:id="@+id/btnAddToItinerary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="Add to Itinerary"
+            android:text="@string/add_to_itinerary"
             android:backgroundTint="?attr/colorPrimary"
             android:textColor="@android:color/white" />
 
-        <!-- Title -->
+        <!-- Title (place name) -->
         <TextView
             android:id="@+id/titleText"
             android:layout_width="match_parent"
@@ -68,29 +68,29 @@
             android:textSize="16sp"
             android:textColor="?android:attr/textColorSecondary" />
 
-        <!-- Price -->
+        <!-- Price Information -->
         <TextView
             android:id="@+id/priceText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="💰 Price info not available"
+            android:text="@string/price_info_unavailable"
             android:textSize="16sp"
             android:textColor="?android:attr/textColorSecondary" />
 
-        <!-- Reviews header -->
+        <!-- Reviews Header -->
         <TextView
             android:id="@+id/reviewsHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:paddingBottom="4dp"
-            android:text="Reviews"
+            android:text="@string/reviews_header"
             android:textStyle="bold"
             android:textSize="16sp"
             android:textColor="?android:attr/textColorPrimary" />
 
-        <!-- Reviews content -->
+        <!-- Reviews Content -->
         <TextView
             android:id="@+id/reviewsText"
             android:layout_width="match_parent"

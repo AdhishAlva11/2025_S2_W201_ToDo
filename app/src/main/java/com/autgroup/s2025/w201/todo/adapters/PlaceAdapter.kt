@@ -36,12 +36,12 @@ class PlaceAdapter(
 
     override fun onBindViewHolder(holder: PlaceViewHolder, position: Int) {
         val place = places[position]
+        val context = holder.itemView.context
 
-        // Display place details
-        holder.txtName.text = place.name ?: ""
-        holder.txtAddress.text = place.address ?: ""
-        holder.txtStatus.text = place.openStatus ?: ""
-        holder.txtRating.text = place.rating?.let { "$it ⭐" } ?: "N/A"
+        holder.txtName.text = place.name ?: context.getString(R.string.unnamed)
+        holder.txtAddress.text = place.address ?: context.getString(R.string.not_available)
+        holder.txtStatus.text = place.openStatus ?: context.getString(R.string.not_available)
+        holder.txtRating.text = place.rating?.toString() ?: context.getString(R.string.not_available)
 
         // Set checkbox and strike-through
         holder.chkCompleted.isChecked = place.completed

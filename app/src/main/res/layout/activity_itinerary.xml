@@ -8,7 +8,7 @@
     android:background="?android:attr/windowBackground"
     tools:context=".activities.ItineraryActivity">
 
-    <!-- App Bar with Title -->
+    <!-- Top App Bar -->
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -21,20 +21,20 @@
             android:background="?attr/colorPrimary"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-            <!-- Centered Title -->
+            <!-- Centered title -->
             <TextView
                 android:id="@+id/toolbar_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="Itineraries"
+                android:text="@string/itineraries"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:textColor="@android:color/white" />
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- Main content area -->
+    <!-- Scrollable main content -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -49,12 +49,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            android:text="+ Add Itinerary"
+            android:text="@string/add_itinerary"
             android:textColor="?attr/colorPrimary"
             android:textSize="16sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:contentDescription="@string/add_itinerary" />
 
-        <!-- Filter spinner -->
+        <!-- Filter section -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -66,24 +67,26 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:paddingEnd="8dp"
-                android:text="Filter:"
+                android:text="@string/filter_label"
                 android:textColor="?android:attr/textColorPrimary" />
 
             <Spinner
                 android:id="@+id/spinnerFilter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:entries="@array/itinerary_filters" />
+                android:entries="@array/itinerary_filters"
+                android:contentDescription="@string/filter_label" />
         </LinearLayout>
 
-        <!-- RecyclerView for itineraries -->
+        <!-- RecyclerView list -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerItineraries"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:clipToPadding="false"
-            android:paddingBottom="8dp" />
+            android:paddingBottom="8dp"
+            android:contentDescription="@string/itineraries" />
     </LinearLayout>
 
     <!-- Bottom navigation -->
@@ -94,6 +97,5 @@
         android:layout_gravity="bottom"
         android:background="?attr/colorSurface"
         app:menu="@menu/bottom_nav_menu"
-        app:labelVisibilityMode="labeled"/>
-
+        app:labelVisibilityMode="labeled" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
