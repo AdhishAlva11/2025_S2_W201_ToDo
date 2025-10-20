@@ -47,8 +47,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
+            android:textColor="@color/purple_500"
             android:textSize="16sp"
-            android:textColor="?android:attr/textColorSecondary" />
+            android:clickable="true"
+            android:focusable="true" />
 
         <!-- Rating -->
         <TextView

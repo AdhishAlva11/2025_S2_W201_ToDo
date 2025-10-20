@@ -1,6 +1,8 @@
 package com.autgroup.s2025.w201.todo.activities
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -75,6 +77,26 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
             "${review.authorName} ⭐${review.rating}\n${review.text}"
         } ?: getString(R.string.no_reviews_available)
 
+        // ✅ --- Make address clickable to open in Google Maps ---
+        addressText.setOnClickListener {
+            if (place.lat != null && place.lng != null) {
+                // Open Google Maps at the specific coordinates
+                val gmmIntentUri = Uri.parse("geo:${place.lat},${place.lng}?q=${Uri.encode(place.address)}")
+                val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+                mapIntent.setPackage("com.google.android.apps.maps")
+
+                try {
+                    startActivity(mapIntent)
+                } catch (e: Exception) {
+                    // Fallback: open in browser if Maps app isn’t available
+                    val webUri = Uri.parse("https://www.google.com/maps/search/?api=1&query=${Uri.encode(place.address)}")
+                    startActivity(Intent(Intent.ACTION_VIEW, webUri))
+                }
+            } else {
+                Toast.makeText(context, getString(R.string.invalid_coordinates), Toast.LENGTH_SHORT).show()
+            }
+        }
+
         firebaseAuth = FirebaseAuth.getInstance()
 
         // --- Add to favourites ---
@@ -130,14 +152,10 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
             val itineraryNames = mutableListOf<String>()
             val itineraryIds = mutableListOf<String>()
 
-            // Collect both ID and display name
             for (child in snapshot.children) {
                 val id = child.key ?: continue
                 val name = child.child("name").getValue(String::class.java)
-
-                // Skip any nodes that don't have a valid name or look like a day subnode
                 if (name.isNullOrBlank() || id.startsWith("day_", true)) continue
-
                 itineraryIds.add(id)
                 itineraryNames.add(name)
             }
@@ -167,18 +185,18 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
 
         dbRef.get().addOnSuccessListener { snapshot ->
             val daysCount = snapshot.child("days").getValue(Int::class.java)
-            val daysList = mutableListOf<Pair<String, String>>() // Pair<dayKey, dayLabel>
+            val daysList = mutableListOf<Pair<String, String>>()
 
             if (daysCount != null && daysCount > 0) {
                 for (i in 1..daysCount) {
-                    val dayKey = "Day$i"                                // DB key
-                    val dayLabel = getString(R.string.day_number, i)    // Localized label
+                    val dayKey = "Day$i"
+                    val dayLabel = getString(R.string.day_number, i)
                     daysList.add(Pair(dayKey, dayLabel))
                 }
             } else {
                 for (child in snapshot.children) {
                     val key = child.key ?: continue
-                    if (key.startsWith("Day", ignoreCase = true)) {    // match DB keys
+                    if (key.startsWith("Day", ignoreCase = true)) {
                         val num = key.removePrefix("Day").toIntOrNull() ?: 1
                         val dayLabel = getString(R.string.day_number, num)
                         daysList.add(Pair(key, dayLabel))
