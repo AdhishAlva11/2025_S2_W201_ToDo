@@ -237,68 +237,16 @@
     <!--Bottom Info String file-->
     <string name="no_itineraries_found">No itineraries found</string>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     <string-array name="radius_options">
         <item>1000</item>
         <item>3000</item>
         <item>5000</item>
     </string-array>
+
+    <string name="share_location">Share Location</string>
+
+    <string name="unknown_place">Unknown Place</string>
+    <string name="share_message">Check out %1$s! Here’s the location: %2$s</string>
+    <string name="share_via">Share via</string>
 
 </resources>

@@ -64,6 +64,7 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
         val priceText = view.findViewById<TextView>(R.id.priceText)
         val addFavButton = view.findViewById<Button>(R.id.addFavouriteButton)
         val addToItineraryBtn = view.findViewById<Button>(R.id.btnAddToItinerary)
+        val shareLocationBtn = view.findViewById<Button>(R.id.btnShareLocation)
 
         // --- Populate place info ---
         titleText.text = place.name ?: getString(R.string.no_name)
@@ -105,6 +106,27 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
         // --- Add to itinerary ---
         addToItineraryBtn.setOnClickListener {
             showChooseItineraryDialog(place)
+        }
+
+        // --- Share location link ---
+        shareLocationBtn.setOnClickListener {
+            val placeName = place.name ?: getString(R.string.unknown_place)
+            val placeAddress = place.address ?: return@setOnClickListener
+
+            // Create a Google Maps link
+            val mapsLink = "https://www.google.com/maps/search/?api=1&query=${placeAddress.replace(" ", "+")}"
+
+            // Create share intent
+            val shareIntent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(
+                    android.content.Intent.EXTRA_TEXT,
+                    getString(R.string.share_message, placeName, mapsLink)
+                )
+            }
+
+            // Launch share chooser
+            startActivity(android.content.Intent.createChooser(shareIntent, getString(R.string.share_via)))
         }
     }
 

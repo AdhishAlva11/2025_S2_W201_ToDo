@@ -237,6 +237,10 @@
     <!--Bottom Info String file-->
     <string name="no_itineraries_found">未找到行程</string>
 
+    <string name="share_location">分享位置</string>
+    <string name="unknown_place">未知地点</string>
+    <string name="share_message">查看 %1$s！位置在这里：%2$s</string>
+    <string name="share_via">通过以下方式分享</string>
 
 
 
