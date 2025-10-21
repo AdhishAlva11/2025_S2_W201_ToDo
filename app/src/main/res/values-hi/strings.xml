@@ -236,6 +236,12 @@
     <!--Bottom Info String file-->
     <string name="no_itineraries_found">कोई यात्रा कार्यक्रम नहीं मिला</string>
 
+    <!-- Distance & Duration Display -->
+    <!-- दूरी और समय प्रदर्शित करें -->
+    <string name="distance_duration_format">%1$s • %2$s</string>
+    <string name="distance_not_available">दूरी उपलब्ध नहीं है</string>
+
+
 
 
 

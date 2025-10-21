@@ -44,15 +44,16 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
         ThemeUtils.applySavedTheme(this)
         super.onCreate(savedInstanceState)
 
-        // Reapply locale context immediately after activity creation
+        // Reapply locale immediately after activity creation
         LocaleUtils.applySavedLocale(this)
 
         setContentView(R.layout.activity_display_map)
 
+        // Setup toolbar
         setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
-        // --- Build language-aware interest → Google Places type map ---
+        // --- Map interests (localized to Google types) ---
         val interestToType = mapOf(
             getString(R.string.restaurants)        to "restaurant",
             getString(R.string.walking)            to "park",
@@ -62,7 +63,7 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
             getString(R.string.culture)            to "museum"
         )
 
-        // --- Search bar click opens SearchActivity ---
+        // --- Search bar opens SearchActivity ---
         findViewById<EditText>(R.id.search_bar).setOnClickListener {
             startActivity(Intent(this, SearchActivity::class.java))
         }
@@ -76,12 +77,11 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
                 R.id.nav_favourites -> startActivity(Intent(this, FavouritesActivity::class.java))
                 R.id.nav_itinerary -> startActivity(Intent(this, ItineraryActivity::class.java))
                 R.id.nav_profile -> startActivity(Intent(this, ProfileActivity::class.java))
-                else -> false
             }
             true
         }
 
-        // --- Load search data from intent ---
+        // --- Load search data from Intent ---
         searchData = intent.getSerializableExtra("searchData") as? Search
         if (searchData == null) {
             Toast.makeText(this, getString(R.string.no_location_data), Toast.LENGTH_SHORT).show()
@@ -89,7 +89,7 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
             return
         }
 
-        // --- Setup map fragment ---
+        // --- Setup Google Map fragment ---
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.mapFragment) as SupportMapFragment
         mapFragment.getMapAsync { map ->
@@ -102,7 +102,7 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
             searchData?.interests?.joinToString(", ")
     }
 
-    // --- Internal map setup helper ---
+    // --- Internal helper for map setup ---
     private fun onMapReadyInternal(map: GoogleMap, interestToType: Map<String, String>) {
         val lat = searchData?.lat
         val lng = searchData?.lng
@@ -133,7 +133,7 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
             Toast.makeText(this, getString(R.string.invalid_coordinates), Toast.LENGTH_SHORT).show()
         }
 
-        // Marker click shows bottom sheet
+        // --- Marker click opens BottomSheet ---
         map.setOnMarkerClickListener { marker ->
             val info = marker.tag as? PlaceInfo
             if (info != null) {
@@ -150,9 +150,7 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
         val radius = searchData?.radius ?: 3000
         val tokenParam = if (pageToken != null) "&pagetoken=$pageToken" else ""
 
-        // Use default locale (always correct after LocaleUtils is applied)
         val currentLang = Locale.getDefault().language
-
         val url =
             "https://maps.googleapis.com/maps/api/place/nearbysearch/json" +
                     "?location=${location.latitude},${location.longitude}" +
@@ -161,6 +159,7 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
                     "$tokenParam&key=$apiKey"
 
         val request = Request.Builder().url(url).build()
+
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 Log.e("PlacesAPI", getString(R.string.request_failed), e)
@@ -175,19 +174,19 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
                     for (i in 0 until results.length()) {
                         val place = results.getJSONObject(i)
                         val placeId = place.getString("place_id")
+
+                        // Fetch details for each place
                         fetchPlaceDetails(placeId, currentLang) { placeInfo ->
-                            runOnUiThread {
-                                val markerPos = LatLng(placeInfo.lat!!, placeInfo.lng!!)
-                                val marker = googleMap.addMarker(
-                                    MarkerOptions().position(markerPos).title(placeInfo.name)
-                                )
-                                marker?.tag = placeInfo
-                            }
+                            val markerPos = LatLng(placeInfo.lat!!, placeInfo.lng!!)
+                            val marker = googleMap.addMarker(
+                                MarkerOptions().position(markerPos).title(placeInfo.name)
+                            )
+                            marker?.tag = placeInfo
                         }
                     }
                 }
 
-                // Handle next page token (pagination)
+                // Handle pagination (next_page_token)
                 val nextPageToken = json.optString("next_page_token", null)
                 if (!nextPageToken.isNullOrEmpty()) {
                     Handler(Looper.getMainLooper()).postDelayed({
@@ -198,7 +197,7 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
         })
     }
 
-    // --- Fetch place details (localized) ---
+    // --- Fetch place details and map them into PlaceInfo ---
     private fun fetchPlaceDetails(placeId: String, language: String, onResult: (PlaceInfo) -> Unit) {
         val apiKey = getString(R.string.project_google_api_key)
         val url = "https://maps.googleapis.com/maps/api/place/details/json" +
@@ -208,6 +207,7 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
                 "&key=$apiKey"
 
         val request = Request.Builder().url(url).build()
+
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 Log.e("PlaceDetailsAPI", getString(R.string.request_failed), e)
@@ -264,7 +264,7 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
         })
     }
 
-    // Required override (delegates to our helper)
+    // --- MapReady override (delegates to helper) ---
     override fun onMapReady(map: GoogleMap) {
         // handled via onCreate’s getMapAsync callback
     }

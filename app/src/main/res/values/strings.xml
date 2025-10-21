@@ -238,6 +238,11 @@
     <string name="no_itineraries_found">No itineraries found</string>
 
 
+    <!-- Distance & Duration Display -->
+    <string name="distance_duration_format">%1$s • %2$s</string>
+    <string name="distance_not_available">Distance not available</string>
+
+
 
 
 

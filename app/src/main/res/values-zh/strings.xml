@@ -237,6 +237,11 @@
     <!--Bottom Info String file-->
     <string name="no_itineraries_found">未找到行程</string>
 
+    <!-- Distance & Duration Display -->
+    <string name="distance_duration_format">%1$s • %2$s</string>
+    <string name="distance_not_available">无法获取距离</string>
+
+
 
 
 

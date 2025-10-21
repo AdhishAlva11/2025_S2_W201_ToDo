@@ -18,6 +18,9 @@ import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
+import org.json.JSONObject
+import java.net.HttpURLConnection
+import java.net.URL
 import java.util.*
 
 class SearchActivity : AppCompatActivity() {
@@ -37,16 +40,13 @@ class SearchActivity : AppCompatActivity() {
 
         val apiKey = getString(R.string.project_google_api_key)
 
-        // Initialize Google Places with your app’s locale (API 23+ compatible)
+        // Initialize Google Places with the correct locale
         if (!Places.isInitialized()) {
             val currentLocale: Locale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                // For Android 7.0 and above
                 LocaleUtils.applySavedLocale(this).resources.configuration.locales[0]
             } else {
-                // For Android 6.0 and below
                 LocaleUtils.applySavedLocale(this).resources.configuration.locale
             }
-
             Places.initialize(applicationContext, apiKey, currentLocale)
         }
 
@@ -89,13 +89,32 @@ class SearchActivity : AppCompatActivity() {
                 val searchData = buildSearchFromUI(currentPlace)
                 val intent = Intent(this, DisplayMapActivity::class.java)
                 intent.putExtra("searchData", searchData)
+
+                // --- New: Calculate distance before showing map ---
+                val destLat = currentPlace?.latLng?.latitude
+                val destLng = currentPlace?.latLng?.longitude
+
+                if (destLat != null && destLng != null) {
+                    // Example: your base point (replace later with user location)
+                    val originLat = -36.8485  // Auckland CBD latitude
+                    val originLng = 174.7633  // Auckland CBD longitude
+
+                    calculateDistanceAndTime(originLat, originLng, destLat, destLng) { distance, duration ->
+                        Toast.makeText(
+                            this,
+                            "Distance: $distance\nTime: $duration",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+
                 startActivity(intent)
             }
         }
     }
 
+    // --- Helper to build Search data object ---
     private fun buildSearchFromUI(place: Place?): Search {
-        // Use localized strings so filtering is consistent with app language
         val selectedInterests = listOf(
             R.id.checkboxFood   to getString(R.string.restaurants),
             R.id.checkboxWalking to getString(R.string.walking),
@@ -111,5 +130,43 @@ class SearchActivity : AppCompatActivity() {
         val selectedRadius = radiusSpinner.selectedItem?.toString()?.toIntOrNull() ?: 5000
 
         return Search.fromPlaceAndInterests(place, selectedInterests, selectedRadius)
+    }
+
+    // --- New helper: Calculate distance & time between two coordinates ---
+    private fun calculateDistanceAndTime(
+        originLat: Double,
+        originLng: Double,
+        destLat: Double,
+        destLng: Double,
+        callback: (String, String) -> Unit
+    ) {
+        val apiKey = getString(R.string.project_google_api_key)
+        val url = "https://maps.googleapis.com/maps/api/directions/json?" +
+                "origin=$originLat,$originLng&destination=$destLat,$destLng&key=$apiKey"
+
+        Thread {
+            try {
+                val conn = URL(url).openConnection() as HttpURLConnection
+                conn.requestMethod = "GET"
+                val result = conn.inputStream.bufferedReader().use { it.readText() }
+
+                val json = JSONObject(result)
+                val routes = json.getJSONArray("routes")
+                if (routes.length() > 0) {
+                    val legs = routes.getJSONObject(0).getJSONArray("legs").getJSONObject(0)
+                    val distance = legs.getJSONObject("distance").getString("text")
+                    val duration = legs.getJSONObject("duration").getString("text")
+
+                    runOnUiThread {
+                        callback(distance, duration)
+                    }
+                } else {
+                    runOnUiThread { callback("N/A", "N/A") }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                runOnUiThread { callback("Error", "Error") }
+            }
+        }.start()
     }
 }

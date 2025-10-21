@@ -17,10 +17,15 @@ import com.autgroup.s2025.w201.todo.classes.PlaceInfo
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import org.json.JSONObject
+import java.util.*
 
 class BottomSheetInfo : BottomSheetDialogFragment() {
 
     private lateinit var firebaseAuth: FirebaseAuth
+    private val client = OkHttpClient()
 
     // --- Correct locale handling for Fragments ---
     override fun onAttach(context: Context) {
@@ -66,6 +71,7 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
         val priceText = view.findViewById<TextView>(R.id.priceText)
         val addFavButton = view.findViewById<Button>(R.id.addFavouriteButton)
         val addToItineraryBtn = view.findViewById<Button>(R.id.btnAddToItinerary)
+        val distanceText = view.findViewById<TextView>(R.id.txtDistance) // Add this TextView in XML
 
         // --- Populate place info ---
         titleText.text = place.name ?: getString(R.string.no_name)
@@ -77,18 +83,28 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
             "${review.authorName} ⭐${review.rating}\n${review.text}"
         } ?: getString(R.string.no_reviews_available)
 
-        // ✅ --- Make address clickable to open in Google Maps ---
+        // --- NEW: Calculate and show distance/time ---
+        val userLat = -36.8485   // You can later replace with actual current location
+        val userLng = 174.7633
+        if (place.lat != null && place.lng != null) {
+            calculateDistanceAndTime(userLat, userLng, place.lat, place.lng) { distance, duration ->
+                distanceText.text = getString(R.string.distance_duration_format, distance, duration)
+            }
+        } else {
+            distanceText.text = getString(R.string.distance_not_available)
+        }
+
+        // --- Make address clickable to open in Google Maps ---
         addressText.setOnClickListener {
             if (place.lat != null && place.lng != null) {
-                // Open Google Maps at the specific coordinates
-                val gmmIntentUri = Uri.parse("geo:${place.lat},${place.lng}?q=${Uri.encode(place.address)}")
+                val gmmIntentUri =
+                    Uri.parse("geo:${place.lat},${place.lng}?q=${Uri.encode(place.address)}")
                 val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
                 mapIntent.setPackage("com.google.android.apps.maps")
 
                 try {
                     startActivity(mapIntent)
                 } catch (e: Exception) {
-                    // Fallback: open in browser if Maps app isn’t available
                     val webUri = Uri.parse("https://www.google.com/maps/search/?api=1&query=${Uri.encode(place.address)}")
                     startActivity(Intent(Intent.ACTION_VIEW, webUri))
                 }
@@ -139,6 +155,43 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
             4 -> getString(R.string.price_very_expensive)
             else -> getString(R.string.price_not_available)
         }
+    }
+
+    // --- Helper: Calculate Distance + Duration (Google Directions API) ---
+    private fun calculateDistanceAndTime(
+        originLat: Double,
+        originLng: Double,
+        destLat: Double,
+        destLng: Double,
+        callback: (String, String) -> Unit
+    ) {
+        val apiKey = getString(R.string.project_google_api_key)
+        val url = "https://maps.googleapis.com/maps/api/directions/json?" +
+                "origin=$originLat,$originLng&destination=$destLat,$destLng&key=$apiKey"
+
+        Thread {
+            try {
+                val request = Request.Builder().url(url).build()
+                val response = client.newCall(request).execute()
+                val result = response.body?.string() ?: return@Thread
+                val json = JSONObject(result)
+                val routes = json.optJSONArray("routes")
+                if (routes != null && routes.length() > 0) {
+                    val legs = routes.getJSONObject(0).getJSONArray("legs").getJSONObject(0)
+                    val distance = legs.getJSONObject("distance").getString("text")
+                    val duration = legs.getJSONObject("duration").getString("text")
+
+                    activity?.runOnUiThread {
+                        callback(distance, duration)
+                    }
+                } else {
+                    activity?.runOnUiThread { callback("N/A", "N/A") }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                activity?.runOnUiThread { callback("Error", "Error") }
+            }
+        }.start()
     }
 
     // --- Step 1: Choose itinerary ---
