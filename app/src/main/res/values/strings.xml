@@ -249,4 +249,8 @@
     <string name="share_message">Check out %1$s! Here’s the location: %2$s</string>
     <string name="share_via">Share via</string>
 
+    <string name="calculating_distance">Calculating distance...</string>
+    <string name="distance_and_time">Distance: %1$s • Time: %2$s</string>
+    <string name="distance_unavailable">Distance unavailable</string>
+
 </resources>

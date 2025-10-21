@@ -34,40 +34,30 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var googleMap: GoogleMap
     private val client = OkHttpClient()
 
-    // --- Apply saved locale before anything else ---
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(LocaleUtils.applySavedLocale(newBase))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Apply saved theme first
         ThemeUtils.applySavedTheme(this)
         super.onCreate(savedInstanceState)
-
-        // Reapply locale context immediately after activity creation
-        LocaleUtils.applySavedLocale(this)
-
         setContentView(R.layout.activity_display_map)
 
+        // Toolbar
         setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
-        // --- Build language-aware interest → Google Places type map ---
-        val interestToType = mapOf(
-            getString(R.string.restaurants)        to "restaurant",
-            getString(R.string.walking)            to "park",
-            getString(R.string.sports)             to "stadium",
-            getString(R.string.landmarks)          to "tourist_attraction",
-            getString(R.string.family_attractions) to "amusement_park",
-            getString(R.string.culture)            to "museum"
-        )
+        // Map fragment
+        val mapFragment = supportFragmentManager
+            .findFragmentById(R.id.mapFragment) as SupportMapFragment
+        mapFragment.getMapAsync(this)
 
-        // --- Search bar click opens SearchActivity ---
+        // Search bar opens SearchActivity
         findViewById<EditText>(R.id.search_bar).setOnClickListener {
             startActivity(Intent(this, SearchActivity::class.java))
         }
 
-        // --- Bottom navigation setup ---
+        // Bottom navigation
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_navigation)
         bottomNav.selectedItemId = R.id.nav_home
         bottomNav.setOnItemSelectedListener { item ->
@@ -76,12 +66,11 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
                 R.id.nav_favourites -> startActivity(Intent(this, FavouritesActivity::class.java))
                 R.id.nav_itinerary -> startActivity(Intent(this, ItineraryActivity::class.java))
                 R.id.nav_profile -> startActivity(Intent(this, ProfileActivity::class.java))
-                else -> false
             }
             true
         }
 
-        // --- Load search data from intent ---
+        // Load search data from intent
         searchData = intent.getSerializableExtra("searchData") as? Search
         if (searchData == null) {
             Toast.makeText(this, getString(R.string.no_location_data), Toast.LENGTH_SHORT).show()
@@ -89,76 +78,75 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
             return
         }
 
-        // --- Setup map fragment ---
-        val mapFragment = supportFragmentManager
-            .findFragmentById(R.id.mapFragment) as SupportMapFragment
-        mapFragment.getMapAsync { map ->
-            googleMap = map
-            onMapReadyInternal(googleMap, interestToType)
-        }
-
-        // --- Display selected interests overlay text ---
+        // Show selected interests overlay
         findViewById<TextView>(R.id.interestOverlay).text =
             searchData?.interests?.joinToString(", ")
     }
 
-    // --- Internal map setup helper ---
-    private fun onMapReadyInternal(map: GoogleMap, interestToType: Map<String, String>) {
+    override fun onMapReady(map: GoogleMap) {
+        googleMap = map
         val lat = searchData?.lat
         val lng = searchData?.lng
         val placeName = searchData?.placeName ?: getString(R.string.selected_location)
 
-        if (lat != null && lng != null) {
-            val location = LatLng(lat, lng)
-            map.addMarker(MarkerOptions().position(location).title(placeName))
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 14f))
-
-            // Draw search radius circle
-            map.addCircle(
-                CircleOptions()
-                    .center(location)
-                    .radius(searchData?.radius?.toDouble() ?: 5000.0)
-                    .strokeColor(Color.BLUE)
-                    .fillColor(0x220000FF)
-                    .strokeWidth(2f)
-            )
-
-            // Fetch nearby places for each selected interest
-            searchData?.interests?.forEach { interest ->
-                interestToType[interest]?.let { type ->
-                    fetchNearbyPlaces(location, type)
-                }
-            }
-        } else {
+        if (lat == null || lng == null) {
             Toast.makeText(this, getString(R.string.invalid_coordinates), Toast.LENGTH_SHORT).show()
+            return
         }
 
-        // Marker click shows bottom sheet
-        map.setOnMarkerClickListener { marker ->
+        val location = LatLng(lat, lng)
+        googleMap.addMarker(MarkerOptions().position(location).title(placeName))
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 14f))
+
+        // Draw search radius circle
+        googleMap.addCircle(
+            CircleOptions()
+                .center(location)
+                .radius(searchData?.radius?.toDouble() ?: 5000.0)
+                .strokeColor(Color.BLUE)
+                .fillColor(0x220000FF)
+                .strokeWidth(2f)
+        )
+
+        // Map of interest → Google Places type
+        val interestToType = mapOf(
+            getString(R.string.restaurants) to "restaurant",
+            getString(R.string.walking) to "park",
+            getString(R.string.sports) to "stadium",
+            getString(R.string.landmarks) to "tourist_attraction",
+            getString(R.string.family_attractions) to "amusement_park",
+            getString(R.string.culture) to "museum"
+        )
+
+        // Fetch nearby places
+        searchData?.interests?.forEach { interest ->
+            interestToType[interest]?.let { type ->
+                fetchNearbyPlaces(location, type)
+            }
+        }
+
+        // Marker click listener → show BottomSheetInfo
+        googleMap.setOnMarkerClickListener { marker ->
             val info = marker.tag as? PlaceInfo
             if (info != null) {
-                val bottomSheet = BottomSheetInfo.newInstance(info)
+                val bottomSheet = BottomSheetInfo.newInstance(info, lat, lng)
                 bottomSheet.show(supportFragmentManager, "BottomSheetInfo")
             }
             true
         }
     }
 
-    // --- Fetch nearby places (localized) ---
     private fun fetchNearbyPlaces(location: LatLng, type: String, pageToken: String? = null) {
         val apiKey = getString(R.string.project_google_api_key)
         val radius = searchData?.radius ?: 3000
         val tokenParam = if (pageToken != null) "&pagetoken=$pageToken" else ""
-
-        // Use default locale (always correct after LocaleUtils is applied)
         val currentLang = Locale.getDefault().language
 
         val url =
             "https://maps.googleapis.com/maps/api/place/nearbysearch/json" +
                     "?location=${location.latitude},${location.longitude}" +
                     "&radius=$radius&type=$type" +
-                    "&language=$currentLang" +
-                    "$tokenParam&key=$apiKey"
+                    "&language=$currentLang$tokenParam&key=$apiKey"
 
         val request = Request.Builder().url(url).build()
         client.newCall(request).enqueue(object : Callback {
@@ -175,7 +163,7 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
                     for (i in 0 until results.length()) {
                         val place = results.getJSONObject(i)
                         val placeId = place.getString("place_id")
-                        fetchPlaceDetails(placeId, currentLang) { placeInfo ->
+                        fetchPlaceDetails(placeId) { placeInfo ->
                             runOnUiThread {
                                 val markerPos = LatLng(placeInfo.lat!!, placeInfo.lng!!)
                                 val marker = googleMap.addMarker(
@@ -187,7 +175,7 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
                     }
                 }
 
-                // Handle next page token (pagination)
+                // Next page token
                 val nextPageToken = json.optString("next_page_token", null)
                 if (!nextPageToken.isNullOrEmpty()) {
                     Handler(Looper.getMainLooper()).postDelayed({
@@ -198,14 +186,14 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
         })
     }
 
-    // --- Fetch place details (localized) ---
-    private fun fetchPlaceDetails(placeId: String, language: String, onResult: (PlaceInfo) -> Unit) {
+    private fun fetchPlaceDetails(placeId: String, onResult: (PlaceInfo) -> Unit) {
         val apiKey = getString(R.string.project_google_api_key)
-        val url = "https://maps.googleapis.com/maps/api/place/details/json" +
-                "?place_id=$placeId" +
-                "&fields=name,rating,formatted_address,opening_hours,reviews,geometry,price_level" +
-                "&language=$language" +
-                "&key=$apiKey"
+        val url =
+            "https://maps.googleapis.com/maps/api/place/details/json" +
+                    "?place_id=$placeId" +
+                    "&fields=name,rating,formatted_address,opening_hours,reviews,geometry,price_level" +
+                    "&language=${Locale.getDefault().language}" +
+                    "&key=$apiKey"
 
         val request = Request.Builder().url(url).build()
         client.newCall(request).enqueue(object : Callback {
@@ -262,10 +250,5 @@ class DisplayMapActivity : AppCompatActivity(), OnMapReadyCallback {
                 onResult(placeInfo)
             }
         })
-    }
-
-    // Required override (delegates to our helper)
-    override fun onMapReady(map: GoogleMap) {
-        // handled via onCreate’s getMapAsync callback
     }
 }

@@ -242,6 +242,9 @@
     <string name="share_message">查看 %1$s！位置在这里：%2$s</string>
     <string name="share_via">通过以下方式分享</string>
 
+    <string name="calculating_distance">正在计算距离...</string>
+    <string name="distance_and_time">距离：%1$s • 时间：%2$s</string>
+    <string name="distance_unavailable">无法获取距离</string>
 
 
 

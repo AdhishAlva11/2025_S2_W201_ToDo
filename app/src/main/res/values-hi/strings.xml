@@ -241,6 +241,10 @@
     <string name="share_message">%1$s देखें! यहाँ स्थान है: %2$s</string>
     <string name="share_via">इसके माध्यम से साझा करें</string>
 
+    <string name="calculating_distance">दूरी की गणना की जा रही है...</string>
+    <string name="distance_and_time">दूरी: %1$s • समय: %2$s</string>
+    <string name="distance_unavailable">दूरी उपलब्ध नहीं है</string>
+
 
 
 

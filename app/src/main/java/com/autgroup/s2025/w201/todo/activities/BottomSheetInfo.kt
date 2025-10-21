@@ -7,7 +7,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -17,12 +17,30 @@ import com.autgroup.s2025.w201.todo.classes.PlaceInfo
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import org.json.JSONObject
+import java.net.HttpURLConnection
+import java.net.URL
 
 class BottomSheetInfo : BottomSheetDialogFragment() {
 
     private lateinit var firebaseAuth: FirebaseAuth
 
-    // --- Correct locale handling for Fragments ---
+    companion object {
+        private const val ARG_PLACE = "place"
+        private const val ARG_USER_LAT = "user_lat"
+        private const val ARG_USER_LNG = "user_lng"
+
+        fun newInstance(info: PlaceInfo, userLat: Double, userLng: Double): BottomSheetInfo {
+            val fragment = BottomSheetInfo()
+            val args = Bundle()
+            args.putSerializable(ARG_PLACE, info)
+            args.putDouble(ARG_USER_LAT, userLat)
+            args.putDouble(ARG_USER_LNG, userLng)
+            fragment.arguments = args
+            return fragment
+        }
+    }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         val localizedContext = com.autgroup.s2025.w201.todo.LocaleUtils.applySavedLocale(context)
@@ -31,18 +49,6 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
             newConfig,
             localizedContext.resources.displayMetrics
         )
-    }
-
-    companion object {
-        private const val ARG_PLACE = "place"
-
-        fun newInstance(info: PlaceInfo): BottomSheetInfo {
-            val fragment = BottomSheetInfo()
-            val args = Bundle()
-            args.putSerializable(ARG_PLACE, info)
-            fragment.arguments = args
-            return fragment
-        }
     }
 
     override fun onCreateView(
@@ -57,6 +63,8 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
         ThemeUtils.applySavedTheme(requireContext())
 
         val place = arguments?.getSerializable(ARG_PLACE) as? PlaceInfo ?: return
+        val userLat = arguments?.getDouble(ARG_USER_LAT) ?: 0.0
+        val userLng = arguments?.getDouble(ARG_USER_LNG) ?: 0.0
 
         val titleText = view.findViewById<TextView>(R.id.titleText)
         val addressText = view.findViewById<TextView>(R.id.addressText)
@@ -64,106 +72,131 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
         val openStatusText = view.findViewById<TextView>(R.id.openStatusText)
         val reviewsText = view.findViewById<TextView>(R.id.reviewsText)
         val priceText = view.findViewById<TextView>(R.id.priceText)
-        val addFavButton = view.findViewById<Button>(R.id.addFavouriteButton)
-        val addToItineraryBtn = view.findViewById<Button>(R.id.btnAddToItinerary)
-        val shareLocationBtn = view.findViewById<Button>(R.id.btnShareLocation)
+        val addFavButton = view.findViewById<LinearLayout>(R.id.addFavouriteButton)
+        val addToItineraryBtn = view.findViewById<LinearLayout>(R.id.btnAddToItinerary)
+        val shareLocationBtn = view.findViewById<LinearLayout>(R.id.btnShareLocation)
+        val distanceText = view.findViewById<TextView>(R.id.distanceText)
 
-        // --- Populate place info ---
+        // Populate place info
         titleText.text = place.name ?: getString(R.string.no_name)
         addressText.text = place.address ?: getString(R.string.no_address)
-        ratingText.text = getString(R.string.rating_with_star, place.rating ?: 0.0)
+        ratingText.text = "${place.rating ?: 0.0}"
         openStatusText.text = place.openStatus ?: getString(R.string.hours_unknown)
-        priceText.text = getString(R.string.price_with_symbol, getPriceText(place.priceLevel))
+        priceText.text = getPriceText(place.priceLevel)
         reviewsText.text = place.reviews?.take(3)?.joinToString("\n\n") { review ->
             "${review.authorName} ⭐${review.rating}\n${review.text}"
         } ?: getString(R.string.no_reviews_available)
 
-        // ✅ --- Make address clickable to open in Google Maps ---
+        // Address clickable for Google Maps
         addressText.setOnClickListener {
             if (place.lat != null && place.lng != null) {
-                // Open Google Maps at the specific coordinates
-                val gmmIntentUri = Uri.parse("geo:${place.lat},${place.lng}?q=${Uri.encode(place.address)}")
+                val gmmIntentUri =
+                    Uri.parse("geo:${place.lat},${place.lng}?q=${Uri.encode(place.address)}")
                 val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
                 mapIntent.setPackage("com.google.android.apps.maps")
-
                 try {
                     startActivity(mapIntent)
                 } catch (e: Exception) {
-                    // Fallback: open in browser if Maps app isn’t available
-                    val webUri = Uri.parse("https://www.google.com/maps/search/?api=1&query=${Uri.encode(place.address)}")
+                    val webUri =
+                        Uri.parse("https://www.google.com/maps/search/?api=1&query=${Uri.encode(place.address)}")
                     startActivity(Intent(Intent.ACTION_VIEW, webUri))
                 }
             } else {
-                Toast.makeText(context, getString(R.string.invalid_coordinates), Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, getString(R.string.invalid_coordinates), Toast.LENGTH_SHORT)
+                    .show()
             }
+        }
+
+        // Driving distance & time
+        if (place.lat != null && place.lng != null && userLat != 0.0 && userLng != 0.0) {
+            distanceText.text = getString(R.string.calculating_distance)
+            val apiKey = getString(R.string.project_google_api_key)
+            getDrivingDistance(requireContext(), userLat, userLng, place.lat, place.lng, apiKey) { distance, duration ->
+                distanceText.text =
+                    if (distance != null && duration != null)
+                        getString(R.string.distance_and_time, distance, duration)
+                    else
+                        getString(R.string.distance_unavailable)
+            }
+        } else {
+            distanceText.text = getString(R.string.distance_unavailable)
         }
 
         firebaseAuth = FirebaseAuth.getInstance()
 
-        // --- Add to favourites ---
+        // Add to favourites
         addFavButton.setOnClickListener {
             val userId = firebaseAuth.currentUser?.uid ?: return@setOnClickListener
             val dbRef = FirebaseDatabase.getInstance(
                 "https://todoauthentication-9a630-default-rtdb.firebaseio.com/"
             ).getReference("$userId/Favourites")
-
             dbRef.push().setValue(place)
                 .addOnSuccessListener {
-                    Toast.makeText(
-                        context,
-                        getString(R.string.added_to_favourites),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(context, getString(R.string.added_to_favourites), Toast.LENGTH_SHORT).show()
                     dismiss()
                 }
                 .addOnFailureListener { e ->
-                    Toast.makeText(
-                        context,
-                        getString(R.string.failed_generic, e.message),
-                        Toast.LENGTH_LONG
-                    ).show()
+                    Toast.makeText(context, getString(R.string.failed_generic, e.message), Toast.LENGTH_LONG).show()
                 }
         }
 
-        // --- Add to itinerary ---
-        addToItineraryBtn.setOnClickListener {
-            showChooseItineraryDialog(place)
-        }
+        // Add to itinerary
+        addToItineraryBtn.setOnClickListener { showChooseItineraryDialog(place) }
 
-        // --- Share location link ---
+        // Share location
         shareLocationBtn.setOnClickListener {
-            val placeName = place.name ?: getString(R.string.unknown_place)
-            val placeAddress = place.address ?: return@setOnClickListener
-
-            // Create a Google Maps link
-            val mapsLink = "https://www.google.com/maps/search/?api=1&query=${placeAddress.replace(" ", "+")}"
-
-            // Create share intent
-            val shareIntent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+            val mapsLink =
+                "https://www.google.com/maps/search/?api=1&query=${place.address?.replace(" ", "+")}"
+            val shareIntent = Intent(Intent.ACTION_SEND).apply {
                 type = "text/plain"
-                putExtra(
-                    android.content.Intent.EXTRA_TEXT,
-                    getString(R.string.share_message, placeName, mapsLink)
-                )
+                putExtra(Intent.EXTRA_TEXT, getString(R.string.share_message, place.name ?: "Place", mapsLink))
             }
-
-            // Launch share chooser
-            startActivity(android.content.Intent.createChooser(shareIntent, getString(R.string.share_via)))
+            startActivity(Intent.createChooser(shareIntent, getString(R.string.share_via)))
         }
     }
 
-    private fun getPriceText(level: Int?): String {
-        return when (level) {
-            0 -> getString(R.string.price_free)
-            1 -> getString(R.string.price_inexpensive)
-            2 -> getString(R.string.price_moderate)
-            3 -> getString(R.string.price_expensive)
-            4 -> getString(R.string.price_very_expensive)
-            else -> getString(R.string.price_not_available)
-        }
+    private fun getPriceText(level: Int?): String = when (level) {
+        0 -> getString(R.string.price_free)
+        1 -> getString(R.string.price_inexpensive)
+        2 -> getString(R.string.price_moderate)
+        3 -> getString(R.string.price_expensive)
+        4 -> getString(R.string.price_very_expensive)
+        else -> getString(R.string.price_not_available)
     }
 
-    // --- Step 1: Choose itinerary ---
+    private fun getDrivingDistance(
+        context: Context,
+        originLat: Double,
+        originLng: Double,
+        destLat: Double,
+        destLng: Double,
+        apiKey: String,
+        callback: (distance: String?, duration: String?) -> Unit
+    ) {
+        Thread {
+            try {
+                val url = URL("https://maps.googleapis.com/maps/api/directions/json?" +
+                        "origin=$originLat,$originLng&destination=$destLat,$destLng&mode=driving&key=$apiKey")
+                val connection = url.openConnection() as HttpURLConnection
+                connection.requestMethod = "GET"
+                val response = connection.inputStream.bufferedReader().use { it.readText() }
+                val json = JSONObject(response)
+                val routes = json.getJSONArray("routes")
+                if (routes.length() > 0) {
+                    val legs = routes.getJSONObject(0).getJSONArray("legs")
+                    val distance = legs.getJSONObject(0).getJSONObject("distance").getString("text")
+                    val duration = legs.getJSONObject(0).getJSONObject("duration").getString("text")
+                    (context as android.app.Activity).runOnUiThread { callback(distance, duration) }
+                } else {
+                    (context as android.app.Activity).runOnUiThread { callback(null, null) }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                (context as android.app.Activity).runOnUiThread { callback(null, null) }
+            }
+        }.start()
+    }
+
     private fun showChooseItineraryDialog(place: PlaceInfo) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val dbRef = FirebaseDatabase.getInstance(
@@ -183,7 +216,8 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
             }
 
             if (itineraryIds.isEmpty()) {
-                Toast.makeText(context, getString(R.string.no_itineraries_found), Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, getString(R.string.no_itineraries_found), Toast.LENGTH_SHORT)
+                    .show()
                 return@addOnSuccessListener
             }
 
@@ -198,7 +232,6 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
         }
     }
 
-    // --- Step 2: Choose day ---
     private fun showChooseDayDialog(place: PlaceInfo, itineraryId: String, itineraryName: String) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val dbRef = FirebaseDatabase.getInstance(
@@ -236,7 +269,6 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
         }
     }
 
-    // --- Step 3: Add place to itinerary/day ---
     private fun addActivityToItinerary(
         place: PlaceInfo,
         itineraryId: String,
@@ -266,4 +298,5 @@ class BottomSheetInfo : BottomSheetDialogFragment() {
                 ).show()
             }
     }
+
 }
