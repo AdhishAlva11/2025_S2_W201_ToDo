@@ -236,7 +236,10 @@
     <!--Bottom Info String file-->
     <string name="no_itineraries_found">कोई यात्रा कार्यक्रम नहीं मिला</string>
 
-
+    <string name="share_location">स्थान साझा करें</string>
+    <string name="unknown_place">अज्ञात स्थान</string>
+    <string name="share_message">%1$s देखें! यहाँ स्थान है: %2$s</string>
+    <string name="share_via">इसके माध्यम से साझा करें</string>
 
 
 
