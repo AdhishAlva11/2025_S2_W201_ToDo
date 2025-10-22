@@ -40,8 +40,60 @@ class ProfileActivity : AppCompatActivity() {
 
     // Emergency number mapping by country
     private val emergencyNumbers = mapOf(
-        "NZ" to "111", "AU" to "000", "US" to "911", "IN" to "112",
-        "CN" to "110/120", "JP" to "119/110", "GB" to "999", "SG" to "999/995"
+        "NZ" to "111",            // New Zealand
+        "AU" to "000",            // Australia
+        "US" to "911",            // United States
+        "CA" to "911",            // Canada
+        "GB" to "999",            // United Kingdom
+        "IE" to "999/112",        // Ireland
+        "IN" to "112",            // India
+        "PK" to "15/1122",        // Pakistan
+        "CN" to "110/120",        // China
+        "JP" to "119/110",        // Japan
+        "KR" to "112/119",        // South Korea
+        "SG" to "999/995",        // Singapore
+        "MY" to "999/991",        // Malaysia
+        "TH" to "191/1669",       // Thailand
+        "PH" to "117/911",        // Philippines
+        "ID" to "110/118",        // Indonesia
+        "VN" to "113/115/114",    // Vietnam
+        "BR" to "190/192/193",    // Brazil
+        "AR" to "911/107",        // Argentina
+        "CL" to "131/132",        // Chile
+        "CO" to "123",            // Colombia
+        "MX" to "911",            // Mexico
+        "PE" to "105/106",        // Peru
+        "EC" to "911",            // Ecuador
+        "UY" to "911/103",        // Uruguay
+        "ZA" to "10111/112",      // South Africa
+        "NG" to "112/199",        // Nigeria
+        "EG" to "122/123",        // Egypt
+        "MA" to "19/150",         // Morocco
+        "RU" to "112/102/101",    // Russia
+        "TR" to "112/155/110",    // Turkey
+        "SA" to "999/997/998",    // Saudi Arabia
+        "AE" to "999/998/997",    // United Arab Emirates
+        "IL" to "100/101/102",    // Israel
+        "FR" to "112/15/17/18",   // France
+        "DE" to "112/110",        // Germany
+        "NL" to "112",            // Netherlands
+        "BE" to "112",            // Belgium
+        "LU" to "112",            // Luxembourg
+        "CH" to "112/117/118",    // Switzerland
+        "ES" to "112",            // Spain
+        "PT" to "112",            // Portugal
+        "IT" to "112/118/113",    // Italy
+        "SE" to "112",            // Sweden
+        "NO" to "112/110/113",    // Norway
+        "DK" to "112",            // Denmark
+        "FI" to "112",            // Finland
+        "PL" to "112/997",        // Poland
+        "GR" to "112/100/166",    // Greece
+        "CZ" to "112/155/158",    // Czech Republic
+        "HU" to "112/104/107",    // Hungary
+        "RO" to "112",            // Romania
+        "BG" to "112/150/166",    // Bulgaria
+        "UA" to "112/101/102"     // Ukraine
     )
 
     // Apply locale before onCreate()
