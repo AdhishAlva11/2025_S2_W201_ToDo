@@ -48,7 +48,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         // --- Supported languages ---
-        val displayLanguages = arrayOf("English", "Hindi", "Chinese")
+        val displayLanguages = arrayOf("English", "Hindi (हिन्दी)", "Chinese (中文)")
         val languageCodes = arrayOf("en", "hi", "zh")
 
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, displayLanguages)
@@ -107,7 +107,7 @@ class SettingsActivity : AppCompatActivity() {
         applicationContext.createConfigurationContext(config)
     }
 
-    // --- Restarts entire app so all screens (Profile, Home, etc.) update language ---
+    // --- Restarts entire app so all screens (Profile, Home, etc) update language ---
     private fun restartApp() {
         val intent = baseContext.packageManager.getLaunchIntentForPackage(baseContext.packageName)
         intent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
