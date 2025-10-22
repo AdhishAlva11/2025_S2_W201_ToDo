@@ -67,6 +67,14 @@ Login → Search Activities → View on Map → Add to Favourites → Create Iti
   - Create multi-day plans and mark each activity as completed.
 
 ---
+## How to Use
+1. Launch the app and **sign in** using Email or Google.  
+2. **Search** for a country or city to explore nearby activities.  
+3. Tap any **map marker** to view details or save it to your **Favourites** or **Itinerary**.  
+4. Open the **Itinerary** tab to view your saved plans and mark activities as completed.  
+5. Visit the **Profile** page to upload a profile photo and view your local emergency contact.  
+6. Customize your experience by changing the **theme** or **language** in the **Settings** screen.  
+---
 
 ## Tech Stack  
 
@@ -83,7 +91,7 @@ Login → Search Activities → View on Map → Add to Favourites → Create Iti
 
 ---
 
-## ⚙️ Setup & Installation  
+## Setup & Installation  
 
 ### Prerequisites  
 - Android Studio (latest version)  
@@ -104,7 +112,7 @@ Login → Search Activities → View on Map → Add to Favourites → Create Iti
 – Firebase services (Auth, Firestore, Storage) are linked via google-services.json.
 – The app is ready to run immediately after cloning.
 ---
-**API Integration Overview**
+## API Integration Overview
 | API                               | Purpose                                |
 | --------------------------------- | -------------------------------------- |
 | **Google Maps SDK**               | Displays interactive maps and markers. |
@@ -114,6 +122,12 @@ Login → Search Activities → View on Map → Add to Favourites → Create Iti
 | **Firebase Database / Firestore** | Stores itineraries and favourites.     |
 | **Firebase Storage**              | Saves profile images.                  |
 
+---
+## Version Info
+- **Version:** 1.0.0  
+- **Minimum SDK:** 29 (Android 10)  
+- **Target SDK:** 34 (Android 14)  
+- **Compatible Devices:** Android phones & tablets  
 ---
 ## Scrum & Project Management  
 
