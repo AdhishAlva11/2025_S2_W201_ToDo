@@ -99,8 +99,8 @@ Login → Search Activities → View on Map → Add to Favourites → Create Iti
 - Firebase project (with Authentication and Firestore enabled)
 
 ### Steps  
-1. **Clone the repository:**  
-     git clone https://github.com/<your-username>/todo-travel-app.git
+1. **Clone the repository.**  
+
 2. **Open in Android Studio**
    Go to File → Open → select the cloned folder.
 3. **Sync Gradle**
